@@ -1,0 +1,22 @@
+tool,modality,percentage,count,cell_label,cell_id
+azimuth,sc_transcriptomics,0.046053959,9590.049692,B,http://purl.obolibrary.org/obo/CL_0000236
+azimuth,sc_transcriptomics,0.004569582,951.54727,Mast,http://purl.obolibrary.org/obo/CL_0000097
+azimuth,sc_transcriptomics,0.004430262,922.536049,Adipocyte,http://purl.obolibrary.org/obo/CL_0000136
+azimuth,sc_transcriptomics,0.399251708,83138.21038,Ventricular Cardiomycoyte,http://purl.obolibrary.org/obo/CL_0002131
+azimuth,sc_transcriptomics,0.02934233,6110.102338,Arterial Endothelial,http://purl.obolibrary.org/obo/CL_1000413
+azimuth,sc_transcriptomics,2.82965E-05,5.892314,ILC,http://purl.obolibrary.org/obo/CL_0001065
+azimuth,sc_transcriptomics,0.230034211,47901.19187,Fibroblast,http://purl.obolibrary.org/obo/CL_0000057
+azimuth,sc_transcriptomics,0.022457997,4676.542677,Monocyte/cDC,http://purl.obolibrary.org/obo/CL_0011031
+azimuth,sc_transcriptomics,0.002150927,447.898434,Lymphatic Endothelial,http://purl.obolibrary.org/obo/CL_0002138
+azimuth,sc_transcriptomics,0.021280332,4431.311675,Macrophage,http://purl.obolibrary.org/obo/CL_0000235
+azimuth,sc_transcriptomics,0.017613114,3667.668106,Smooth Muscle,http://purl.obolibrary.org/obo/CL_0000192
+azimuth,sc_transcriptomics,0.001613378,335.961829,Atrial Cardiomyocyte,http://purl.obolibrary.org/obo/CL_0002129
+azimuth,sc_transcriptomics,0.009713768,2022.747225,T,http://purl.obolibrary.org/obo/CL_0000084
+azimuth,sc_transcriptomics,0.009697804,2019.422905,NK,http://purl.obolibrary.org/obo/CL_0000623
+azimuth,sc_transcriptomics,0.094840052,19749.02564,Capillary Endothelial,http://purl.obolibrary.org/obo/CL_0002144
+azimuth,sc_transcriptomics,0.00931074,1938.822761,Venous Endothelial,http://purl.obolibrary.org/obo/CL_1000414
+azimuth,sc_transcriptomics,8.85785E-05,18.445148,Endothelial,http://purl.obolibrary.org/obo/CL_0000115
+azimuth,sc_transcriptomics,0.082223709,17121.8604,Pericyte,http://purl.obolibrary.org/obo/CL_0000669
+azimuth,sc_transcriptomics,0.005258899,1095.087338,Endocardial,http://purl.obolibrary.org/obo/CL_0002350
+azimuth,sc_transcriptomics,0.005035602,1048.58887,Mesothelial,http://purl.obolibrary.org/obo/CL_0000077
+azimuth,sc_transcriptomics,0.005004751,1042.164685,Neuronal,http://purl.obolibrary.org/obo/CL_0002573
