@@ -1,0 +1,65 @@
+#+ summary: Lung ctann cell summaries
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ccf: <http://purl.org/ccf/>
+PREFIX ASCTB-TEMP: <https://purl.org/ccf/ASCTB-TEMP_>
+PREFIX CL: <http://purl.obolibrary.org/obo/CL_>
+PREFIX FMA: <http://purl.org/sig/ont/fma/fma>
+PREFIX UBERON: <http://purl.obolibrary.org/obo/UBERON_>
+PREFIX HRA: <https://purl.humanatlas.io/collection/hra-api>
+PREFIX HRApop: <https://purl.humanatlas.io/graph/hra-pop>
+PREFIX uberon: <https://purl.humanatlas.io/vocab/uberon>
+
+SELECT DISTINCT ?organ_label ?as_label ?cell_label ?sex ?modality ?tool ?organ_id ?as_id ?cell_id ?count ?percentage_of_total
+FROM HRApop:
+FROM HRA:
+FROM uberon:
+WHERE {
+
+  # Get all AS cell summaries
+  ?as_iri ccf:has_cell_summary [
+    ccf:sex ?sex ;
+    ccf:cell_annotation_method ?tool ;
+    ccf:modality ?modality ;
+    ccf:has_cell_summary_row [
+      ccf:cell_id ?cell_iri ;
+      ccf:cell_label ?cell_summary_label ;
+      ccf:cell_count ?count_value ;
+      ccf:percentage_of_total ?percentage_of_total_value ;
+    ]
+  ] .
+  FILTER(STRSTARTS(STR(?as_iri), STR(UBERON:)))
+
+  # Find organs the AS occur in
+  ?refOrgan a ccf:SpatialEntity ;
+    ccf:has_reference_organ ?refOrgan ;
+    ccf:representation_of ?organ_iri .
+  
+  [] a ccf:SpatialEntity ;
+      ccf:has_reference_organ ?refOrgan ;
+      ccf:representation_of ?as_iri .
+
+  # Format Organ ID and label
+  BIND(REPLACE(REPLACE(STR(?organ_iri), STR(UBERON:), 'UBERON:'), STR(FMA:), 'FMA:') as ?organ_id)
+  ?organ_iri rdfs:label ?organ_label_value .
+  BIND(REPLACE(?organ_label_value, 'Set of lactiferous glands in ', '') as ?organ_label)
+
+  # Format AS ID and label
+  BIND(REPLACE(STR(?as_iri), STR(UBERON:), 'UBERON:') as ?as_id)
+  ?as_iri rdfs:label ?as_label .
+
+  # Format Cell ID and label
+  OPTIONAL {
+    ?cell_iri rdfs:label ?cell_rdfs_label .
+  }
+  BIND(REPLACE(REPLACE(STR(?cell_iri), STR(CL:), 'CL:'), STR(ASCTB-TEMP:), 'ASCTB-TEMP:') as ?cell_id)
+  BIND(COALESCE(?cell_rdfs_label, ?cell_summary_label) as ?cell_label)
+
+  # Format count and percentage
+  BIND(xsd:decimal(?count_value) as ?count)
+  BIND(xsd:decimal(?percentage_of_total_value) as ?percentage_of_total)
+}
+ORDER BY ?organ_label ?tool ?count
