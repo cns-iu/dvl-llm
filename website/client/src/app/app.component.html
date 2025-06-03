@@ -1,0 +1,20 @@
+<mat-toolbar color="primary">
+  <img
+    src="https://cdn.humanatlas.io/ui/dashboard-ui/assets/logo/hra-logo-2.svg"
+    height="40"
+    style="margin-right: 16px"
+  />
+  <span>Data Visualization Literacy Framework</span>
+</mat-toolbar>
+
+<mat-tab-group
+  [selectedIndex]="selectedIndex"
+  (selectedIndexChange)="onTabChange($event)"
+>
+  <mat-tab label="Acquire"></mat-tab>
+  <mat-tab label="Analyze"></mat-tab>
+  <mat-tab label="Visualize"></mat-tab>
+  <mat-tab label="Deploy"></mat-tab>
+</mat-tab-group>
+
+<router-outlet></router-outlet>

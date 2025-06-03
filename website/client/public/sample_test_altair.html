@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #vis {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .vega-embed {
+      flex: 1;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="vis">
+    
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.20.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300, "stroke": null}}, "data": {"name": "data-2a0352850c171f1dfbe7f63d367ca820"}, "mark": {"type": "line", "point": true}, "encoding": {"color": {"field": "group", "title": "Group", "type": "nominal"}, "opacity": {"condition": {"param": "param_1", "value": 1}, "value": 0.15}, "tooltip": [{"field": "group", "type": "nominal"}, {"field": "date", "type": "temporal"}, {"field": "cumulative_count", "type": "quantitative"}], "x": {"field": "date", "title": "Date", "type": "temporal"}, "y": {"field": "cumulative_count", "title": "Cumulative Count", "type": "quantitative"}}, "height": "container", "params": [{"name": "param_1", "select": {"type": "point", "fields": ["group"]}, "bind": "legend"}], "width": "container", "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-2a0352850c171f1dfbe7f63d367ca820": [{"group": "2D FTU illustrations", "date": "2022-05-06T00:00:00", "count": 8, "order": 9, "cumulative_count": 8}, {"group": "2D FTU illustrations", "date": "2022-12-15T00:00:00", "count": 11, "order": 9, "cumulative_count": 19}, {"group": "2D FTU illustrations", "date": "2023-06-15T00:00:00", "count": 2, "order": 9, "cumulative_count": 21}, {"group": "2D FTU illustrations", "date": "2023-12-15T00:00:00", "count": 1, "order": 9, "cumulative_count": 22}, {"group": "2D FTU illustrations", "date": "2024-06-15T00:00:00", "count": 0, "order": 9, "cumulative_count": 22}, {"group": "2D FTU illustrations", "date": "2024-12-15T00:00:00", "count": 0, "order": 9, "cumulative_count": 22}, {"group": "OMAPs", "date": "2021-12-01T00:00:00", "count": 1, "order": 8, "cumulative_count": 1}, {"group": "OMAPs", "date": "2022-05-06T00:00:00", "count": 6, "order": 8, "cumulative_count": 7}, {"group": "OMAPs", "date": "2022-12-15T00:00:00", "count": 0, "order": 8, "cumulative_count": 7}, {"group": "OMAPs", "date": "2023-06-15T00:00:00", "count": 6, "order": 8, "cumulative_count": 13}, {"group": "OMAPs", "date": "2023-12-15T00:00:00", "count": 0, "order": 8, "cumulative_count": 13}, {"group": "OMAPs", "date": "2024-06-15T00:00:00", "count": 8, "order": 8, "cumulative_count": 21}, {"group": "OMAPs", "date": "2024-12-15T00:00:00", "count": 0, "order": 8, "cumulative_count": 21}, {"group": "SOPs", "date": "2022-02-02T00:00:00", "count": 1, "order": 10, "cumulative_count": 1}, {"group": "SOPs", "date": "2022-06-09T00:00:00", "count": 3, "order": 10, "cumulative_count": 4}, {"group": "SOPs", "date": "2022-06-23T00:00:00", "count": 1, "order": 10, "cumulative_count": 5}, {"group": "SOPs", "date": "2022-11-30T00:00:00", "count": 3, "order": 10, "cumulative_count": 8}, {"group": "SOPs", "date": "2022-12-01T00:00:00", "count": 2, "order": 10, "cumulative_count": 10}, {"group": "SOPs", "date": "2022-12-07T00:00:00", "count": 1, "order": 10, "cumulative_count": 11}, {"group": "SOPs", "date": "2022-12-09T00:00:00", "count": 1, "order": 10, "cumulative_count": 12}, {"group": "SOPs", "date": "2023-01-27T00:00:00", "count": 1, "order": 10, "cumulative_count": 13}, {"group": "SOPs", "date": "2023-05-05T00:00:00", "count": 1, "order": 10, "cumulative_count": 14}, {"group": "SOPs", "date": "2023-10-18T00:00:00", "count": 1, "order": 10, "cumulative_count": 15}, {"group": "SOPs", "date": "2023-12-11T00:00:00", "count": 1, "order": 10, "cumulative_count": 16}, {"group": "SOPs", "date": "2023-12-13T00:00:00", "count": 1, "order": 10, "cumulative_count": 17}, {"group": "SOPs", "date": "2024-06-12T00:00:00", "count": 6, "order": 10, "cumulative_count": 23}, {"group": "SOPs", "date": "2024-12-10T00:00:00", "count": 5, "order": 10, "cumulative_count": 28}, {"group": "anatomical structures", "date": "2021-03-12T00:00:00", "count": 1357, "order": 5, "cumulative_count": 1357}, {"group": "anatomical structures", "date": "2021-12-01T00:00:00", "count": 1154, "order": 5, "cumulative_count": 2511}, {"group": "anatomical structures", "date": "2022-05-06T00:00:00", "count": 107, "order": 5, "cumulative_count": 2618}, {"group": "anatomical structures", "date": "2022-12-15T00:00:00", "count": 78, "order": 5, "cumulative_count": 2696}, {"group": "anatomical structures", "date": "2023-06-15T00:00:00", "count": 1573, "order": 5, "cumulative_count": 4269}, {"group": "anatomical structures", "date": "2023-12-15T00:00:00", "count": 226, "order": 5, "cumulative_count": 4495}, {"group": "anatomical structures", "date": "2024-06-15T00:00:00", "count": 164, "order": 5, "cumulative_count": 4659}, {"group": "anatomical structures", "date": "2024-12-15T00:00:00", "count": 35, "order": 5, "cumulative_count": 4694}, {"group": "biomarkers", "date": "2021-03-12T00:00:00", "count": 1255, "order": 7, "cumulative_count": 1255}, {"group": "biomarkers", "date": "2021-12-01T00:00:00", "count": 254, "order": 7, "cumulative_count": 1509}, {"group": "biomarkers", "date": "2022-05-06T00:00:00", "count": 13, "order": 7, "cumulative_count": 1522}, {"group": "biomarkers", "date": "2022-12-15T00:00:00", "count": -93, "order": 7, "cumulative_count": 1429}, {"group": "biomarkers", "date": "2023-06-15T00:00:00", "count": 566, "order": 7, "cumulative_count": 1995}, {"group": "biomarkers", "date": "2023-12-15T00:00:00", "count": 15, "order": 7, "cumulative_count": 2010}, {"group": "biomarkers", "date": "2024-06-15T00:00:00", "count": 14, "order": 7, "cumulative_count": 2024}, {"group": "biomarkers", "date": "2024-12-15T00:00:00", "count": -6, "order": 7, "cumulative_count": 2018}, {"group": "cell types", "date": "2021-03-12T00:00:00", "count": 511, "order": 6, "cumulative_count": 511}, {"group": "cell types", "date": "2021-12-01T00:00:00", "count": 215, "order": 6, "cumulative_count": 726}, {"group": "cell types", "date": "2022-05-06T00:00:00", "count": 9, "order": 6, "cumulative_count": 735}, {"group": "cell types", "date": "2022-12-15T00:00:00", "count": -33, "order": 6, "cumulative_count": 702}, {"group": "cell types", "date": "2023-06-15T00:00:00", "count": 510, "order": 6, "cumulative_count": 1212}, {"group": "cell types", "date": "2023-12-15T00:00:00", "count": -23, "order": 6, "cumulative_count": 1189}, {"group": "cell types", "date": "2024-06-15T00:00:00", "count": 118, "order": 6, "cumulative_count": 1307}, {"group": "cell types", "date": "2024-12-15T00:00:00", "count": -19, "order": 6, "cumulative_count": 1288}, {"group": "experts", "date": "2019-04-24T00:00:00", "count": 1, "order": 2, "cumulative_count": 1}, {"group": "experts", "date": "2019-07-30T00:00:00", "count": 1, "order": 2, "cumulative_count": 2}, {"group": "experts", "date": "2020-01-01T00:00:00", "count": 2, "order": 2, "cumulative_count": 4}, {"group": "experts", "date": "2021-03-12T00:00:00", "count": 32, "order": 2, "cumulative_count": 36}, {"group": "experts", "date": "2021-05-06T00:00:00", "count": 16, "order": 2, "cumulative_count": 52}, {"group": "experts", "date": "2021-07-28T00:00:00", "count": 1, "order": 2, "cumulative_count": 53}, {"group": "experts", "date": "2021-12-01T00:00:00", "count": 48, "order": 2, "cumulative_count": 101}, {"group": "experts", "date": "2021-12-15T00:00:00", "count": 2, "order": 2, "cumulative_count": 103}, {"group": "experts", "date": "2022-05-06T00:00:00", "count": 23, "order": 2, "cumulative_count": 126}, {"group": "experts", "date": "2022-12-15T00:00:00", "count": 9, "order": 2, "cumulative_count": 135}, {"group": "experts", "date": "2023-06-15T00:00:00", "count": 21, "order": 2, "cumulative_count": 156}, {"group": "experts", "date": "2023-08-18T00:00:00", "count": 1, "order": 2, "cumulative_count": 157}, {"group": "experts", "date": "2023-12-01T00:00:00", "count": 6, "order": 2, "cumulative_count": 163}, {"group": "experts", "date": "2023-12-05T00:00:00", "count": 1, "order": 2, "cumulative_count": 164}, {"group": "experts", "date": "2023-12-15T00:00:00", "count": 8, "order": 2, "cumulative_count": 172}, {"group": "experts", "date": "2024-06-15T00:00:00", "count": 16, "order": 2, "cumulative_count": 188}, {"group": "experts", "date": "2024-08-07T00:00:00", "count": 1, "order": 2, "cumulative_count": 189}, {"group": "experts", "date": "2024-11-23T00:00:00", "count": 1, "order": 2, "cumulative_count": 190}, {"group": "organs", "date": "2021-03-12T00:00:00", "count": 26, "order": 4, "cumulative_count": 26}, {"group": "organs", "date": "2021-12-01T00:00:00", "count": 22, "order": 4, "cumulative_count": 48}, {"group": "organs", "date": "2022-05-06T00:00:00", "count": 5, "order": 4, "cumulative_count": 53}, {"group": "organs", "date": "2022-12-15T00:00:00", "count": 2, "order": 4, "cumulative_count": 55}, {"group": "organs", "date": "2023-06-15T00:00:00", "count": 11, "order": 4, "cumulative_count": 66}, {"group": "organs", "date": "2023-12-15T00:00:00", "count": 0, "order": 4, "cumulative_count": 66}, {"group": "organs", "date": "2024-06-15T00:00:00", "count": 1, "order": 4, "cumulative_count": 67}, {"group": "organs", "date": "2024-12-15T00:00:00", "count": 6, "order": 4, "cumulative_count": 73}]}};
+      var embedOpt = {"actions": false, "renderer": "canvas", "responsive": true, "mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+  </div>
+</body>
+</html>

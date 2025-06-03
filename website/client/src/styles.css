@@ -1,0 +1,31 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+/* Default font for all non-code text */
+body,
+button,
+select,
+input,
+textarea,
+.dropdown,
+.refine-header,
+.refine-subheader,
+.refine-button {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+}
+
+/* Font for code editor and code blocks */
+.ace_editor,
+code,
+pre {
+  font-family: "Roboto Mono", monospace !important;
+  font-weight: 400 !important;
+}
