@@ -8,12 +8,15 @@ import {
   HostListener,
   OnInit,
 } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
+
 import { FormsModule } from '@angular/forms';
 import { AceEditorModule } from 'ngx-ace-editor-wrapper';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
+import { VisualizeService } from './visualize.service';
 
 @Component({
   selector: 'app-visualize',
@@ -21,6 +24,15 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [CommonModule, FormsModule, AceEditorModule, HttpClientModule],
   templateUrl: './visualize.component.html',
   styleUrl: './visualize.component.css',
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-out', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [animate('300ms ease-in', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
 export class VisualizeComponent implements AfterViewInit, OnInit {
   models = ['Deepseek - R1', 'llama-4-scout'];
@@ -159,6 +171,9 @@ google.charts.setOnLoadCallback(() => {
   // Flag to determine if we're in column layout (vertical dragging) or row layout (horizontal dragging)
   private isColumnLayout = false;
 
+  // Track previous state to handle toggle behavior correctly
+  private wasCodeVisible = true;
+
   @ViewChild('leftPane') leftPane!: ElementRef;
   @ViewChild('rightPane') rightPane!: ElementRef;
   @ViewChild('splitPane') splitPane!: ElementRef;
@@ -188,12 +203,12 @@ google.charts.setOnLoadCallback(() => {
     private renderer: Renderer2,
     private el: ElementRef,
     private ngZone: NgZone,
-    private http: HttpClient
+    private visualizeService: VisualizeService
   ) {
     this.selectLibrary(this.selectedLibrary);
   }
 
-  // Get visualization type icon class based on type
+  // Helper methods for visualization type
   getVisualizationTypeIcon(type: string): string {
     switch (type) {
       case 'interactive':
@@ -207,7 +222,6 @@ google.charts.setOnLoadCallback(() => {
     }
   }
 
-  // Get visualization type tooltip text
   getVisualizationTypeTooltip(type: string): string {
     switch (type) {
       case 'interactive':
@@ -221,7 +235,6 @@ google.charts.setOnLoadCallback(() => {
     }
   }
 
-  // Helper method to safely get the selected library's type
   getSelectedLibraryType(): string {
     const selectedLib = this.libraries.find(
       (lib) => lib.name === this.selectedLibrary
@@ -332,8 +345,38 @@ google.charts.setOnLoadCallback(() => {
   }
 
   toggleCode() {
-    this.isCodeVisible = !this.isCodeVisible;
+    // If code is currently hidden and we're toggling it, show it
+    if (!this.isCodeVisible) {
+      this.isCodeVisible = true;
 
+      // Apply transition class to animate the change
+      const splitPane = this.el.nativeElement.querySelector('.split-pane');
+      if (splitPane) {
+        this.renderer.addClass(splitPane, 'transitioning');
+
+        // Remove the class after transition completes
+        setTimeout(() => {
+          this.renderer.removeClass(splitPane, 'transitioning');
+        }, 500); // Match this with the CSS transition duration
+      }
+    } else {
+      // If code is visible, hide it
+      this.wasCodeVisible = true; // Remember that code was visible
+      this.isCodeVisible = false;
+
+      // Apply transition class to animate the change
+      const splitPane = this.el.nativeElement.querySelector('.split-pane');
+      if (splitPane) {
+        this.renderer.addClass(splitPane, 'transitioning');
+
+        // Remove the class after transition completes
+        setTimeout(() => {
+          this.renderer.removeClass(splitPane, 'transitioning');
+        }, 500); // Match this with the CSS transition duration
+      }
+    }
+
+    // Ensure at least one pane is visible
     if (!this.isVisualizationVisible && !this.isCodeVisible) {
       this.isVisualizationVisible = true;
     }
@@ -351,7 +394,9 @@ google.charts.setOnLoadCallback(() => {
     if (!leftPane || !rightPane || !splitPane) return;
 
     if (this.isVisualizationVisible && this.isCodeVisible) {
+      // Both panes visible - restore original sizes
       this.renderer.addClass(splitPane, 'both-visible');
+      this.renderer.removeClass(splitPane, 'single-pane');
 
       if (this.isColumnLayout) {
         this.renderer.setStyle(
@@ -401,24 +446,54 @@ google.charts.setOnLoadCallback(() => {
 
       this.renderer.removeClass(leftPane, 'hidden');
       this.renderer.removeClass(rightPane, 'hidden');
+      this.renderer.removeClass(leftPane, 'fullscreen');
+      this.renderer.removeClass(rightPane, 'fullscreen');
     } else if (this.isVisualizationVisible && !this.isCodeVisible) {
+      // Only visualization visible - make it fullscreen
       this.renderer.removeClass(splitPane, 'both-visible');
+      this.renderer.addClass(splitPane, 'single-pane');
       this.renderer.removeClass(leftPane, 'hidden');
       this.renderer.addClass(rightPane, 'hidden');
+      this.renderer.addClass(leftPane, 'fullscreen');
+      this.renderer.removeClass(rightPane, 'fullscreen');
 
-      if (this.isColumnLayout) {
-        this.renderer.setStyle(leftPane, 'flex', '1 1 100%');
-        this.renderer.setStyle(leftPane, 'width', '100%');
-        this.renderer.setStyle(leftPane, 'height', '100%');
-      } else {
-        this.renderer.setStyle(leftPane, 'flex', '1 1 100%');
-        this.renderer.setStyle(leftPane, 'width', '100%');
-        this.renderer.setStyle(leftPane, 'height', '100%');
+      // Set explicit styles for fullscreen
+      this.renderer.setStyle(leftPane, 'flex', '1 1 auto');
+      this.renderer.setStyle(leftPane, 'width', '100%');
+      this.renderer.setStyle(leftPane, 'height', '100%');
+      this.renderer.setStyle(leftPane, 'max-width', '100%');
+      this.renderer.setStyle(leftPane, 'max-height', '100%');
+
+      // Force iframe to expand if present
+      const iframe = leftPane.nativeElement.querySelector('iframe');
+      if (iframe) {
+        this.renderer.setStyle(iframe, 'width', '100%');
+        this.renderer.setStyle(iframe, 'height', '100%');
+      }
+
+      // Force visualization container to expand
+      const visualContainer = leftPane.nativeElement.querySelector(
+        '.visualization-container'
+      );
+      if (visualContainer) {
+        this.renderer.setStyle(visualContainer, 'width', '100%');
+        this.renderer.setStyle(visualContainer, 'height', '100%');
       }
     } else if (!this.isVisualizationVisible && this.isCodeVisible) {
+      // Only code visible
       this.renderer.removeClass(splitPane, 'both-visible');
+      this.renderer.addClass(splitPane, 'single-pane');
       this.renderer.removeClass(rightPane, 'hidden');
       this.renderer.addClass(leftPane, 'hidden');
+      this.renderer.removeClass(leftPane, 'fullscreen');
+      this.renderer.addClass(rightPane, 'fullscreen');
+
+      // Make code editor fullscreen
+      this.renderer.setStyle(rightPane, 'flex', '1 1 auto');
+      this.renderer.setStyle(rightPane, 'width', '100%');
+      this.renderer.setStyle(rightPane, 'height', '100%');
+      this.renderer.setStyle(rightPane, 'max-width', '100%');
+      this.renderer.setStyle(rightPane, 'max-height', '100%');
     }
 
     this.ensureProperSizing();
@@ -887,6 +962,11 @@ google.charts.setOnLoadCallback(() => {
   }
 
   applyRefinement() {
-    console.log('Refinement applied:', this.refineText);
+    if (!this.refineText.trim()) return;
+    this.visualizeService
+      .refineVisulization(this.refineText)
+      .subscribe((res: string) => {
+        this.visualSrc = res;
+      });
   }
 }

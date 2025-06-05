@@ -93,6 +93,7 @@
       class="left-pane"
       #leftPane
       [ngClass]="{ hidden: !isVisualizationVisible }"
+      [@fadeInOut]="isCodeVisible"
     >
       <!-- Standardized visualization container with scrollable iframe -->
       <div class="visualization-container" #visualizationContainer>
@@ -151,7 +152,12 @@
     ></div>
 
     <!-- Right pane with code editor -->
-    <div class="right-pane" #rightPane [ngClass]="{ hidden: !isCodeVisible }">
+    <div
+      class="right-pane"
+      #rightPane
+      [ngClass]="{ hidden: !isCodeVisible }"
+      [@fadeInOut]="isCodeVisible"
+    >
       <!-- Code editor action buttons -->
       <div class="button-container">
         <!-- Copy button -->
