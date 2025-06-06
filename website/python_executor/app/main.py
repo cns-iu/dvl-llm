@@ -49,6 +49,7 @@ def execute_code(req: CodeRequest):
         if result.returncode == 0 and os.path.exists(output_file):
             return {
                 "status": "success",
+                "code":req.code,
                 "output_html_path": output_file
             }
         else:
