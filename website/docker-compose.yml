@@ -1,13 +1,16 @@
 #version: "3.8"
 
 services:
+  frontend:
+    build: ./client
+    ports:
+      - "4200:80"
   python-executor:
     build: ./python_executor
     ports:
       - "5001:5001"
     volumes:
       - ./data:/app/data
-
   backend:
     build: ./server
     ports:

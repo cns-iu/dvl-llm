@@ -37,6 +37,17 @@
       <label for="dvl-checkbox">DVL</label>
     </div>
 
+    <!-- Generate Visualization button styled like Submit button -->
+
+    <button
+      class="refine-button"
+      (click)="generateVisualization()"
+      [disabled]="isGenerating"
+    >
+      <span *ngIf="!isGenerating">Generate Visualization</span>
+      <span *ngIf="isGenerating">Generating...</span>
+    </button>
+
     <!-- Toggle for visualization pane -->
     <button
       class="toggle-button visualization-toggle"
@@ -95,11 +106,13 @@
       [ngClass]="{ hidden: !isVisualizationVisible }"
       [@fadeInOut]="isCodeVisible"
     >
-      <!-- Standardized visualization container with scrollable iframe -->
       <div class="visualization-container" #visualizationContainer>
-        <!-- Download button for visualization -->
         <div class="download-container">
-          <button class="download-button" title="Download visualization">
+          <button
+            class="download-button"
+            title="Download visualization"
+            (click)="downloadVisualization()"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -114,10 +127,6 @@
               <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
           </button>
-          <div class="download-options">
-            <button class="download-option">HTML</button>
-            <button class="download-option">PNG</button>
-          </div>
         </div>
 
         <div class="iframe-wrapper scrollable">
@@ -161,7 +170,11 @@
       <!-- Code editor action buttons -->
       <div class="button-container">
         <!-- Copy button -->
-        <button class="action-button copy-button" title="Copy code">
+        <button
+          class="action-button copy-button"
+          title="Copy code"
+          (click)="copyCode()"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -179,7 +192,11 @@
         </button>
 
         <!-- Revert button -->
-        <button class="action-button revert-button" title="Revert code">
+        <button
+          class="action-button revert-button"
+          title="Revert code"
+          (click)="revertCode()"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"

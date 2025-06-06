@@ -696,3 +696,58 @@ img.visualization-image {
 .split-pane {
   transition: all 0.5s ease-in-out !important;
 }
+
+/* Updated styles for the Generate Visualization button to match the Submit button */
+
+/* Update the Generate Visualization button to match the Submit button style */
+.generate-button {
+  background-color: #ff0043; /* Red color like the Submit button */
+  color: white;
+  border: none;
+  border-radius: 8px; /* Rounded corners like the Submit button */
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.generate-button:hover {
+  background-color: #e00039; /* Slightly darker shade when hovering */
+}
+
+.generate-button:disabled {
+  background-color: #ffb3c2; /* Lighter shade when disabled */
+  cursor: not-allowed;
+}
+
+/* Make the dropdown container flex to accommodate the button and checkbox */
+.dropdown-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+
+/* DVL Checkbox styling is already in your CSS */
+
+@media (max-width: 768px) {
+  .dropdown-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button-container {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .generate-button {
+    width: 100%;
+  }
+
+  .dvl-checkbox-container {
+    margin: 10px 0;
+  }
+}

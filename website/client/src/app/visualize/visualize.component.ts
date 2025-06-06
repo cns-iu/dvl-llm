@@ -43,13 +43,11 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
   originalCodeText: string = '';
   isCodeModified: boolean = false;
 
+  isGenerating: boolean = false;
+
+  isDVL: boolean = false;
+
   libraries = [
-    // {
-    //   name: 'Plotly',
-    //   language: 'Python',
-    //   code: `import plotly.express as px\nimport pandas as pd\n\ndata = {\n  "country": ["USA", "BRA", "IND", "CHN", "RUS"],\n  "value": [75, 62, 88, 54, 91]\n}\ndf = pd.DataFrame(data)\nfig = px.choropleth(df, locations="country", color="value")\nfig.show()`,
-    //   jsonPath: '/test_sample.html',
-    // },
     {
       name: 'altair',
       language: 'Python',
@@ -92,12 +90,6 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
       jsonPath: '/html_plotnine_us1.html',
       type: 'non-interactive',
     },
-    // {
-    //   name: 'plotly.graph_objects',
-    //   language: 'Python',
-    //   code: `import altair as alt\nimport pandas as pd\n\ndata = pd.DataFrame({\n  'x': ['A', 'B', 'C', 'D'],\n  'y': [5, 3, 6, 7]\n})\nchart = alt.Chart(data).mark_bar().encode(x='x', y='y')\nchart.show()`,
-    //   jsonPath: '/html_go_us1.html',
-    // },
     {
       name: 'chartify',
       language: 'Python',
@@ -131,13 +123,6 @@ google.charts.setOnLoadCallback(() => {
       jsonPath: '/us1_js_1.html',
       type: 'static',
     },
-    // {
-    //   name: 'matplotlib',
-    //   language: 'Python',
-    //   code: `import matplotlib.pyplot as plt\nimport numpy as np\n\nx = np.array(['A', 'B', 'C', 'D'])\ny = np.array([5, 3, 6, 7])\n\nplt.bar(x, y)\nplt.show()`,
-    //   jsonPath: '/png_matplotlib_us1.png',
-    //   type: 'non-interactive',
-    // },
   ];
 
   filteredLibraries = this.libraries.filter(
@@ -149,29 +134,24 @@ google.charts.setOnLoadCallback(() => {
   visualSrc: SafeResourceUrl = '';
   isDragging = false;
 
-  // Track mouse button state to prevent unwanted dragging
   isMouseDown = false;
 
-  // Overlay for capturing events during drag
   showDragOverlay = false;
 
-  // Property for refine feature
   refineText: string = '';
 
-  // Toggle visibility state for visualization and code panes
   isVisualizationVisible = true;
   isCodeVisible = true;
 
-  // Store original pane sizes for restoration
+  shouldDisplayVisualization = false;
+
   private originalLeftPaneSize = '60%';
   private originalRightPaneSize = '40%';
   private originalTopPaneSize = '60%';
   private originalBottomPaneSize = '40%';
 
-  // Flag to determine if we're in column layout (vertical dragging) or row layout (horizontal dragging)
   private isColumnLayout = false;
 
-  // Track previous state to handle toggle behavior correctly
   private wasCodeVisible = true;
 
   @ViewChild('leftPane') leftPane!: ElementRef;
@@ -183,13 +163,11 @@ google.charts.setOnLoadCallback(() => {
   @ViewChild('visualizationContainer') visualizationContainer!: ElementRef;
   @ViewChild('visualImage') visualImage!: ElementRef<HTMLImageElement>;
 
-  // Store event listener removal functions
   private mouseMoveListener: (() => void) | null = null;
   private mouseUpListener: (() => void) | null = null;
   private touchMoveListener: (() => void) | null = null;
   private touchEndListener: (() => void) | null = null;
 
-  // Initial values for drag operation
   private initialX = 0;
   private initialY = 0;
   private initialLeftWidth = 0;
@@ -203,12 +181,12 @@ google.charts.setOnLoadCallback(() => {
     private renderer: Renderer2,
     private el: ElementRef,
     private ngZone: NgZone,
-    private visualizeService: VisualizeService
+    private visualizeService: VisualizeService,
+    private http: HttpClient
   ) {
-    this.selectLibrary(this.selectedLibrary);
+    this.codeText = '';
   }
 
-  // Helper methods for visualization type
   getVisualizationTypeIcon(type: string): string {
     switch (type) {
       case 'interactive':
@@ -242,28 +220,20 @@ google.charts.setOnLoadCallback(() => {
     return selectedLib ? selectedLib.type : '';
   }
 
-  ngOnInit() {
-    // Initialize iframe source
-    this.updateIframeSource();
-  }
+  ngOnInit() {}
 
   ngAfterViewInit() {
-    // Initialize proper sizing after view is initialized
     this.ensureProperSizing();
 
-    // Add event listeners for dropdown animations
     this.enhanceDropdowns();
 
-    // Check if we're in column layout
     this.checkLayoutMode();
 
-    // Listen for window resize events
     window.addEventListener('resize', () => {
       this.ensureProperSizing();
       this.checkLayoutMode();
     });
 
-    // Add touch event listeners for mobile support
     const dragBar = this.el.nativeElement.querySelector('.drag-bar-vertical');
     if (dragBar) {
       this.renderer.listen(dragBar, 'touchstart', (e: TouchEvent) => {
@@ -272,8 +242,6 @@ google.charts.setOnLoadCallback(() => {
     }
 
     this.setInitialPaneSizes();
-
-    this.updateIframeSource();
 
     setTimeout(() => {
       this.updateLayoutBasedOnVisibility();
@@ -345,38 +313,31 @@ google.charts.setOnLoadCallback(() => {
   }
 
   toggleCode() {
-    // If code is currently hidden and we're toggling it, show it
     if (!this.isCodeVisible) {
       this.isCodeVisible = true;
 
-      // Apply transition class to animate the change
       const splitPane = this.el.nativeElement.querySelector('.split-pane');
       if (splitPane) {
         this.renderer.addClass(splitPane, 'transitioning');
 
-        // Remove the class after transition completes
         setTimeout(() => {
           this.renderer.removeClass(splitPane, 'transitioning');
-        }, 500); // Match this with the CSS transition duration
+        }, 500);
       }
     } else {
-      // If code is visible, hide it
-      this.wasCodeVisible = true; // Remember that code was visible
+      this.wasCodeVisible = true;
       this.isCodeVisible = false;
 
-      // Apply transition class to animate the change
       const splitPane = this.el.nativeElement.querySelector('.split-pane');
       if (splitPane) {
         this.renderer.addClass(splitPane, 'transitioning');
 
-        // Remove the class after transition completes
         setTimeout(() => {
           this.renderer.removeClass(splitPane, 'transitioning');
-        }, 500); // Match this with the CSS transition duration
+        }, 500);
       }
     }
 
-    // Ensure at least one pane is visible
     if (!this.isVisualizationVisible && !this.isCodeVisible) {
       this.isVisualizationVisible = true;
     }
@@ -394,7 +355,6 @@ google.charts.setOnLoadCallback(() => {
     if (!leftPane || !rightPane || !splitPane) return;
 
     if (this.isVisualizationVisible && this.isCodeVisible) {
-      // Both panes visible - restore original sizes
       this.renderer.addClass(splitPane, 'both-visible');
       this.renderer.removeClass(splitPane, 'single-pane');
 
@@ -457,46 +417,31 @@ google.charts.setOnLoadCallback(() => {
       this.renderer.addClass(leftPane, 'fullscreen');
       this.renderer.removeClass(rightPane, 'fullscreen');
 
-      // Set explicit styles for fullscreen
       this.renderer.setStyle(leftPane, 'flex', '1 1 auto');
       this.renderer.setStyle(leftPane, 'width', '100%');
       this.renderer.setStyle(leftPane, 'height', '100%');
       this.renderer.setStyle(leftPane, 'max-width', '100%');
       this.renderer.setStyle(leftPane, 'max-height', '100%');
 
-      // Force iframe to expand if present
-      const iframe = leftPane.nativeElement.querySelector('iframe');
+      const iframe = leftPane.querySelector('iframe');
       if (iframe) {
         this.renderer.setStyle(iframe, 'width', '100%');
         this.renderer.setStyle(iframe, 'height', '100%');
       }
-
-      // Force visualization container to expand
-      const visualContainer = leftPane.nativeElement.querySelector(
-        '.visualization-container'
-      );
-      if (visualContainer) {
-        this.renderer.setStyle(visualContainer, 'width', '100%');
-        this.renderer.setStyle(visualContainer, 'height', '100%');
-      }
     } else if (!this.isVisualizationVisible && this.isCodeVisible) {
-      // Only code visible
       this.renderer.removeClass(splitPane, 'both-visible');
       this.renderer.addClass(splitPane, 'single-pane');
-      this.renderer.removeClass(rightPane, 'hidden');
       this.renderer.addClass(leftPane, 'hidden');
+      this.renderer.removeClass(rightPane, 'hidden');
       this.renderer.removeClass(leftPane, 'fullscreen');
       this.renderer.addClass(rightPane, 'fullscreen');
 
-      // Make code editor fullscreen
       this.renderer.setStyle(rightPane, 'flex', '1 1 auto');
       this.renderer.setStyle(rightPane, 'width', '100%');
       this.renderer.setStyle(rightPane, 'height', '100%');
       this.renderer.setStyle(rightPane, 'max-width', '100%');
       this.renderer.setStyle(rightPane, 'max-height', '100%');
     }
-
-    this.ensureProperSizing();
   }
 
   private setInitialPaneSizes() {
@@ -569,44 +514,82 @@ google.charts.setOnLoadCallback(() => {
     }
   }
 
-  private updateIframeSource() {
-    const selected = this.libraries.find(
-      (lib) => lib.name === this.selectedLibrary
-    );
+  generateVisualization() {
+    if (this.selectedModel && this.selectedLanguage && this.selectedLibrary) {
+      this.isGenerating = true;
 
-    if (selected) {
-      const path = selected.jsonPath;
-      this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(path);
-      this.codeText = selected.code;
-      this.refineText = '';
+      this.shouldDisplayVisualization = true;
 
-      const isPng = path.endsWith('.png');
+      const selected = this.libraries.find(
+        (lib) => lib.name === this.selectedLibrary
+      );
 
-      setTimeout(() => {
-        const wrapper = this.el.nativeElement.querySelector('.iframe-wrapper');
-        if (wrapper) {
-          this.renderer.addClass(wrapper, 'scrollable');
-        }
+      if (selected) {
+        this.refineText = '';
 
-        if (isPng && this.visualImage) {
-          const img = this.visualImage.nativeElement;
-          this.renderer.setStyle(img, 'width', '100%');
-          this.renderer.setStyle(img, 'height', '100%');
-          this.renderer.setStyle(img, 'object-fit', 'contain');
-          this.renderer.setStyle(img, 'max-width', '100%');
-          this.renderer.setStyle(img, 'max-height', '100%');
-          this.renderer.setStyle(img, 'display', 'block');
-        } else if (
-          !isPng &&
-          this.visualFrame &&
-          this.visualFrame.nativeElement
-        ) {
-          const iframe = this.visualFrame.nativeElement;
-          this.renderer.setStyle(iframe, 'width', '100%');
-          this.renderer.setStyle(iframe, 'height', '100%');
-          this.renderer.setStyle(iframe, 'border', 'none');
-        }
-      }, 300);
+        const payload = {
+          model: this.selectedModel,
+          language: this.selectedLanguage,
+          library: this.selectedLibrary,
+          isDVL: this.isDVL,
+        };
+
+        // console.log(payload);
+
+        this.visualizeService.generateVisulization(payload).subscribe(
+          (response) => {
+            this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+              response.url
+            );
+
+            this.codeText = response.code;
+
+            const key = 'originalCode';
+            if (!localStorage.getItem(key)) {
+              localStorage.setItem(key, response.code);
+            }
+
+            setTimeout(() => {
+              const wrapper =
+                this.el.nativeElement.querySelector('.iframe-wrapper');
+              if (wrapper) {
+                this.renderer.addClass(wrapper, 'scrollable');
+              }
+
+              const isPng = response.url.endsWith('.png');
+
+              if (isPng && this.visualImage) {
+                const img = this.visualImage.nativeElement;
+                this.renderer.setStyle(img, 'width', '100%');
+                this.renderer.setStyle(img, 'height', '100%');
+                this.renderer.setStyle(img, 'object-fit', 'contain');
+                this.renderer.setStyle(img, 'max-width', '100%');
+                this.renderer.setStyle(img, 'max-height', '100%');
+                this.renderer.setStyle(img, 'display', 'block');
+              } else if (
+                !isPng &&
+                this.visualFrame &&
+                this.visualFrame.nativeElement
+              ) {
+                const iframe = this.visualFrame.nativeElement;
+                this.renderer.setStyle(iframe, 'width', '100%');
+                this.renderer.setStyle(iframe, 'height', '100%');
+                this.renderer.setStyle(iframe, 'border', 'none');
+              }
+
+              this.isGenerating = false;
+            }, 300);
+          },
+          (error) => {
+            console.error('Error generating visualization:', error);
+            this.isGenerating = false;
+          }
+        );
+      }
+    } else {
+      this.shouldDisplayVisualization = false;
+      this.visualSrc = '';
+      this.isGenerating = false;
     }
   }
 
@@ -624,9 +607,6 @@ google.charts.setOnLoadCallback(() => {
 
   selectLibrary(libName: string) {
     this.selectedLibrary = libName;
-
-    this.updateIframeSource();
-
     this.animateDropdownChange();
   }
 
@@ -963,10 +943,63 @@ google.charts.setOnLoadCallback(() => {
 
   applyRefinement() {
     if (!this.refineText.trim()) return;
-    this.visualizeService
-      .refineVisulization(this.refineText)
-      .subscribe((res: string) => {
-        this.visualSrc = res;
-      });
+
+    this.isGenerating = true;
+
+    this.visualizeService.refineVisulization(this.refineText).subscribe(
+      (response) => {
+        this.visualSrc =
+          this.sanitizer.bypassSecurityTrustResourceUrl(response);
+        this.isGenerating = false;
+      },
+      (error) => {
+        console.error('Error refining visualization:', error);
+        this.isGenerating = false;
+      }
+    );
+  }
+
+  copyCode() {
+    if (!this.codeText) return;
+
+    navigator.clipboard.writeText(this.codeText).then(
+      () => {
+        console.log('Code copied to clipboard!');
+      },
+      (err) => {
+        console.error('Failed to copy code:', err);
+      }
+    );
+  }
+
+  revertCode() {
+    const originalCode = localStorage.getItem('originalCode');
+    if (originalCode) {
+      this.codeText = originalCode;
+      this.isCodeModified = false;
+      console.log('Code reverted to original.');
+    } else {
+      console.warn('Original code not found.');
+    }
+  }
+
+  downloadVisualization() {
+    if (!this.visualSrc) return;
+
+    const url = this.visualSrc.toString();
+    const fileName = url.split('/').pop() || 'visualization';
+
+    this.http.get(url, { responseType: 'blob' }).subscribe(
+      (blob) => {
+        const a = document.createElement('a');
+        a.href = window.URL.createObjectURL(blob);
+        a.download = fileName;
+        a.click();
+        window.URL.revokeObjectURL(a.href);
+      },
+      (error) => {
+        console.error('Download failed:', error);
+      }
+    );
   }
 }
