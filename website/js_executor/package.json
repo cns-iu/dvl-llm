@@ -1,0 +1,25 @@
+{
+  "name": "js-executor",
+  "version": "1.0.0",
+  "description": "Microservice to execute JavaScript visualization code and return output HTML",
+  "main": "app/main.js",
+  "scripts": {
+    "start": "node app/main.js"
+  },
+  "dependencies": {
+  "chart.js": "^4.4.1",
+  "d3": "^7.9.0",
+  "ejs": "^3.1.9",
+  "echarts": "^5.5.0",
+  "express": "^4.18.2",
+  "google-charts": "^1.1.0",
+  "highcharts": "^11.4.2",
+  "plotly.js-dist": "^2.31.1",
+  "uuid": "^9.0.1",
+  "vega": "^5.25.0",
+  "vega-embed": "^6.22.3",
+  "vega-lite": "^5.17.0"
+},
+  "author": "Your Name",
+  "license": "MIT"
+}

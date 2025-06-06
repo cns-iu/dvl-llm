@@ -1,0 +1,26 @@
+#version: "3.8"
+
+services:
+   python-executor:
+     build: ./python_executor
+     ports:
+       - "5001:5001"
+     volumes:
+       - ./data:/app/data
+
+#  r-executor:
+#    build: ./r_executor
+##    platform: linux/arm64  # <-- CRITICAL for M1/M2/M3 Macs
+#    ports:
+#      - "5002:5002"
+#    volumes:
+#      - ./data:/app/data
+
+#  js-executor:
+#    build: ./js_executor
+#    ports:
+#      - "5003:5003"
+#    volumes:
+#      - ./data:/app/data
+
+

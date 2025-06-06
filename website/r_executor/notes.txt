@@ -1,0 +1,37 @@
+to do:
+1. add security measures
+
+example success output:
+{
+    "status": [
+        "success"
+    ],
+    "exit_code": [
+        0
+    ],
+    "stdout": [
+        ""
+    ],
+    "stderr": [
+        "Loading required package: zoo\n\nAttaching package: ‘zoo’\n\nThe following objects are masked from ‘package:base’:\n\n    as.Date, as.Date.numeric"
+    ],
+    "output_html_path": [
+        "/app/data/output/dygraph_plot.html"
+    ]
+}
+
+example error output:
+{
+    "status": [
+        "error"
+    ],
+    "exit_code": [
+        1
+    ],
+    "stdout": [
+        ""
+    ],
+    "stderr": [
+        "Loading required package: zoo\n\nAttaching package: ‘zoo’\n\nThe following objects are masked from ‘package:base’:\n\n    as.Date, as.Date.numeric\n\nError: unexpected symbol in \" values <- c(5, 6, 7adfad\"\nExecution halted"
+    ]
+}

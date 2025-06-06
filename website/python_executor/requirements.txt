@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+
+# Visualization libraries
+matplotlib
+seaborn
+plotly
+altair
+bokeh
+holoviews
+pygal
+plotnine
+plotext
