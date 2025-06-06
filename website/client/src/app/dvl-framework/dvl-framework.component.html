@@ -1,1 +1,303 @@
-<p>dvl-framework works!</p>
+<div class="visualize-wrapper">
+  <!-- Top controls with model and language selection -->
+
+  <!-- Carousel for visualization libraries -->
+  <div class="carousel-container">
+    <!-- Left navigation arrow -->
+    <div
+      class="carousel-arrow left"
+      (click)="scrollCarousel('left')"
+      [ngClass]="{ disabled: isAtStart }"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </div>
+
+    <!-- Carousel track with visualization cards -->
+    <div class="carousel-track" #carouselTrack>
+      <div
+        *ngFor="let lib of filteredLibraries"
+        class="viz-card"
+        [ngClass]="{ selected: selectedLibrary === lib.name }"
+        (click)="selectLibrary(lib.name)"
+      >
+        <div class="viz-card-content">
+          <div class="viz-card-title">{{ lib.name }}</div>
+          <div class="viz-type-icon">
+            <i
+              [class]="getVisualizationTypeIcon(lib.type)"
+              [title]="getVisualizationTypeTooltip(lib.type)"
+            ></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right navigation arrow -->
+    <div
+      class="carousel-arrow right"
+      (click)="scrollCarousel('right')"
+      [ngClass]="{ disabled: isAtEnd }"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </div>
+
+    <!-- Use Visualization button -->
+    <button
+      class="use-viz-button"
+      (click)="generateVisualization()"
+      [disabled]="isGenerating"
+    >
+      <span *ngIf="!isGenerating">Use Visualization</span>
+      <span *ngIf="isGenerating">Loading...</span>
+    </button>
+  </div>
+
+  <!-- Improved split pane with fixed height alignment -->
+  <div
+    class="split-pane"
+    #splitPane
+    [ngClass]="{ 'both-visible': isVisualizationVisible && isCodeVisible }"
+  >
+    <!-- Left pane with visualization -->
+    <div
+      class="left-pane"
+      #leftPane
+      [ngClass]="{ hidden: !isVisualizationVisible }"
+    >
+      <div class="visualization-container" #visualizationContainer>
+        <div class="download-container">
+          <button
+            class="download-button"
+            title="Download visualization"
+            (click)="downloadVisualization()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="iframe-wrapper scrollable">
+          <!-- Conditionally render iframe or img -->
+          <ng-container *ngIf="selectedLibrary && visualSrc">
+            <iframe
+              *ngIf="!visualSrc.toString().endsWith('.png')"
+              #visualFrame
+              class="visual-frame"
+              [src]="visualSrc"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+
+            <img
+              #visualImage
+              *ngIf="visualSrc.toString().endsWith('.png')"
+              class="image-frame"
+              [src]="visualSrc"
+              alt="PNG visualization"
+            />
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="drag-bar-vertical"
+      (mousedown)="startDragging($event)"
+      (touchstart)="startTouchDragging($event)"
+      *ngIf="isVisualizationVisible && isCodeVisible"
+    ></div>
+
+    <!-- Right pane with code editor -->
+    <div class="right-pane" #rightPane [ngClass]="{ hidden: !isCodeVisible }">
+      <!-- Code editor action buttons -->
+      <div class="button-container">
+        <!-- Copy button -->
+        <button
+          class="action-button copy-button"
+          title="Copy code"
+          (click)="copyCode()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path
+              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+            ></path>
+          </svg>
+        </button>
+        <div class="copied-message" *ngIf="copiedMessageShown">Copied!</div>
+
+        <!-- Revert button -->
+        <button
+          class="action-button revert-button"
+          title="Revert code"
+          (click)="revertCode()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M1 4v6h6"></path>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+        </button>
+      </div>
+
+      <ace-editor
+        [(text)]="codeText"
+        [mode]="selectedLanguage.toLowerCase()"
+        [theme]="'monokai'"
+        style="width: 100%; height: 100%"
+        [readOnly]="false"
+      ></ace-editor>
+    </div>
+
+    <!-- Overlay div to capture events during dragging -->
+    <div *ngIf="showDragOverlay" class="drag-overlay" #dragOverlay></div>
+  </div>
+
+  <!-- Toggle buttons for visualization and code panes -->
+  <div class="toggle-buttons">
+    <button
+      class="toggle-button visualization-toggle"
+      (click)="toggleVisualization()"
+      [title]="
+        isVisualizationVisible ? 'Hide Visualization' : 'Show Visualization'
+      "
+      aria-label="Toggle visualization visibility"
+    >
+      <span class="eye-icon">
+        <svg
+          *ngIf="isVisualizationVisible"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+
+        <svg
+          *ngIf="!isVisualizationVisible"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94"
+          ></path>
+          <path
+            d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"
+          ></path>
+          <path d="M10.88 10.88a3 3 0 0 0 4.24 4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+      </span>
+    </button>
+
+    <button
+      class="toggle-button code-toggle"
+      (click)="toggleCode()"
+      [title]="isCodeVisible ? 'Hide Code' : 'Show Code'"
+      aria-label="Toggle code visibility"
+    >
+      <span class="eye-icon">
+        <svg
+          *ngIf="isCodeVisible"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+
+        <svg
+          *ngIf="!isCodeVisible"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94"
+          ></path>
+          <path
+            d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"
+          ></path>
+          <path d="M10.88 10.88a3 3 0 0 0 4.24 4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+      </span>
+    </button>
+  </div>
+
+  <!-- Refine feature at the bottom -->
+  <div class="refine-section">
+    <h2 class="refine-header">Refine</h2>
+    <textarea
+      class="refine-input"
+      [(ngModel)]="refineText"
+      placeholder="Enter natural language instructions to refine your visualization..."
+    ></textarea>
+    <button class="refine-button" (click)="applyRefinement()">Submit</button>
+  </div>
+</div>

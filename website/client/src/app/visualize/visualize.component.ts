@@ -409,7 +409,6 @@ google.charts.setOnLoadCallback(() => {
       this.renderer.removeClass(leftPane, 'fullscreen');
       this.renderer.removeClass(rightPane, 'fullscreen');
     } else if (this.isVisualizationVisible && !this.isCodeVisible) {
-      // Only visualization visible - make it fullscreen
       this.renderer.removeClass(splitPane, 'both-visible');
       this.renderer.addClass(splitPane, 'single-pane');
       this.renderer.removeClass(leftPane, 'hidden');
@@ -529,12 +528,12 @@ google.charts.setOnLoadCallback(() => {
 
         const payload = {
           model: this.selectedModel,
-          language: this.selectedLanguage,
+          language: this.selectedLanguage.toLowerCase(),
           library: this.selectedLibrary,
           isDVL: this.isDVL,
         };
 
-        // console.log(payload);
+        console.log(payload);
 
         this.visualizeService.generateVisulization(payload).subscribe(
           (response) => {
@@ -959,12 +958,17 @@ google.charts.setOnLoadCallback(() => {
     );
   }
 
+  copiedMessageShown = false;
+
   copyCode() {
     if (!this.codeText) return;
 
     navigator.clipboard.writeText(this.codeText).then(
       () => {
-        console.log('Code copied to clipboard!');
+        this.copiedMessageShown = true;
+        setTimeout(() => {
+          this.copiedMessageShown = false;
+        }, 2000);
       },
       (err) => {
         console.error('Failed to copy code:', err);

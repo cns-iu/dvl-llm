@@ -751,3 +751,30 @@ img.visualization-image {
     margin: 10px 0;
   }
 }
+
+.copy-button-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.copied-message {
+  font-size: 12px;
+  color: green;
+  margin-top: 4px;
+  opacity: 1;
+  animation: fadeOut 1.5s forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
