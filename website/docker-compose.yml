@@ -1,13 +1,23 @@
 #version: "3.8"
 
 services:
-   python-executor:
-     build: ./python_executor
-     ports:
-       - "5001:5001"
-     volumes:
-       - ./data:/app/data
+  python-executor:
+    build: ./python_executor
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./data:/app/data
 
+  backend:
+    build: ./server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - python-executor
+    environment:
+      - PYTHONUNBUFFERED=1
 #  r-executor:
 #    build: ./r_executor
 ##    platform: linux/arm64  # <-- CRITICAL for M1/M2/M3 Macs
@@ -22,5 +32,4 @@ services:
 #      - "5003:5003"
 #    volumes:
 #      - ./data:/app/data
-
 

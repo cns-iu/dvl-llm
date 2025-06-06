@@ -3,3 +3,6 @@ uvicorn[standard]
 python-dotenv
 httpx
 matplotlib
+requests
+langchain
+langchain-openai

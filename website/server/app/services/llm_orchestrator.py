@@ -19,7 +19,7 @@ def generate_and_execute(
 ):
     # 1. Init LLM
     factory = LLMFactory(
-        default_jetstream_api_key='sk-80c0448d6e224899a92668cc7e250c55',
+        default_jetstream_api_key='',
         # default_openai_api_key='your_openai_key_here_if_needed'
         default_google_api_key=''
     )
@@ -63,7 +63,8 @@ def generate_and_execute(
     # 4. Route to correct executor (only Python for now)
     if execution_env.lower() == "python":
         response = requests.post(
-            "http://localhost:5001/execute",
+            # "http://localhost:5001/execute",
+            "http://python-executor:5001/execute",
             json={"code": code, "filename_prefix": filename_prefix}
         )
     else:
