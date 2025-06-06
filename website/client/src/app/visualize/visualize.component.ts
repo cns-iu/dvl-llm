@@ -528,9 +528,9 @@ google.charts.setOnLoadCallback(() => {
         this.refineText = '';
 
         const payload = {
-          model: this.selectedModel,
-          language: this.selectedLanguage,
-          library: this.selectedLibrary,
+          model: 'DeepSeek-R1',
+          language: this.selectedLanguage.toLowerCase(),
+          library: 'plotly',
           isDVL: this.isDVL,
         };
 
