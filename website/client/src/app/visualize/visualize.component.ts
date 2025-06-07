@@ -35,7 +35,7 @@ import { VisualizeService } from './visualize.service';
   ],
 })
 export class VisualizeComponent implements AfterViewInit, OnInit {
-  models = ['Deepseek - R1', 'llama-4-scout'];
+  models = ['DeepSeek-R1', 'llama-4-scout'];
   selectedModel = this.models[0];
 
   languages = ['Python', 'R', 'JavaScript'];
@@ -538,14 +538,17 @@ google.charts.setOnLoadCallback(() => {
         this.visualizeService.generateVisulization(payload).subscribe(
           (response) => {
             this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
-              response.url
+              `http://localhost:8000${response.output_path}`
             );
 
+            console.log(response.output_path);
+
             this.codeText = response.code;
+            console.log(this.codeText);
 
             const key = 'originalCode';
             if (!localStorage.getItem(key)) {
-              localStorage.setItem(key, response.code);
+              localStorage.setItem(key, this.codeText);
             }
 
             setTimeout(() => {
@@ -555,7 +558,7 @@ google.charts.setOnLoadCallback(() => {
                 this.renderer.addClass(wrapper, 'scrollable');
               }
 
-              const isPng = response.url.endsWith('.png');
+              const isPng = response.output_path.endsWith('.png');
 
               if (isPng && this.visualImage) {
                 const img = this.visualImage.nativeElement;
@@ -990,20 +993,23 @@ google.charts.setOnLoadCallback(() => {
   downloadVisualization() {
     if (!this.visualSrc) return;
 
-    const url = this.visualSrc.toString();
-    const fileName = url.split('/').pop() || 'visualization';
+    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+      this.visualSrc.toString()
+    );
+    const blobUrl = (safeUrl as any).changingThisBreaksApplicationSecurity;
 
-    this.http.get(url, { responseType: 'blob' }).subscribe(
-      (blob) => {
+    fetch(blobUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const fileName = 'visualization.html';
         const a = document.createElement('a');
-        a.href = window.URL.createObjectURL(blob);
+        a.href = URL.createObjectURL(blob);
         a.download = fileName;
         a.click();
-        window.URL.revokeObjectURL(a.href);
-      },
-      (error) => {
+        URL.revokeObjectURL(a.href);
+      })
+      .catch((error) => {
         console.error('Download failed:', error);
-      }
-    );
+      });
   }
 }

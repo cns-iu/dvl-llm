@@ -10,14 +10,14 @@ interface GenerateRequest {
 }
 
 interface GenerateResponse {
-  url: string;
+  output_path: string;
   code: string;
 }
 @Injectable({
   providedIn: 'root',
 })
 export class VisualizeService {
-  private baseUrl = 'http://localhost:3000';
+  private baseUrl = 'http://localhost:8000/api';
   constructor(private http: HttpClient) {}
 
   generateVisulization(payload: GenerateRequest): Observable<GenerateResponse> {
