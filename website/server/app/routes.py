@@ -29,7 +29,7 @@ def generate(req: GenerateRequest):
 
 @router.get("/download/{filename}", tags=["generate"])
 def download_visualization(filename: str):
-    file_path = f"/code/data/static-output/{filename}"  
+    file_path = f"/code/data/output/{filename}.html" 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(file_path, filename=filename, media_type='text/html')

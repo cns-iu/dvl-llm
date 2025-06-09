@@ -19,7 +19,7 @@ def generate_and_execute(
 ):
     # 1. Init LLM
     factory = LLMFactory(
-        default_jetstream_api_key='sk-d124b81a3ead4cbd95b77249ca755831',
+        default_jetstream_api_key='',
         # default_openai_api_key='your_openai_key_here_if_needed'
         default_google_api_key=''
     )

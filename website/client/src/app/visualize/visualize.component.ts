@@ -7,6 +7,7 @@ import {
   NgZone,
   HostListener,
   OnInit,
+  booleanAttribute,
 } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 
@@ -175,6 +176,7 @@ google.charts.setOnLoadCallback(() => {
   private totalWidth = 0;
   private totalHeight = 0;
   private dragBar: HTMLElement | null = null;
+  generatedFilename: string | null = null;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -537,14 +539,15 @@ google.charts.setOnLoadCallback(() => {
 
         this.visualizeService.generateVisulization(payload).subscribe(
           (response) => {
+            const fullPath = response.output_path;
+            this.generatedFilename =
+              fullPath.split('/').pop()?.replace('.html', '') || 'test';
+
             this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
               `http://localhost:8000${response.output_path}`
             );
 
-            console.log(response.output_path);
-
             this.codeText = response.code;
-            console.log(this.codeText);
 
             const key = 'originalCode';
             if (!localStorage.getItem(key)) {
@@ -991,25 +994,31 @@ google.charts.setOnLoadCallback(() => {
   }
 
   downloadVisualization() {
-    if (!this.visualSrc) return;
+    if (!this.generatedFilename) {
+      console.warn('No file to download.');
+      return;
+    }
 
-    const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-      this.visualSrc.toString()
-    );
-    const blobUrl = (safeUrl as any).changingThisBreaksApplicationSecurity;
-
-    fetch(blobUrl)
-      .then((response) => response.blob())
-      .then((blob) => {
-        const fileName = 'visualization.html';
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(a.href);
-      })
-      .catch((error) => {
-        console.error('Download failed:', error);
-      });
+    this.visualizeService
+      .downloadVisualization(this.generatedFilename)
+      .subscribe(
+        (blob) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const htmlText = reader.result as string;
+            const finalBlob = new Blob([htmlText], { type: 'text/html' });
+            const url = URL.createObjectURL(finalBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${this.generatedFilename}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+          };
+          reader.readAsText(blob);
+        },
+        (error) => {
+          console.error('Download failed:', error);
+        }
+      );
   }
 }

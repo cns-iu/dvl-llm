@@ -31,4 +31,9 @@ export class VisualizeService {
     const payload = { refine: refineText };
     return this.http.post<string>(`${this.baseUrl}/refine`, payload);
   }
+
+  downloadVisualization(filename: string): Observable<Blob> {
+    const url = `${this.baseUrl}/download/${filename}`;
+    return this.http.get(url, { responseType: 'blob' });
+  }
 }
