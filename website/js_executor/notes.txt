@@ -1,9 +1,0 @@
-to do:
-1. how to check for empty pages
-2. implement security issues
-
-example success response:
-{
-    "status": "success",
-    "output_html_path": "/app/data/output/js_output_7e7a9bb2.html"
-}

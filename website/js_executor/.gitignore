@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+
+# Output HTML files
+output/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# IDE/editor junk
+.vscode/
+.DS_Store

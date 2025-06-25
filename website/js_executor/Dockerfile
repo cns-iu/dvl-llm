@@ -1,20 +1,21 @@
-# Use Node.js base image
-FROM node:20
+# Use official Node.js LTS image
+FROM node:18-alpine
 
-# Set working directory inside container
-WORKDIR /app
+# Create app directory
+WORKDIR /usr/src/app
 
-# Copy dependency definitions
-COPY package.json ./
-
-# Install dependencies
+# Copy package files and install dependencies
+COPY package*.json ./
 RUN npm install
 
-# Copy rest of the application (e.g., app/main.js, templates, etc.)
+# Copy the entire app source
 COPY . .
 
-# Expose port for service
+# Create output folder and make it writable
+# RUN mkdir -p output && chmod -R 777 output
+
+# Expose the port (adjust if needed)
 EXPOSE 5003
 
-# Run the service
-CMD ["node", "app/main.js"]
+# Start the server
+CMD ["npm", "start"]
