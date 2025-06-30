@@ -7,7 +7,8 @@ import os
 # app = FastAPI(title="LLM-to-Viz API")
 
 app = FastAPI(
-    title="LLM-to-Viz API",
+    # title="LLM-to-Viz API",
+    title="DVL - LLM Visualization API",
     docs_url="/",      # serve Swagger UI at "/"
     redoc_url=None     # disable ReDoc 
 )
@@ -20,6 +21,13 @@ app.mount(
     StaticFiles(directory=output_dir),
     name="static-output"
 )
+
+# app.mount(
+#     "/static-output",
+#     StaticFiles(directory="/code/data/Visualizations"),
+#     name="static-output"
+# )
+
 
 # Allow Angular dev server (localhost:4200) to call this API during development
 app.add_middleware(

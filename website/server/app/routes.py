@@ -1,22 +1,39 @@
 import httpx
-from fastapi import APIRouter, HTTPException
-from app.models import GenerateRequest, GenerateResponse
+from fastapi import APIRouter, HTTPException, Query  
+from app.models import GenerateRequest, GenerateResponse, UserStoryResponse
+from app.models import RefineRequest, RefineResponse
 from app.services.llm_client import get_plot_code
 from app.services.code_runner import run_python
 from app.services.llm_orchestrator import generate_and_execute
+from app.userstories import user_stories
 from fastapi.responses import FileResponse
+from typing import List
 import os
+import pandas as pd
 
 router = APIRouter(prefix="/api", tags=["generate"])
 
 @router.post("/generate", response_model=GenerateResponse)
 def generate(req: GenerateRequest):
+    """
+    Generates visualization code based on the provided prompt using the selected LLM, language, and charting library.
+
+    - **model**: Name of the LLM to use (e.g., DeepSeek-R1)
+    - **language**: Programming language in which the code should be generated
+    - **library**: Charting library to use (e.g., Plotly, Matplotlib, Altair)
+    - **isDVL**: Set to true if using DVL framework constraints
+
+    This endpoint returns the generated code and a path to the rendered visualization output.
+    
+    Example Input:
+    `{
+    "model_name": "DeepSeek-R1",
+    "language": "python",
+    "library": "plotly",
+    "isDVL": true
+    }`
+    """
     try:
-        
-#         model_name="DeepSeek-R1",
-#         execution_env="python",
-#         library="plotly",
-#         filename_prefix=f"test"
         result = generate_and_execute(provider="jetstream",model_name=req.model,execution_env=req.language,library=req.library,filename_prefix=f"test")
         code = result["code"]
         output_file = result["output_html_path"]
@@ -27,112 +44,138 @@ def generate(req: GenerateRequest):
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
-@router.get("/download/{filename}", tags=["generate"])
+@router.get("/download/{filename}")
 def download_visualization(filename: str):
+
+    """
+    Returns a generated visualization HTML file for download.
+
+    This endpoint allows clients to retrieve a previously generated file,
+    identified by its filename, and serves it with appropriate headers to trigger download.
+
+    - **filename**: Name of the file (without `.html` extension)
+
+    Note: This is typically used after calling the `/generate` endpoint,
+    where the file path is returned for both rendering the visualization.
+    """
+    # """
+    # Returns a generated visualization HTML file for download.
+
+    # This endpoint is used when a user clicks "Download" in the frontend after generating a visualization.
+
+    # - **filename**: Name of the file (without `.html` extension)
+
+    # The file is retrieved from the directory and returned with the appropriate headers
+    # so it can be downloaded by the browser.
+
+    # """
+    # Note: The same file may be previewed via an iframe using the `output_path` from the `/generate` endpoint,
+    # but this endpoint ensures it is downloaded.
     file_path = f"/code/data/output/{filename}.html" 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(file_path, filename=filename, media_type='text/html')
 
-# @router.post("/generate", response_model=GenerateResponse)
-# async def generate(req: GenerateRequest):
-#     try:
-        
-# #         model_name="DeepSeek-R1",
-# #         execution_env="python",
-# #         library="plotly",
-# #         filename_prefix=f"test"
-#         result = await generate_and_execute(provider="jetstream",model_name=req.model,execution_env=req.language,library=req.library,filename_prefix=f"test")
-#         code = result["code"]
-#         output_path = result["output_html_path"]
-#         # image_b64 = run_python(code)
-#         return GenerateResponse(code=code, output_path=output_path)
-#     except Exception as exc:
-#         raise HTTPException(status_code=500, detail=str(exc))
+# After mvp0
 
-# @router.post("/generate", response_model=GenerateResponse)
-# async def generate(req: GenerateRequest):
-#     try:
-#         code = await get_plot_code(req.model,req.language,req.library)
-#         image_b64 = run_python(code)
-#         return GenerateResponse(code=code, image_b64=image_b64)
-#     except Exception as exc:
-#         raise HTTPException(status_code=500, detail=str(exc))
+
+@router.get("/userstories", response_model=List[UserStoryResponse])
+def get_userstories():
+    """
+    Returns a list of all defined user stories along with their metadata.
+
+    Each user story object includes:
+    - id : Unique identifier of the user story.
+    - userstory : User story Name (e.g., HRA Growth over time).
+    - description : Short textual description of the user story.
+    - viz_Types: List of supported or recommended visualization types.
+
+    This endpoint is typically used to populate selection menus,
+    provide contextual information about available user stories.
+
+    """
+    # Response:
+    #     200 OK: List[UserStoryResponse]
+    return user_stories
+
+# to use the data folder in website works only after creating a image
+# DATA_DIR = "/code/data"
+# INPUT_DIR = os.path.join(DATA_DIR, "input")
+# CSV_PATH = os.path.join(INPUT_DIR, "dvl-llm-1-hra-growth-over-time.csv")
+
+# data in server folder
+CSV_PATH = os.path.join(os.path.dirname(__file__), "..","serverdata", "input", "dvl-llm-1-hra-growth-over-time.csv.")
+@router.get("/csv/top", summary="Get top N rows from user story data")
+def get_top_rows(n: int = Query(5, gt=0, le=100)):
+    """
+
+    Retrieve the top `n` rows from the user stories metadata CSV file.
+
+    - n (int): Number of rows to return.
+
+    Returns a list of dictionaries, where each dictionary represents a row from the CSV file.
+
+    This endpoint is typically used to preview sample data before full ingestion or visualization.
+    """
+    # GET /csv/top
+    # Raises:
+    # - 404 Not Found: If the CSV file does not exist at the expected path.
+    # - 500 Internal Server Error: If an error occurs while reading or parsing the CSV.
+    # """
+    # Fetch top n rows from the CSV file.
+    # """
+    if not os.path.exists(CSV_PATH):
+        raise HTTPException(status_code=404, detail="CSV file not found")
+
+    try:
+        df = pd.read_csv(CSV_PATH)
+        top_rows = df.head(n)
+        return top_rows.to_dict(orient="records")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/refine", response_model=RefineResponse, summary="Refine an existing visualization")
+async def refine_visualization(req: RefineRequest):
+    """
+    Refine an existing visualization based on a user-provided refinement prompt.
+
+    Request Body:
+    - `user_story_id`: ID of the user story to which the original visualization belongs.
+    - `language`: The programming language used (e.g., Python).
+    - `library`: The visualization library used (e.g., matplotlib).
+    - `original_code`: The original code that generated the visualization.
+    - `refinement_prompt`: A natural language instruction describing how to modify the visualization.
+
+    Returns:
+    - `updated_code`: Modified version of the original code.
+    - `output_path`:  path of the refined visualization.
+
+    Example Input:
+    `{
+    "user_story_id": 1,
+    "language": "python",
+    "library": "plotly",
+    "original_code": "import .... ",
+    "refinement_prompt": "change colors ... "
+    }`
+
+    """
+
+    # `refinement_prompt`: A natural language instruction describing how to modify the visualization.
+    # Raises:
+    # - 400 Bad Request: If the refinement cannot be processed.
+    # - 500 Internal Server Error: For any other processing errors.
+    try:
+        # === Placeholder logic ===
+        # call LLM 
+        # updated_code = req.original_code + f"\n# Refined with: {req.refinement_prompt}"
+        # output_path = run_python(updated_code)  # assuming you have a safe sandboxed runner
+
+        return RefineResponse(
+            updated_code=req.refinement_prompt,
+            output_path="/app/code/ref/viz1.html"
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Refinement failed: {str(e)}")
     
-
-# @router.post("/generate", response_model=GenerateResponse)
-# async def generate(req: GenerateRequest):
-#     try:
-#         # 1. Generate code from LLM
-#         code = await get_plot_code(req.model, req.language, req.library)
-
-#         # 3. POST only the code to that runner
-#         async with httpx.AsyncClient() as client:
-#             response = await client.post(
-#                 "http://127.0.0.1:8001/execute",
-#                 json={"code": code}
-#             )
-#             response.raise_for_status()
-#             payload = response.json()
-#             image_b64 = payload.get("output")
-#             if not image_b64:
-#                 raise HTTPException(
-#                     status_code=500,
-#                     detail="Runner service did not return an 'output' field"
-#                 )
-
-#         # 4. Return both the code and the runner’s output
-#         return GenerateResponse(code=code, image_b64=image_b64)
-
-#     except httpx.HTTPStatusError as http_exc:
-#         # Runner returns a 4xx/5xx
-#         raise HTTPException(status_code=502, detail=f"Runner error: {http_exc.response.text}")
-#     except HTTPException:
-#         raise
-#     except Exception as exc:
-#         raise HTTPException(status_code=500, detail=str(exc))
-
-# import httpx
-# from fastapi import HTTPException
-
-# @router.post("/generate", response_model=GenerateResponse)
-# async def generate(req: GenerateRequest):
-#     try:
-#         # 1. Generate code from LLM
-#         code = await get_plot_code(req.model, req.language, req.library)
-
-#         # 2. Pick runner URL based on language
-#         if req.language == "python":
-#             runner_url = "http://python-runner:8001/execute"
-#         elif req.language == "javascript":
-#             runner_url = "http://js-runner:8002/execute"
-#         elif req.language == "r":
-#             runner_url = "http://r-runner:8003/execute"
-#         else:
-#             raise HTTPException(status_code=400, detail="Unsupported language")
-
-#         # 3. POST only the code to that runner
-#         async with httpx.AsyncClient() as client:
-#             response = await client.post(
-#                 runner_url,
-#                 json={"code": code}
-#             )
-#             response.raise_for_status()
-#             payload = response.json()
-#             image_b64 = payload.get("output")
-#             if not image_b64:
-#                 raise HTTPException(
-#                     status_code=500,
-#                     detail="Runner service did not return an 'output' field"
-#                 )
-
-#         # 4. Return both the code and the runner’s output
-#         return GenerateResponse(code=code, image_b64=image_b64)
-
-#     except httpx.HTTPStatusError as http_exc:
-#         # Runner returned a 4xx/5xx
-#         raise HTTPException(status_code=502, detail=f"Runner error: {http_exc.response.text}")
-#     except HTTPException:
-#         raise
-#     except Exception as exc:
-#         raise HTTPException(status_code=500, detail=str(exc))

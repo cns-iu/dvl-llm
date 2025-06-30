@@ -19,7 +19,7 @@ def generate_and_execute(
 ):
     # 1. Init LLM
     factory = LLMFactory(
-        default_jetstream_api_key='',
+        default_jetstream_api_key='sk-80c0448d6e224899a92668cc7e250c55',
         # default_openai_api_key='your_openai_key_here_if_needed'
         default_google_api_key=''
     )
@@ -58,7 +58,7 @@ def generate_and_execute(
     code = chain.invoke(prompt_vars)
     code = extract_code(code)
     print("\n--- Code from LLM ---\n")
-    print(code)
+    # print(code)
 
     # 4. Route to correct executor (only Python for now)
     if execution_env.lower() == "python":
