@@ -49,7 +49,7 @@ user_stories: List[UserStoryResponse] = [
         userstory="Sankey Diagram of Donor Demographics from Experimental or HRApop Atlas Data",
         description="This dataset captures metadata linking donors, organs, tissue blocks, anatomical structures, and datasets. It is best visualized using a Sankey diagram to show the flow from donors to organs, structures, and datasets.",
         viz_types=["Sankey"],
-        image_url="https://i.pravatar.cc/48?u=7"
+        image_url="http://localhost:8000/static-output/USP1/7.png"
     ),
     UserStoryResponse(
         id=8,
