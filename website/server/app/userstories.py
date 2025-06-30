@@ -7,7 +7,7 @@ user_stories: List[UserStoryResponse] = [
         userstory="Number of HRA SMEs over time",
         description="This dataset contains cumulative counts recorded annually across multiple SME categories. Each entry includes the year, group name, and corresponding cumulative count. The data is best visualized using a line chart to show how each group has progressed over time.",
         viz_types=["Line Chart"],
-        image_url="https://i.pravatar.cc/48?u=1"
+        image_url="http://localhost:8000/static-output/USP1/1.png"
     ),
     UserStoryResponse(
         id=2,
