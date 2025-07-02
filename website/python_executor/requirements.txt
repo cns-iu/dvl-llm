@@ -1,6 +1,10 @@
 fastapi
 uvicorn
 
+# analytical libraries
+numpy
+pandas
+
 # Visualization libraries
 matplotlib
 seaborn
