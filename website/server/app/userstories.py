@@ -56,7 +56,7 @@ user_stories: List[UserStoryResponse] = [
         userstory="Comparative Analysis of Healthy vs. Diseased Lung Tissue Using Violin Plots",
         description="This dataset contains spatial graphs of healthy and diseased tissues, showing cell types and their connections. It enables comparison of immune cell distributions, such as CD68+ Macrophages and Mast Cells, across conditions.",
         viz_types=["Split Violin"],
-        image_url="https://i.pravatar.cc/48?u=8"
+        image_url="http://localhost:8000/static-output/USP1/8.png"
     ),
     UserStoryResponse(
         id=9,

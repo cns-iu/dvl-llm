@@ -1,17 +1,22 @@
 import httpx
-from fastapi import APIRouter, HTTPException, Query  
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File
 from app.models import GenerateRequest, GenerateResponse, UserStoryResponse
 from app.models import RefineRequest, RefineResponse
 from app.services.llm_client import get_plot_code
 from app.services.code_runner import run_python
 from app.services.llm_orchestrator import generate_and_execute
 from app.userstories import user_stories
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from typing import List
-import os
+import os, json, shutil
 import pandas as pd
 
+
 router = APIRouter(prefix="/api", tags=["generate"])
+
+json_path = os.path.join(os.getcwd(), "visualizations.json")
+with open(json_path,"r") as f:
+    user_story_visuals = json.load(f)
 
 @router.post("/generate", response_model=GenerateResponse)
 def generate(req: GenerateRequest):
@@ -58,19 +63,6 @@ def download_visualization(filename: str):
     Note: This is typically used after calling the `/generate` endpoint,
     where the file path is returned for both rendering the visualization.
     """
-    # """
-    # Returns a generated visualization HTML file for download.
-
-    # This endpoint is used when a user clicks "Download" in the frontend after generating a visualization.
-
-    # - **filename**: Name of the file (without `.html` extension)
-
-    # The file is retrieved from the directory and returned with the appropriate headers
-    # so it can be downloaded by the browser.
-
-    # """
-    # Note: The same file may be previewed via an iframe using the `output_path` from the `/generate` endpoint,
-    # but this endpoint ensures it is downloaded.
     file_path = f"/code/data/output/{filename}.html" 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
@@ -104,14 +96,14 @@ def get_userstories():
 # CSV_PATH = os.path.join(INPUT_DIR, "dvl-llm-1-hra-growth-over-time.csv")
 
 # data in server folder
-CSV_PATH = os.path.join(os.path.dirname(__file__), "..","serverdata", "input", "dvl-llm-1-hra-growth-over-time.csv.")
-@router.get("/csv/top", summary="Get top N rows from user story data")
-def get_top_rows(n: int = Query(5, gt=0, le=100)):
+
+@router.get("/csv/top/{us_id}", summary="Get top N rows from user story data")
+def get_top_rows(us_id: str, n: int = Query(5, gt=0, le=20)):
     """
 
-    Retrieve the top `n` rows from the user stories metadata CSV file.
+    Retrieve the top `N` rows from the selected user story metadata CSV file.
 
-    - n (int): Number of rows to return.
+    - us_id : id of the user story
 
     Returns a list of dictionaries, where each dictionary represents a row from the CSV file.
 
@@ -124,6 +116,8 @@ def get_top_rows(n: int = Query(5, gt=0, le=100)):
     # """
     # Fetch top n rows from the CSV file.
     # """
+    filename = f"{us_id}.csv"
+    CSV_PATH = os.path.join(os.path.dirname(__file__), "..","data", "input", filename)
     if not os.path.exists(CSV_PATH):
         raise HTTPException(status_code=404, detail="CSV file not found")
 
@@ -179,3 +173,59 @@ async def refine_visualization(req: RefineRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Refinement failed: {str(e)}")
     
+# @router.get("/userstory/{us_id}")
+# def get_all_visualizations(us_id: str):
+#     try:
+#         return user_story_visuals[us_id]
+#     except KeyError:
+#         raise HTTPException(status_code=404, detail="User story not found")
+    
+@router.get("/userstory/{us_id}")
+def get_all_visualizations(us_id: str):
+    try:
+        story_data = user_story_visuals[us_id]
+        result = []
+        for language, libraries in story_data.items():
+            for library, llms in libraries.items():
+                for llm, content in llms.items():
+                    result.append({
+                        "language": language,
+                        "library": library,
+                        "llm": llm,
+                        "code": content["code"] + " "+" Check "+language + library + llm + "  user story" + us_id,
+                        "image_url": content["image_url"]
+                    })
+        return result
+
+    except KeyError:
+        raise HTTPException(status_code=404, detail="User story not found")
+@router.get("/userstory/{us_id}/{language}/{library}/{llm}")
+def get_visualization(us_id: str, language: str, library: str, llm: str):
+    try:
+        data = user_story_visuals[us_id][language][library][llm]
+        return {
+            "code": data["code"],
+            "image_url": data["image_url"]
+        }
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Visualization not found")
+    
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "input")
+
+@router.post("/csv/upload", summary="Upload an Excel file to the input folder")
+async def upload_excel(file: UploadFile = File(...)):
+    """
+    Upload an Excel (.xlsx or .xls) file and save it in the input folder.
+    """
+    if not file.filename.endswith((".xlsx", ".xls")):
+        raise HTTPException(status_code=400, detail="Only Excel files (.xlsx, .xls) are allowed")
+
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    save_path = os.path.join(UPLOAD_DIR, file.filename)
+
+    try:
+        with open(save_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return JSONResponse(content={"message": f"File '{file.filename}' uploaded successfully"}, status_code=200)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
