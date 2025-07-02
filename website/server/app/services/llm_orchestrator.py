@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional, NamedTuple
 import copy
 
 # Assuming your LLMFactory and LangChain imports are in a shared location
-from llm_factory import LLMFactory
+from .llm_factory import LLMFactory
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage, AIMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
