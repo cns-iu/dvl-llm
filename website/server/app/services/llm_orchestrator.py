@@ -7,7 +7,7 @@ from typing import List, Dict, Any, Optional, NamedTuple
 import copy
 
 # Assuming your LLMFactory and LangChain imports are in a shared location
-from llm_factory import LLMFactory
+from .llm_factory import LLMFactory
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage, AIMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -234,7 +234,7 @@ if __name__ == '__main__':
         provider="jetstream",
         model_name="DeepSeek-R1",
         llm_factory_api_key="sk-d124b81a3ead4cbd95b77249ca755831",
-        prompt_file_path="../../../data/input/prompts/prompts.json"
+        prompt_file_path="../../data/input/prompts/prompts.json"
     )
 
     # 1. Initial Run
@@ -258,12 +258,12 @@ if __name__ == '__main__':
         print("\n--- Final Result of Refinement (Iteration 3) ---")
         pprint.pprint(refine_result2)
 
-        # # 3. Undo the refinement
-        # # Let's say we didn't like the bar chart and want to go back
-        # undo_result = orchestrator.undo()
-        # print("\n--- Result After Undo ---")
-        # print("This result should match the output from the initial run.")
-        # pprint.pprint(undo_result)
+        # 3. Undo the refinement
+        # Let's say we didn't like the bar chart and want to go back
+        undo_result = orchestrator.undo()
+        print("\n--- Result After Undo ---")
+        print("This result should match the output from the initial run.")
+        pprint.pprint(undo_result)
         #
         # # Verify the state
         # assert undo_result == refine_result1
