@@ -2,8 +2,6 @@ import httpx
 from fastapi import APIRouter, HTTPException, Query, UploadFile, File
 from app.models import GenerateRequest, GenerateResponse, UserStoryResponse
 from app.models import RefineRequest, RefineResponse
-from app.services.llm_client import get_plot_code
-from app.services.code_runner import run_python
 from app.services.llm_orchestrator import LLMOrchestrator
 from app.userstories import user_stories
 from fastapi.responses import FileResponse, JSONResponse
@@ -32,6 +30,7 @@ def generate(req: GenerateRequest):
     
     Example Input:
     `{
+    "id":1,
     "model_name": "DeepSeek-R1",
     "language": "python",
     "library": "plotly",

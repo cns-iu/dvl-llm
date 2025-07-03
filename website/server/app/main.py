@@ -11,7 +11,7 @@ app = FastAPI(
     debug=True
 )
 
-# ✅ Correct container path to the mounted volume
+# container path to the mounted volumes
 output_dir = "/app/data/output"
 os.makedirs(output_dir, exist_ok=True)
 
@@ -33,7 +33,7 @@ app.mount(
 # CORS for Angular dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

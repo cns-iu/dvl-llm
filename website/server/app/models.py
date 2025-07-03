@@ -5,6 +5,7 @@ class GenerateRequest(BaseModel):
     """
     What the Angular front-end will POST to /api/generate.
     """
+    id: int = Field( default=1, description="User Story Id") 
     model: str = Field(
         ..., 
         examples=["DeepSeek-R1"], 

@@ -85,17 +85,7 @@ class LLMOrchestrator:
     #         return {"status": "error", "error_code": 2000,
     #                 "error_message": "Service Level Error: Could not connect to executor.",
     #                 "details": {"stderr": str(e)}}
-    import ast  # make sure this is at the top of your file
-
-    # def _execute_code(self, execution_env: str, code: str, filename_prefix: str) -> Dict[str, Any]:
-    #     """Routes code to the correct executor microservice."""
-    #     url = self.executor_urls.get(execution_env.lower())
-    #     if not url:
-    #         return {
-    #             "status": "error",
-    #             "error_code": 2000,
-    #             "error_message": f"Service Level Error: No executor for '{execution_env}'."
-    #         }
+    # import ast 
     def _execute_code(self, execution_env: str, code: str, filename_prefix: str) -> Dict[str, Any]:
         url = self.executor_urls.get(execution_env.lower())
         if not url:
