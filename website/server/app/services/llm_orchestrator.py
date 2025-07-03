@@ -36,7 +36,7 @@ class LLMOrchestrator:
     ):
         self.max_retries = max_retries
         self.executor_urls = {
-            "python": "http://localhost:5001/execute",  # Using localhost for local testing
+            "python": "http://python-executor:5001/execute",  # Using localhost for local testing
         }
         self.llm = LLMFactory(
             provider=provider, model_name=model_name,
@@ -71,20 +71,65 @@ class LLMOrchestrator:
         match = re.search(r"```(?:python|r|javascript)?\n(.*?)```", raw_text, re.DOTALL)
         return match.group(1).strip() if match else raw_text.strip()
 
+    # def _execute_code(self, execution_env: str, code: str, filename_prefix: str) -> Dict[str, Any]:
+    #     """Routes code to the correct executor microservice."""
+    #     url = self.executor_urls.get(execution_env.lower())
+    #     if not url:
+    #         return {"status": "error", "error_code": 2000,
+    #                 "error_message": f"Service Level Error: No executor for '{execution_env}'."}
+    #     try:
+    #         response = requests.post(url, json={"code": code, "filename_prefix": filename_prefix}, timeout=40)
+    #         response.raise_for_status()
+    #         return response.json()
+    #     except requests.exceptions.RequestException as e:
+    #         return {"status": "error", "error_code": 2000,
+    #                 "error_message": "Service Level Error: Could not connect to executor.",
+    #                 "details": {"stderr": str(e)}}
+    import ast  # make sure this is at the top of your file
+
+    # def _execute_code(self, execution_env: str, code: str, filename_prefix: str) -> Dict[str, Any]:
+    #     """Routes code to the correct executor microservice."""
+    #     url = self.executor_urls.get(execution_env.lower())
+    #     if not url:
+    #         return {
+    #             "status": "error",
+    #             "error_code": 2000,
+    #             "error_message": f"Service Level Error: No executor for '{execution_env}'."
+    #         }
     def _execute_code(self, execution_env: str, code: str, filename_prefix: str) -> Dict[str, Any]:
-        """Routes code to the correct executor microservice."""
         url = self.executor_urls.get(execution_env.lower())
         if not url:
-            return {"status": "error", "error_code": 2000,
-                    "error_message": f"Service Level Error: No executor for '{execution_env}'."}
+            return {
+                "status": "error",
+                "error_code": 2000,
+                "error_message": f"Service Level Error: No executor for '{execution_env}'."
+            }
+
         try:
+            print(f"[DEBUG] Sending request to executor at {url}")
+            print(f"[DEBUG] Payload: {{'code': <code omitted>, 'filename_prefix': '{filename_prefix}'}}")
             response = requests.post(url, json={"code": code, "filename_prefix": filename_prefix}, timeout=40)
             response.raise_for_status()
-            return response.json()
+            result = response.json()
+            print(f"[DEBUG] Received response: {result}")
+            return result
         except requests.exceptions.RequestException as e:
-            return {"status": "error", "error_code": 2000,
-                    "error_message": "Service Level Error: Could not connect to executor.",
-                    "details": {"stderr": str(e)}}
+            print(f"[ERROR] Executor connection failed: {e}")
+            return {
+                "status": "error",
+                "error_code": 2000,
+                "error_message": "Service Level Error: Could not connect to executor.",
+                "details": {"stderr": str(e)}
+            }
+        except ValueError as e:
+            print(f"[ERROR] Invalid JSON response from executor: {e}")
+            return {
+                "status": "error",
+                "error_code": 2001,
+                "error_message": "Invalid response format from executor.",
+                "details": {"stderr": str(e)}
+            }
+
 
     def _generation_and_execution_loop(self) -> Dict[str, Any]:
         """
@@ -112,6 +157,7 @@ class LLMOrchestrator:
                 self.messages[-1] = AIMessage(content=generated_code)
 
             print("Executing code...")
+            print(generated_code)
             result = self._execute_code(self.execution_env, generated_code, current_filename_prefix)
 
             if result.get("status") == "success":
@@ -227,45 +273,46 @@ class LLMOrchestrator:
         return previous_state.result
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # --- How to Use the DvlOrchestrator Class with Undo ---
 
-    orchestrator = LLMOrchestrator(
-        provider="jetstream",
-        model_name="DeepSeek-R1",
-        llm_factory_api_key="sk-d124b81a3ead4cbd95b77249ca755831",
-        prompt_file_path="../../../data/input/prompts/prompts.json"
-    )
+    # orchestrator = LLMOrchestrator(
+    #     provider="jetstream",
+    #     model_name="DeepSeek-R1",
+    #     llm_factory_api_key="sk-d124b81a3ead4cbd95b77249ca755831",
+    #     prompt_file_path="../../data/input/prompts/prompts.json"
+    # )
 
-    # 1. Initial Run
-    initial_result = orchestrator.run(
-        execution_env="python", library="plotly", filename_prefix="test_run"
-    )
-    print("\n--- 🏁 Final Result of Initial Run (Iteration 1) ---")
-    pprint.pprint(initial_result)
+    # # 1. Initial Run
+    # initial_result = orchestrator.run(
+    #     execution_env="python", library="plotly", filename_prefix="test_run"
+    # )
+    # print("\n--- 🏁 Final Result of Initial Run (Iteration 1) ---")
+    # pprint.pprint(initial_result)
 
-    # 2. Refinement
-    if initial_result.get("status") == "success":
-        refine_result1 = orchestrator.refine(
-            refine_prompt="Use a color scheme from color brewer for the biological group variable. Add a legend that shows the color scale used for biological groups"
-        )
-        print("\n--- Final Result of Refinement (Iteration 2) ---")
-        pprint.pprint(refine_result1)
+    # # 2. Refinement
+    # if initial_result.get("status") == "success":
+    #     refine_result1 = orchestrator.refine(
+    #         refine_prompt="Use a color scheme from color brewer for the biological group variable. Add a legend that shows the color scale used for biological groups"
+    #     )
+    #     print("\n--- Final Result of Refinement (Iteration 2) ---")
+    #     pprint.pprint(refine_result1)
 
-        refine_result2 = orchestrator.refine(
-            refine_prompt="change the y-axis to reflect logarithmic scale"
-        )
-        print("\n--- Final Result of Refinement (Iteration 3) ---")
-        pprint.pprint(refine_result2)
+    #     refine_result2 = orchestrator.refine(
+    #         refine_prompt="change the y-axis to reflect logarithmic scale"
+    #     )
+    #     print("\n--- Final Result of Refinement (Iteration 3) ---")
+    #     pprint.pprint(refine_result2)
 
-        # # 3. Undo the refinement
-        # # Let's say we didn't like the bar chart and want to go back
-        # undo_result = orchestrator.undo()
-        # print("\n--- Result After Undo ---")
-        # print("This result should match the output from the initial run.")
-        # pprint.pprint(undo_result)
+    #     # 3. Undo the refinement
+    #     # Let's say we didn't like the bar chart and want to go back
+    #     undo_result = orchestrator.undo()
+    #     print("\n--- Result After Undo ---")
+    #     print("This result should match the output from the initial run.")
+    #     pprint.pprint(undo_result)
         #
         # # Verify the state
         # assert undo_result == refine_result1
         # assert orchestrator.iteration_count == 2
         # print("\nState successfully reverted.")
+    

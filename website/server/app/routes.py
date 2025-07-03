@@ -4,7 +4,7 @@ from app.models import GenerateRequest, GenerateResponse, UserStoryResponse
 from app.models import RefineRequest, RefineResponse
 from app.services.llm_client import get_plot_code
 from app.services.code_runner import run_python
-# from app.services.llm_orchestrator import generate_and_execute
+from app.services.llm_orchestrator import LLMOrchestrator
 from app.userstories import user_stories
 from fastapi.responses import FileResponse, JSONResponse
 from typing import List
@@ -39,8 +39,17 @@ def generate(req: GenerateRequest):
     }`
     """
     try:
-        # result = generate_and_execute(provider="jetstream",model_name=req.model,execution_env=req.language,library=req.library,filename_prefix=f"test")
-        result = {"code":"", "output_html_path":""}
+        orchestrator = LLMOrchestrator(
+            provider="jetstream",
+            model_name=req.model,
+            llm_factory_api_key="sk-d124b81a3ead4cbd95b77249ca755831",
+            prompt_file_path="/app/data/input/prompts.json" 
+        )
+
+        # 1. Initial Run
+        result = orchestrator.run(
+            execution_env=req.language, library=req.library, filename_prefix="test_run"
+        )
         code = result["code"]
         output_file = result["output_html_path"]
         filename = output_file.split("/")[-1]  # test.html
