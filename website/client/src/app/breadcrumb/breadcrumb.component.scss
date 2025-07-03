@@ -1,0 +1,16 @@
+:host {
+  ::ng-deep {
+    .p-breadcrumb {
+      background-color: #e5e5e5;
+      font-size: 13px;
+      font-weight: 400;
+    }
+    .p-breadcrumb-item-link {
+      color: #b20a2f;
+    }
+    .active-breadcrumb {
+      font-weight: 600;
+      color: gray;
+    }
+  }
+}

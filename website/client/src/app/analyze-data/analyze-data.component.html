@@ -1,1 +1,64 @@
-<p>analyze-data works!</p>
+@if(!isChildRoute) {
+<div class="visualizations-page">
+  <div class="content-container">
+    <div class="section-header">
+      <h2>Choose Visualization</h2>
+    </div>
+
+    <!-- Python Section -->
+    <div class="category-section">
+      <h3 class="category-title">Python</h3>
+
+      <div class="visualization-grid">
+        <div
+          class="visualization-card"
+          *ngFor="let viz of pythonVisualizations"
+        >
+          <div class="card-header">
+            <h4 class="viz-title">{{ viz.title }}</h4>
+            <h5 class="viz-library">{{ viz.library }}</h5>
+            <button class="explore-btn" (click)="onExplore(viz)">
+              Explore →
+            </button>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-title">{{ viz.description }}</div>
+            <div class="chart-image">
+              <img [src]="viz.imagePath" [alt]="viz.description" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript Section -->
+    <div class="category-section">
+      <h3 class="category-title">JavaScript</h3>
+
+      <div class="visualization-grid">
+        <div
+          class="visualization-card"
+          *ngFor="let viz of javascriptVisualizations"
+        >
+          <div class="card-header">
+            <h4 class="viz-title">{{ viz.title }}</h4>
+            <h5 class="viz-library">{{ viz.library }}</h5>
+            <button class="explore-btn" (click)="onExplore(viz)">
+              Explore →
+            </button>
+          </div>
+
+          <div class="chart-container">
+            <div class="chart-title">{{ viz.description }}</div>
+            <div class="chart-image">
+              <img [src]="viz.imagePath" [alt]="viz.description" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
+<router-outlet></router-outlet>

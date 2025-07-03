@@ -6,8 +6,17 @@ import { VisualizeComponent } from './visualize/visualize.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'gather', pathMatch: 'full' },
-  { path: 'gather', component: GatherDataComponent },
-  { path: 'analyze', component: AnalyzeDataComponent },
-  { path: 'dvl', component: DvlFrameworkComponent },
-  { path: 'visualize', component: VisualizeComponent },
+  {
+    path: 'gather',
+    component: GatherDataComponent,
+    children: [
+      {
+        path: 'analyze/:id',
+        component: AnalyzeDataComponent,
+        children: [{ path: 'deploy/:modelId', component: VisualizeComponent }],
+      },
+    ],
+  },
+  // { path: 'dvl', component: DvlFrameworkComponent },
+  // { path: 'deploy', component: VisualizeComponent },
 ];

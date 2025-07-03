@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -17,6 +18,7 @@ import { HttpClientModule } from '@angular/common/http';
     MatIconModule,
     FormsModule,
     HttpClientModule,
+    BreadcrumbComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -24,7 +26,7 @@ import { HttpClientModule } from '@angular/common/http';
 export class AppComponent {
   title = 'dvl-llm';
 
-  tabRoutes = ['gather', 'analyze', 'dvl', 'visualize'];
+  tabRoutes = ['gather', 'analyze', 'deploy'];
 
   constructor(private router: Router) {}
 

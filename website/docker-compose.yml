@@ -20,7 +20,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./data:/code/data
+      - ./data:/app/data
+      - ./server/sdata:/app/sdata
     depends_on:
       - python-executor
     environment:

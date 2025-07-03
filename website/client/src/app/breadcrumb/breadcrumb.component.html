@@ -1,0 +1,22 @@
+<p-breadcrumb class="max-w-full" [model]="items">
+  <ng-template #item let-item>
+    <ng-container *ngIf="item.routerLink; else elseBlock">
+      <a
+        routerLinkActive="active-breadcrumb"
+        [routerLink]="item.routerLink"
+        [routerLinkActiveOptions]="
+          item.routerLinkActiveOptions || { exact: true }
+        "
+        class="p-breadcrumb-item-link"
+      >
+        <span [ngClass]="[item.icon ? item.icon : '', 'text-color']"></span>
+        <span class="text-primary font-semibold">{{ item.label }}</span>
+      </a>
+    </ng-container>
+    <ng-template #elseBlock>
+      <a [href]="item.url">
+        <span class="text-color">{{ item.label }}</span>
+      </a>
+    </ng-template>
+  </ng-template>
+</p-breadcrumb>
