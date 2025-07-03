@@ -1,54 +1,8 @@
 <div class="visualize-wrapper">
-  <!-- Top full-width dropdowns with improved styling -->
-  <div class="dropdown-container" #dropdownContainer>
-    <select
-      [(ngModel)]="selectedModel"
-      class="dropdown"
-      (change)="animateDropdownChange()"
-    >
-      <option *ngFor="let model of models" [value]="model">{{ model }}</option>
-    </select>
-
-    <select
-      [(ngModel)]="selectedLanguage"
-      (change)="selectLanguage(selectedLanguage)"
-      class="dropdown"
-    >
-      <option *ngFor="let lang of languages" [value]="lang">{{ lang }}</option>
-    </select>
-
-    <select
-      [(ngModel)]="selectedLibrary"
-      (change)="selectLibrary(selectedLibrary)"
-      class="dropdown"
-    >
-      <option *ngFor="let lib of filteredLibraries" [value]="lib.name">
-        {{ lib.name }}
-        <i
-          [class]="getVisualizationTypeIcon(lib.type)"
-          [title]="getVisualizationTypeTooltip(lib.type)"
-        ></i>
-      </option>
-    </select>
-
-    <!-- DVL Checkbox -->
-    <div class="dvl-checkbox-container">
-      <input type="checkbox" id="dvl-checkbox" class="dvl-checkbox" />
-      <label for="dvl-checkbox">DVL</label>
-    </div>
-
-    <!-- Generate Visualization button styled like Submit button -->
-
-    <button
-      class="refine-button"
-      (click)="generateVisualization()"
-      [disabled]="isGenerating"
-    >
-      <span *ngIf="!isGenerating">Generate Visualization</span>
-      <span *ngIf="isGenerating">Generating...</span>
-    </button>
-
-    <!-- Toggle for visualization pane -->
+  <div class="tab-container">
+    <div class="tab">DeekSeek-R1</div>
+    <div class="tab">Python</div>
+    <div class="tab">Altair</div>
     <button
       class="toggle-button visualization-toggle"
       (click)="toggleCode()"
@@ -69,7 +23,6 @@
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
           <circle cx="12" cy="12" r="3"></circle>
         </svg>
-
         <svg
           *ngIf="!isCodeVisible"
           xmlns="http://www.w3.org/2000/svg"
@@ -99,71 +52,10 @@
     #splitPane
     [ngClass]="{ 'both-visible': isVisualizationVisible && isCodeVisible }"
   >
-    <!-- Left pane with visualization -->
+    <!-- Left pane with code editor -->
     <div
       class="left-pane"
       #leftPane
-      [ngClass]="{ hidden: !isVisualizationVisible }"
-      [@fadeInOut]="isCodeVisible"
-    >
-      <div class="visualization-container" #visualizationContainer>
-        <div class="download-container">
-          <button
-            class="download-button"
-            title="Download visualization"
-            (click)="downloadVisualization()"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-          </button>
-        </div>
-
-        <div class="iframe-wrapper scrollable">
-          <!-- Conditionally render iframe or img -->
-          <ng-container *ngIf="selectedLibrary && visualSrc">
-            <iframe
-              *ngIf="!visualSrc.toString().endsWith('.png')"
-              #visualFrame
-              class="visual-frame"
-              [src]="visualSrc"
-              frameborder="0"
-              allowfullscreen
-            ></iframe>
-
-            <img
-              #visualImage
-              *ngIf="visualSrc.toString().endsWith('.png')"
-              class="image-frame"
-              [src]="visualSrc"
-              alt="PNG visualization"
-            />
-          </ng-container>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="drag-bar-vertical"
-      (mousedown)="startDragging($event)"
-      (touchstart)="startTouchDragging($event)"
-      *ngIf="isVisualizationVisible && isCodeVisible"
-    ></div>
-
-    <!-- Right pane with code editor -->
-    <div
-      class="right-pane"
-      #rightPane
       [ngClass]="{ hidden: !isCodeVisible }"
       [@fadeInOut]="isCodeVisible"
     >
@@ -191,7 +83,6 @@
           </svg>
         </button>
         <div class="copied-message" *ngIf="copiedMessageShown">Copied!</div>
-
         <!-- Revert button -->
         <button
           class="action-button revert-button"
@@ -212,7 +103,6 @@
           </svg>
         </button>
       </div>
-
       <ace-editor
         [(text)]="codeText"
         [mode]="selectedLanguage.toLowerCase()"
@@ -221,7 +111,63 @@
         [readOnly]="false"
       ></ace-editor>
     </div>
-
+    <div
+      class="drag-bar-vertical"
+      (mousedown)="startDragging($event)"
+      (touchstart)="startTouchDragging($event)"
+      *ngIf="isVisualizationVisible && isCodeVisible"
+    ></div>
+    <!-- Right pane with visualization -->
+    <div
+      class="right-pane"
+      #rightPane
+      [ngClass]="{ hidden: !isVisualizationVisible }"
+      [@fadeInOut]="isVisualizationVisible"
+    >
+      <div class="visualization-container" #visualizationContainer>
+        <div class="download-container">
+          <button
+            class="download-button"
+            title="Download visualization"
+            (click)="downloadVisualization()"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="iframe-wrapper scrollable">
+          <!-- Conditionally render iframe or img -->
+          <ng-container *ngIf="selectedLibrary && visualSrc">
+            <iframe
+              *ngIf="!visualSrc.toString().endsWith('.png')"
+              #visualFrame
+              class="visual-frame"
+              [src]="visualSrc"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+            <img
+              #visualImage
+              *ngIf="visualSrc.toString().endsWith('.png')"
+              class="image-frame"
+              [src]="visualSrc"
+              alt="PNG visualization"
+            />
+          </ng-container>
+        </div>
+      </div>
+    </div>
     <!-- Overlay div to capture events during dragging -->
     <div *ngIf="showDragOverlay" class="drag-overlay" #dragOverlay></div>
   </div>
@@ -234,5 +180,76 @@
       placeholder="Enter natural language instructions to refine your visualization..."
     ></textarea>
     <button class="refine-button" (click)="applyRefinement()">Submit</button>
+
+    <div class="snackbar-container">
+      <button
+        class="snackbar visualize"
+        (click)="insertText('Apply linear scale on y-axis', $event)"
+      >
+        <span class="snackbar-text">Apply linear scale on y-axis</span>
+        <span class="tag visualize">Visualize</span>
+      </button>
+      <button
+        class="snackbar visualize"
+        (click)="
+          insertText(
+            'Assign custom color per group using color brewer colors',
+            $event
+          )
+        "
+      >
+        <span class="snackbar-text"
+          >Assign custom color per group using color brewer colors</span
+        >
+        <span class="tag visualize">Visualize</span>
+      </button>
+      <button
+        class="snackbar analyze"
+        (click)="insertText('Apply logarithmic scale on y-axis', $event)"
+      >
+        <span class="snackbar-text">Apply logarithmic scale on y-axis</span>
+        <span class="tag analyze">Analyze</span>
+      </button>
+      <button
+        class="snackbar analyze"
+        (click)="
+          insertText(
+            'Convert and sort the x-axis by date time descending',
+            $event
+          )
+        "
+      >
+        <span class="snackbar-text"
+          >Convert and sort the x-axis by date time descending</span
+        >
+        <span class="tag analyze">Analyze</span>
+      </button>
+      <button
+        class="snackbar deploy"
+        (click)="
+          insertText('Export the figure as .HTML for interactivity', $event)
+        "
+      >
+        <span class="snackbar-text"
+          >Export the figure as .HTML for interactivity</span
+        >
+        <span class="tag deploy">Deploy</span>
+      </button>
+      <button
+        class="snackbar deploy"
+        (click)="
+          insertText(
+            'Generate a high-resolution image of the plot by setting resolution to 300 DPI with all content tightly fitted in the saved file',
+            $event
+          )
+        "
+      >
+        <span class="snackbar-text"
+          >Generate a high-resolution image of the plot by setting resolution to
+          300 DPI with all content tightly fitted in the saved file</span
+        >
+        <span class="tag deploy">Deploy</span>
+      </button>
+    </div>
   </div>
 </div>

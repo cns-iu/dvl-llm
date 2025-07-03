@@ -146,10 +146,10 @@ google.charts.setOnLoadCallback(() => {
 
   shouldDisplayVisualization = false;
 
-  private originalLeftPaneSize = '60%';
-  private originalRightPaneSize = '40%';
-  private originalTopPaneSize = '60%';
-  private originalBottomPaneSize = '40%';
+  private originalLeftPaneSize = '40%';
+  private originalRightPaneSize = '60%';
+  private originalTopPaneSize = '40%';
+  private originalBottomPaneSize = '60%';
 
   private isColumnLayout = false;
 
@@ -226,28 +226,20 @@ google.charts.setOnLoadCallback(() => {
 
   ngAfterViewInit() {
     this.ensureProperSizing();
-
     this.enhanceDropdowns();
-
     this.checkLayoutMode();
-
     window.addEventListener('resize', () => {
       this.ensureProperSizing();
       this.checkLayoutMode();
+      this.updateLayoutBasedOnVisibility();
     });
-
     const dragBar = this.el.nativeElement.querySelector('.drag-bar-vertical');
     if (dragBar) {
       this.renderer.listen(dragBar, 'touchstart', (e: TouchEvent) => {
         this.startTouchDragging(e);
       });
     }
-
     this.setInitialPaneSizes();
-
-    setTimeout(() => {
-      this.updateLayoutBasedOnVisibility();
-    }, 100);
   }
 
   ngOnDestroy() {
@@ -317,33 +309,24 @@ google.charts.setOnLoadCallback(() => {
   toggleCode() {
     if (!this.isCodeVisible) {
       this.isCodeVisible = true;
-
+      this.isVisualizationVisible = false;
       const splitPane = this.el.nativeElement.querySelector('.split-pane');
       if (splitPane) {
         this.renderer.addClass(splitPane, 'transitioning');
-
         setTimeout(() => {
           this.renderer.removeClass(splitPane, 'transitioning');
         }, 500);
       }
     } else {
-      this.wasCodeVisible = true;
       this.isCodeVisible = false;
-
       const splitPane = this.el.nativeElement.querySelector('.split-pane');
       if (splitPane) {
         this.renderer.addClass(splitPane, 'transitioning');
-
         setTimeout(() => {
           this.renderer.removeClass(splitPane, 'transitioning');
         }, 500);
       }
     }
-
-    if (!this.isVisualizationVisible && !this.isCodeVisible) {
-      this.isVisualizationVisible = true;
-    }
-
     setTimeout(() => {
       this.updateLayoutBasedOnVisibility();
     }, 10);
@@ -449,54 +432,71 @@ google.charts.setOnLoadCallback(() => {
     const splitPane = this.el.nativeElement.querySelector('.split-pane');
     const leftPane = this.el.nativeElement.querySelector('.left-pane');
     const rightPane = this.el.nativeElement.querySelector('.right-pane');
-
     if (splitPane && leftPane && rightPane) {
-      this.renderer.addClass(splitPane, 'both-visible');
-
-      if (this.isColumnLayout) {
-        this.renderer.setStyle(
-          document.documentElement,
-          '--top-pane-height',
-          this.originalTopPaneSize
-        );
-        this.renderer.setStyle(
-          document.documentElement,
-          '--bottom-pane-height',
-          this.originalBottomPaneSize
-        );
-
-        this.renderer.setStyle(
-          leftPane,
-          'flex',
-          `0 0 ${this.originalTopPaneSize}`
-        );
-        this.renderer.setStyle(
-          rightPane,
-          'flex',
-          `0 0 ${this.originalBottomPaneSize}`
-        );
-      } else {
+      const storedLeftPaneSize = localStorage.getItem('leftPaneSize');
+      const storedRightPaneSize = localStorage.getItem('rightPaneSize');
+      if (storedLeftPaneSize && storedRightPaneSize) {
         this.renderer.setStyle(
           document.documentElement,
           '--left-pane-width',
-          this.originalLeftPaneSize
+          storedLeftPaneSize
         );
         this.renderer.setStyle(
           document.documentElement,
           '--right-pane-width',
-          this.originalRightPaneSize
+          storedRightPaneSize
         );
-
-        this.renderer.setStyle(
-          leftPane,
-          'flex',
-          `0 0 ${this.originalLeftPaneSize}`
-        );
-        this.renderer.setStyle(
-          rightPane,
-          'flex',
-          `0 0 ${this.originalRightPaneSize}`
-        );
+        this.renderer.setStyle(leftPane, 'flex', `0 0 ${storedLeftPaneSize}`);
+        this.renderer.setStyle(rightPane, 'flex', `0 0 ${storedRightPaneSize}`);
+      } else {
+        this.renderer.addClass(splitPane, 'both-visible');
+        if (this.isColumnLayout) {
+          this.renderer.setStyle(
+            document.documentElement,
+            '--top-pane-height',
+            this.originalTopPaneSize
+          );
+          this.renderer.setStyle(
+            document.documentElement,
+            '--bottom-pane-height',
+            this.originalBottomPaneSize
+          );
+          this.renderer.setStyle(
+            leftPane,
+            'flex',
+            `0 0 ${this.originalTopPaneSize}`
+          );
+          this.renderer.setStyle(
+            rightPane,
+            'flex',
+            `0 0 ${this.originalBottomPaneSize}`
+          );
+          localStorage.setItem('leftPaneSize', this.originalTopPaneSize);
+          localStorage.setItem('rightPaneSize', this.originalBottomPaneSize);
+        } else {
+          this.renderer.setStyle(
+            document.documentElement,
+            '--left-pane-width',
+            this.originalLeftPaneSize
+          );
+          this.renderer.setStyle(
+            document.documentElement,
+            '--right-pane-width',
+            this.originalRightPaneSize
+          );
+          this.renderer.setStyle(
+            leftPane,
+            'flex',
+            `0 0 ${this.originalLeftPaneSize}`
+          );
+          this.renderer.setStyle(
+            rightPane,
+            'flex',
+            `0 0 ${this.originalRightPaneSize}`
+          );
+          localStorage.setItem('leftPaneSize', this.originalLeftPaneSize);
+          localStorage.setItem('rightPaneSize', this.originalRightPaneSize);
+        }
       }
     }
   }
@@ -1020,5 +1020,21 @@ google.charts.setOnLoadCallback(() => {
           console.error('Download failed:', error);
         }
       );
+  }
+
+  insertText(text: string, event: MouseEvent) {
+    this.refineText = text;
+    const target = event.target as HTMLElement;
+    const snackbar = target.closest('.snackbar');
+    if (snackbar) {
+      snackbar.classList.add('clicked');
+      setTimeout(() => {
+        snackbar.classList.remove('clicked');
+      }, 1500);
+    }
+  }
+
+  clearText() {
+    this.refineText = '';
   }
 }
