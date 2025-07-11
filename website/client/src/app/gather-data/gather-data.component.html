@@ -1,4 +1,39 @@
-@if (!isChildRoute) {
+<!-- Only show on /gather, hide on /gather/analyze/... -->
+<div *ngIf="!isChildRoute" class="gather-container">
+  <h2>Select Dataset</h2>
+  <hr />
+  <p>
+    Select a
+    <span class="hra-highlight">Human Reference Atlas</span>
+    dataset to get started.
+  </p>
+  <!-- grid of cards -->
+  <div class="card-list">
+    <div class="dataset-card" *ngFor="let story of userStories">
+      <!-- thumbnail -->
+      <img
+        class="dataset-image"
+        [src]="story.image_url"
+        [alt]="'Dataset ' + story.id"
+      />
+
+      <!-- title & description -->
+      <div class="card-content">
+        <h3 class="dataset-title">{{ story.userstory }}</h3>
+        <p class="dataset-description">{{ story.description }}</p>
+      </div>
+
+      <!-- action -->
+      <button class="use-btn" (click)="onExplore(story.id)">
+        Use dataset →
+      </button>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
+
+<!-- @if (!isChildRoute) {
 <div class="gather-container">
   <h2>Acquire Data</h2>
   <table class="data-table">
@@ -18,7 +53,7 @@
         </td>
         <td class="btn-cell">
           <button class="explore-btn" (click)="onExplore(story.id)">
-            Explore →
+            Explore → Use dataset →
           </button>
         </td>
       </tr>
@@ -31,4 +66,4 @@
   </table>
 </div>
 }
-<router-outlet></router-outlet>
+<router-outlet></router-outlet> -->

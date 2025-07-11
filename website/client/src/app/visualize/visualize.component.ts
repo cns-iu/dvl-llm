@@ -18,6 +18,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { VisualizeService } from './visualize.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-visualize',
@@ -38,7 +39,7 @@ import { VisualizeService } from './visualize.service';
 export class VisualizeComponent implements AfterViewInit, OnInit {
   models = ['DeepSeek-R1', 'llama-4-scout'];
   selectedModel = this.models[0];
-
+  storyId!: number;
   languages = ['Python', 'R', 'JavaScript'];
   selectedLanguage = 'Python';
   originalCodeText: string = '';
@@ -184,7 +185,9 @@ google.charts.setOnLoadCallback(() => {
     private el: ElementRef,
     private ngZone: NgZone,
     private visualizeService: VisualizeService,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.codeText = '';
   }
@@ -222,7 +225,76 @@ google.charts.setOnLoadCallback(() => {
     return selectedLib ? selectedLib.type : '';
   }
 
-  ngOnInit() {}
+  // ngOnInit() {
+  //   console.log('🧠 Inside ngOnInit');
+  //   console.log('Router state:', this.router.getCurrentNavigation());
+  //   const nav = this.router.getCurrentNavigation();
+  //   const state = history.state as {
+  //     id: number;
+  //     model: string;
+  //     language: string;
+  //     library: string;
+  //     isDVL: boolean;
+  //   };
+  //   console.log('📦 history.state in VisualizeComponent:', state);
+  //   if (state && state.id != null) {
+  //     this.storyId = state.id;
+  //     this.selectedModel = state.model || 'DeepSeek-R1';
+  //     this.selectedLanguage = state.language || 'python';
+  //     this.selectedLibrary = state.library || 'plotly';
+  //     this.isDVL = state.isDVL ?? true;
+
+  //     this.filteredLibraries = this.libraries.filter(
+  //       (lib) =>
+  //         lib.language.toLowerCase() === this.selectedLanguage.toLowerCase()
+  //     );
+  //     console.log('🔥 generateVisualization() calling');
+  //     this.generateVisualization(); // 🔥 auto-trigger generation
+  //     console.log('🔥 generateVisualization() called');
+  //   } else {
+  //     console.warn(
+  //       'No router state received. Cannot auto-generate visualization.'
+  //     );
+  //   }
+  // }
+  ngOnInit() {
+    // 1) Debug: print any router navigation object (usually null on reload)
+    console.log(
+      '🧠 Inside ngOnInit – router.getCurrentNavigation():',
+      this.router.getCurrentNavigation()
+    );
+
+    // 2) Grab whatever you passed via router.navigate(..., { state })
+    const state = history.state as {
+      id: number;
+      model: string;
+      language: string;
+      library: string;
+      isDVL: boolean;
+    };
+    console.log('📦 history.state in VisualizeComponent:', state);
+
+    // 3) If valid, initialize and fire off the generation
+    if (state && state.id != null) {
+      this.storyId = state.id;
+      this.selectedModel = state.model || 'DeepSeek-R1';
+      this.selectedLanguage = state.language || 'python';
+      this.selectedLibrary = state.library || 'plotly';
+      this.isDVL = state.isDVL ?? true;
+
+      // 4) Update any filtered dropdowns, etc.
+      this.filteredLibraries = this.libraries.filter(
+        (lib) =>
+          lib.language.toLowerCase() === this.selectedLanguage.toLowerCase()
+      );
+
+      // 5) Log and generate
+      console.log('🔥 generateVisualization() calling');
+      this.generateVisualization();
+    } else {
+      console.warn('⚠️ No valid state—skipping auto-generate.');
+    }
+  }
 
   ngAfterViewInit() {
     this.ensureProperSizing();
@@ -516,87 +588,151 @@ google.charts.setOnLoadCallback(() => {
   }
 
   generateVisualization() {
-    if (this.selectedModel && this.selectedLanguage && this.selectedLibrary) {
+    // 1) Ensure we have everything we need
+    if (
+      this.storyId != null &&
+      this.selectedModel &&
+      this.selectedLanguage &&
+      this.selectedLibrary
+    ) {
       this.isGenerating = true;
-
       this.shouldDisplayVisualization = true;
 
-      const selected = this.libraries.find(
-        (lib) => lib.name === this.selectedLibrary
-      );
+      // 2) Build payload including storyId
+      const payload = {
+        id: this.storyId,
+        // model: this.selectedModel,
+        model: 'DeepSeek-R1',
+        language: this.selectedLanguage.toLowerCase(),
+        library: this.selectedLibrary,
+        isDVL: this.isDVL,
+      };
+      console.log('🚀 generateVisualization() payload:', payload);
 
-      if (selected) {
-        this.refineText = '';
-
-        const payload = {
-          model: this.selectedModel,
-          language: this.selectedLanguage.toLowerCase(),
-          library: this.selectedLibrary,
-          isDVL: this.isDVL,
-        };
-
-        console.log(payload);
-
-        this.visualizeService.generateVisulization(payload).subscribe(
+      // 3) Call backend
+      this.visualizeService
+        .generateVisulization(payload) // ensure your service method is named generateVisualization
+        .subscribe(
           (response) => {
+            // 4) On success: render chart & code
             const fullPath = response.output_path;
             this.generatedFilename =
               fullPath.split('/').pop()?.replace('.html', '') || 'test';
 
             this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
-              `http://localhost:8000${response.output_path}`
+              `http://localhost:8000${fullPath}`
             );
-
             this.codeText = response.code;
 
-            const key = 'originalCode';
-            if (!localStorage.getItem(key)) {
-              localStorage.setItem(key, this.codeText);
+            // 5) Save original code if first time
+            if (!localStorage.getItem('originalCode')) {
+              localStorage.setItem('originalCode', this.codeText);
             }
 
+            // 6) Tweak DOM after a short delay (same as your existing logic)
             setTimeout(() => {
-              const wrapper =
-                this.el.nativeElement.querySelector('.iframe-wrapper');
-              if (wrapper) {
-                this.renderer.addClass(wrapper, 'scrollable');
-              }
-
-              const isPng = response.output_path.endsWith('.png');
-
-              if (isPng && this.visualImage) {
-                const img = this.visualImage.nativeElement;
-                this.renderer.setStyle(img, 'width', '100%');
-                this.renderer.setStyle(img, 'height', '100%');
-                this.renderer.setStyle(img, 'object-fit', 'contain');
-                this.renderer.setStyle(img, 'max-width', '100%');
-                this.renderer.setStyle(img, 'max-height', '100%');
-                this.renderer.setStyle(img, 'display', 'block');
-              } else if (
-                !isPng &&
-                this.visualFrame &&
-                this.visualFrame.nativeElement
-              ) {
-                const iframe = this.visualFrame.nativeElement;
-                this.renderer.setStyle(iframe, 'width', '100%');
-                this.renderer.setStyle(iframe, 'height', '100%');
-                this.renderer.setStyle(iframe, 'border', 'none');
-              }
-
+              // ... your existing resizing/scrolling logic ...
               this.isGenerating = false;
             }, 300);
           },
           (error) => {
-            console.error('Error generating visualization:', error);
+            console.error('❌ Error generating visualization:', error);
             this.isGenerating = false;
           }
         );
-      }
     } else {
+      // Missing required info: hide everything
       this.shouldDisplayVisualization = false;
       this.visualSrc = '';
       this.isGenerating = false;
+      console.warn(
+        '⚠️ generateVisualization() skipped: missing storyId or selection'
+      );
     }
   }
+
+  // generateVisualization() {
+  //   if (this.selectedModel && this.selectedLanguage && this.selectedLibrary) {
+  //     this.isGenerating = true;
+
+  //     this.shouldDisplayVisualization = true;
+
+  //     const selected = this.libraries.find(
+  //       (lib) => lib.name === this.selectedLibrary
+  //     );
+
+  //     if (selected) {
+  //       this.refineText = '';
+
+  //       const payload = {
+  //         model: this.selectedModel,
+  //         language: this.selectedLanguage.toLowerCase(),
+  //         library: this.selectedLibrary,
+  //         isDVL: this.isDVL,
+  //       };
+
+  //       console.log(payload);
+
+  //       this.visualizeService.generateVisulization(payload).subscribe(
+  //         (response) => {
+  //           const fullPath = response.output_path;
+  //           this.generatedFilename =
+  //             fullPath.split('/').pop()?.replace('.html', '') || 'test';
+
+  //           this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+  //             `http://localhost:8000${response.output_path}`
+  //           );
+
+  //           this.codeText = response.code;
+
+  //           const key = 'originalCode';
+  //           if (!localStorage.getItem(key)) {
+  //             localStorage.setItem(key, this.codeText);
+  //           }
+
+  //           setTimeout(() => {
+  //             const wrapper =
+  //               this.el.nativeElement.querySelector('.iframe-wrapper');
+  //             if (wrapper) {
+  //               this.renderer.addClass(wrapper, 'scrollable');
+  //             }
+
+  //             const isPng = response.output_path.endsWith('.png');
+
+  //             if (isPng && this.visualImage) {
+  //               const img = this.visualImage.nativeElement;
+  //               this.renderer.setStyle(img, 'width', '100%');
+  //               this.renderer.setStyle(img, 'height', '100%');
+  //               this.renderer.setStyle(img, 'object-fit', 'contain');
+  //               this.renderer.setStyle(img, 'max-width', '100%');
+  //               this.renderer.setStyle(img, 'max-height', '100%');
+  //               this.renderer.setStyle(img, 'display', 'block');
+  //             } else if (
+  //               !isPng &&
+  //               this.visualFrame &&
+  //               this.visualFrame.nativeElement
+  //             ) {
+  //               const iframe = this.visualFrame.nativeElement;
+  //               this.renderer.setStyle(iframe, 'width', '100%');
+  //               this.renderer.setStyle(iframe, 'height', '100%');
+  //               this.renderer.setStyle(iframe, 'border', 'none');
+  //             }
+
+  //             this.isGenerating = false;
+  //           }, 300);
+  //         },
+  //         (error) => {
+  //           console.error('Error generating visualization:', error);
+  //           this.isGenerating = false;
+  //         }
+  //       );
+  //     }
+  //   } else {
+  //     this.shouldDisplayVisualization = false;
+  //     this.visualSrc = '';
+  //     this.isGenerating = false;
+  //   }
+  // }
 
   selectLanguage(lang: string) {
     this.selectedLanguage = lang;

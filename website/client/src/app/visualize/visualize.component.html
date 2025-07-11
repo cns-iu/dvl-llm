@@ -1,4 +1,12 @@
 <div class="visualize-wrapper">
+  <div
+    *ngIf="isGenerating"
+    class="loading-spinner"
+    style="width: 100%; text-align: center; padding: 1rem 0"
+  >
+    Generating visualization… Please wait.
+  </div>
+
   <div class="tab-container">
     <div class="tab">DeekSeek-R1</div>
     <div class="tab">Python</div>

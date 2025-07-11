@@ -1,11 +1,13 @@
 import { Routes } from '@angular/router';
 import { GatherDataComponent } from './gather-data/gather-data.component';
 import { AnalyzeDataComponent } from './analyze-data/analyze-data.component';
-import { DvlFrameworkComponent } from './dvl-framework/dvl-framework.component';
-import { VisualizeComponent } from './visualize/visualize.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'gather', pathMatch: 'full' },
+  {
+    path: '',
+    redirectTo: 'gather',
+    pathMatch: 'full',
+  },
   {
     path: 'gather',
     component: GatherDataComponent,
@@ -13,10 +15,39 @@ export const routes: Routes = [
       {
         path: 'analyze/:id',
         component: AnalyzeDataComponent,
-        children: [{ path: 'deploy/:modelId', component: VisualizeComponent }],
+        children: [
+          {
+            path: 'deploy/:modelId',
+            loadComponent: () =>
+              import('./visualize/visualize.component').then(
+                (m) => m.VisualizeComponent
+              ),
+          },
+        ],
       },
     ],
   },
-  // { path: 'dvl', component: DvlFrameworkComponent },
-  // { path: 'deploy', component: VisualizeComponent },
 ];
+
+// import { Routes } from '@angular/router';
+// import { GatherDataComponent } from './gather-data/gather-data.component';
+// import { AnalyzeDataComponent } from './analyze-data/analyze-data.component';
+// import { DvlFrameworkComponent } from './dvl-framework/dvl-framework.component';
+// import { VisualizeComponent } from './visualize/visualize.component';
+
+// export const routes: Routes = [
+//   { path: '', redirectTo: 'gather', pathMatch: 'full' },
+//   {
+//     path: 'gather',
+//     component: GatherDataComponent,
+//     children: [
+//       {
+//         path: 'analyze/:id',
+//         component: AnalyzeDataComponent,
+//         children: [{ path: 'deploy/:modelId', component: VisualizeComponent }],
+//       },
+//     ],
+//   },
+//   // { path: 'dvl', component: DvlFrameworkComponent },
+//   // { path: 'deploy', component: VisualizeComponent },
+// ];
