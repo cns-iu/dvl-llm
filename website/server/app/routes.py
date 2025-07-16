@@ -16,6 +16,8 @@ json_path = os.path.join(os.getcwd(), "visualizations.json")
 with open(json_path,"r") as f:
     user_story_visuals = json.load(f)
 
+orchestrator = None
+
 @router.post("/generate", response_model=GenerateResponse)
 def generate(req: GenerateRequest):
     """
@@ -37,6 +39,7 @@ def generate(req: GenerateRequest):
     "isDVL": true
     }`
     """
+    global orchestrator
     try:
         orchestrator = LLMOrchestrator(
             provider="jetstream",
@@ -72,13 +75,11 @@ def download_visualization(filename: str):
     Note: This is typically used after calling the `/generate` endpoint,
     where the file path is returned for both rendering the visualization.
     """
-    file_path = f"/code/data/output/{filename}.html" 
+    # file_path = f"/code/data/output/{filename}.html" 
+    file_path = f"/app/data/output/{filename}.html"
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(file_path, filename=filename, media_type='text/html')
-
-# After mvp0
-
 
 @router.get("/userstories", response_model=List[UserStoryResponse])
 def get_userstories():
@@ -98,6 +99,23 @@ def get_userstories():
     # Response:
     #     200 OK: List[UserStoryResponse]
     return user_stories
+@router.get(
+    "/userstories/{userstory_id}",
+    response_model=UserStoryResponse,
+    summary="Get a single user story by ID",
+)
+def get_userstory(userstory_id: int):
+    """
+    Returns the user story whose `id` matches `userstory_id`.
+    
+    - **userstory_id**: Unique identifier of the user story.
+    
+    Raises 404 if not found.
+    """
+    for story in user_stories:
+        if story.id == userstory_id:
+            return story
+    raise HTTPException(status_code=404, detail=f"User story {userstory_id} not found")
 
 # to use the data folder in website works only after creating a image
 # DATA_DIR = "/code/data"
@@ -126,7 +144,7 @@ def get_top_rows(us_id: str, n: int = Query(5, gt=0, le=20)):
     # Fetch top n rows from the CSV file.
     # """
     filename = f"{us_id}.csv"
-    CSV_PATH = os.path.join(os.path.dirname(__file__), "..","data", "input", filename)
+    CSV_PATH = os.path.join(os.path.dirname(__file__), "..","sdata", "input", filename)
     if not os.path.exists(CSV_PATH):
         raise HTTPException(status_code=404, detail="CSV file not found")
 
@@ -136,51 +154,67 @@ def get_top_rows(us_id: str, n: int = Query(5, gt=0, le=20)):
         return top_rows.to_dict(orient="records")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+# REFINEMENT_FILE = os.path.join(os.getcwd(), "website", "data", "refinements.json")
+REFINEMENT_FILE = os.path.join("sdata", "input", "refinements.json")
+@router.get("/refinements/{user_story_id}")
+def get_refinements(user_story_id: str):
+    if not os.path.exists(REFINEMENT_FILE):
+        raise HTTPException(status_code=500, detail="Refinement data file not found")
+    
+    with open(REFINEMENT_FILE, "r") as f:
+        all_refinements = json.load(f)
+    
+    if user_story_id not in all_refinements:
+        raise HTTPException(status_code=404, detail="No refinements found for this user story")
+    
+    # return JSONResponse(content={"user_story_id": user_story_id, "refinements": all_refinements[user_story_id]})
+    return all_refinements[user_story_id]
 
-@router.post("/refine", response_model=RefineResponse, summary="Refine an existing visualization")
-async def refine_visualization(req: RefineRequest):
-    """
-    Refine an existing visualization based on a user-provided refinement prompt.
+# @router.post("/refine", response_model=RefineResponse, summary="Refine an existing visualization")
+# async def refine_visualization(req: RefineRequest):
+#     """
+#     Refine an existing visualization based on a user-provided refinement prompt.
 
-    Request Body:
-    - `user_story_id`: ID of the user story to which the original visualization belongs.
-    - `language`: The programming language used (e.g., Python).
-    - `library`: The visualization library used (e.g., matplotlib).
-    - `original_code`: The original code that generated the visualization.
-    - `refinement_prompt`: A natural language instruction describing how to modify the visualization.
+#     Request Body:
+#     - `user_story_id`: ID of the user story to which the original visualization belongs.
+#     - `language`: The programming language used (e.g., Python).
+#     - `library`: The visualization library used (e.g., matplotlib).
+#     - `original_code`: The original code that generated the visualization.
+#     - `refinement_prompt`: A natural language instruction describing how to modify the visualization.
 
-    Returns:
-    - `updated_code`: Modified version of the original code.
-    - `output_path`:  path of the refined visualization.
+#     Returns:
+#     - `updated_code`: Modified version of the original code.
+#     - `output_path`:  path of the refined visualization.
 
-    Example Input:
-    `{
-    "user_story_id": 1,
-    "language": "python",
-    "library": "plotly",
-    "original_code": "import .... ",
-    "refinement_prompt": "change colors ... "
-    }`
+#     Example Input:
+#     `{
+#     "user_story_id": 1,
+#     "language": "python",
+#     "library": "plotly",
+#     "original_code": "import .... ",
+#     "refinement_prompt": "change colors ... "
+#     }`
 
-    """
+#     """
 
-    # `refinement_prompt`: A natural language instruction describing how to modify the visualization.
-    # Raises:
-    # - 400 Bad Request: If the refinement cannot be processed.
-    # - 500 Internal Server Error: For any other processing errors.
-    try:
-        # === Placeholder logic ===
-        # call LLM 
-        # updated_code = req.original_code + f"\n# Refined with: {req.refinement_prompt}"
-        # output_path = run_python(updated_code)  # assuming you have a safe sandboxed runner
+#     # `refinement_prompt`: A natural language instruction describing how to modify the visualization.
+#     # Raises:
+#     # - 400 Bad Request: If the refinement cannot be processed.
+#     # - 500 Internal Server Error: For any other processing errors.
+#     try:
+#         # === Placeholder logic ===
+#         # call LLM 
+#         # updated_code = req.original_code + f"\n# Refined with: {req.refinement_prompt}"
+#         # output_path = run_python(updated_code)  # assuming you have a safe sandboxed runner
 
-        return RefineResponse(
-            updated_code=req.refinement_prompt,
-            output_path="/app/code/ref/viz1.html"
-        )
+#         return RefineResponse(
+#             updated_code=req.refinement_prompt,
+#             output_path="/app/code/ref/viz1.html"
+#         )
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Refinement failed: {str(e)}")
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=f"Refinement failed: {str(e)}")
     
 # @router.get("/userstory/{us_id}")
 # def get_all_visualizations(us_id: str):
@@ -238,3 +272,27 @@ async def upload_excel(file: UploadFile = File(...)):
         return JSONResponse(content={"message": f"File '{file.filename}' uploaded successfully"}, status_code=200)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save file: {str(e)}")
+    
+
+
+@router.post("/refine", response_model=RefineResponse)
+def refine(req: RefineRequest):
+    global orchestrator
+
+    if orchestrator is None:
+        raise HTTPException(status_code=400, detail="No active orchestrator session. Call /generate first.")
+
+    try:
+        result = orchestrator.refine(req.prompt)
+        code = result["code"]
+        output_file = result["output_html_path"]
+        filename = output_file.split("/")[-1]
+        output_path = f"/static-output/{filename}"
+
+        return {
+            "updated_code": code,
+            "output_path": output_path
+        }
+
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))

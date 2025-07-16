@@ -43,28 +43,30 @@ class UserStoryResponse(BaseModel):
     image_url: str
 
 
-class RefineRequest(BaseModel):
-    user_story_id: int = Field(
-    ..., 
-    description="ID of the user story being refined"
-    )
-    language: str = Field(
-    ..., 
-    description="Programming language (e.g., 'python')"
-    )
-    library: str = Field(
-    ..., 
-    description="Charting library (e.g., 'matplotlib')"
-    )
-    original_code: str = Field(
-    ..., 
-    description="The original visualization code"
-    )
-    refinement_prompt: str = Field(
-    ..., 
-    description="User's textual request for refining the visualization"
-    )
+# class RefineRequest(BaseModel):
+#     user_story_id: int = Field(
+#     ..., 
+#     description="ID of the user story being refined"
+#     )
+#     language: str = Field(
+#     ..., 
+#     description="Programming language (e.g., 'python')"
+#     )
+#     library: str = Field(
+#     ..., 
+#     description="Charting library (e.g., 'matplotlib')"
+#     )
+#     original_code: str = Field(
+#     ..., 
+#     description="The original visualization code"
+#     )
+#     refinement_prompt: str = Field(
+#     ..., 
+#     description="User's textual request for refining the visualization"
+#     )
 
+class RefineRequest(BaseModel):
+    prompt: str
 
 class RefineResponse(BaseModel):
     updated_code: str = Field(..., description="Modified visualization code after refinement")
