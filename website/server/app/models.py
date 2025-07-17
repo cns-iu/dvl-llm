@@ -41,6 +41,7 @@ class UserStoryResponse(BaseModel):
     description: str
     viz_types: List[str]
     image_url: str
+    category: str
 
 
 # class RefineRequest(BaseModel):
