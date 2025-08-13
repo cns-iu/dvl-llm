@@ -5,8 +5,12 @@
       "description": "Use log scale on y-axis"
     },
     {
-      "keyword": "color",
+      "keyword": "line color",
       "description": "Use color brewer colors"
+    },
+    {
+      "keyword": "background color",
+      "description": "set background color to white"
     },
     {
       "keyword": "legend",

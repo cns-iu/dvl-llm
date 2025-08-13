@@ -1,7 +1,7 @@
 import httpx
 from fastapi import APIRouter, HTTPException, Query, UploadFile, File
 from app.models import GenerateRequest, GenerateResponse, UserStoryResponse
-from app.models import RefineRequest, RefineResponse
+from app.models import RefineRequest, RefineResponse, UndoResponse
 from app.services.llm_orchestrator import LLMOrchestrator
 from app.userstories import user_stories
 from fastapi.responses import FileResponse, JSONResponse
@@ -295,4 +295,46 @@ def refine(req: RefineRequest):
         }
 
     except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+@router.post("/undo", response_model=UndoResponse, summary="Undo last action and revert to previous visualization")
+def undo_last_action():
+    global orchestrator
+
+    if orchestrator is None:
+        # No session yet (same behavior style as /refine)
+        raise HTTPException(status_code=400, detail="No active orchestrator session. Call /generate first.")
+
+    try:
+        result = orchestrator.undo()  # returns previous_state.result (or an error dict)
+
+        # If the service returns an error dict, surface it as 400
+        if result.get("status") == "error":
+            # Use the service's error payload
+            return UndoResponse(
+                status="error",
+                error_code=result.get("error_code"),
+                error_message=result.get("error_message"),
+            )
+
+        # Map to the same fields you use in /refine
+        code = result.get("code")
+        output_file = result.get("output_html_path")
+
+        output_path = None
+        if output_file:
+            filename = output_file.split("/")[-1]
+            output_path = f"/static-output/{filename}"
+
+        return UndoResponse(
+            status="success",
+            updated_code=code,
+            output_path=output_path,
+            message="Reverted to previous state."
+        )
+
+    except HTTPException:
+        # Let FastAPI-propagated HTTP errors bubble up unchanged
+        raise
+    except Exception as exc:
+        # Any unexpected error -> 500
         raise HTTPException(status_code=500, detail=str(exc))

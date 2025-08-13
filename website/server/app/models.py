@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
+from typing import Optional, Literal
 
 class GenerateRequest(BaseModel):
     """
@@ -72,3 +73,11 @@ class RefineRequest(BaseModel):
 class RefineResponse(BaseModel):
     updated_code: str = Field(..., description="Modified visualization code after refinement")
     output_path: str = Field(..., description="path of the refined visualization")
+
+class UndoResponse(BaseModel):
+    status: Literal["success", "error"]
+    updated_code: Optional[str] = None
+    output_path: Optional[str] = None
+    message: Optional[str] = None
+    error_code: Optional[int] = None
+    error_message: Optional[str] = None
