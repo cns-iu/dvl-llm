@@ -1,4 +1,10 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  HostListener,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -20,16 +26,16 @@ interface VisualizationItem {
   standalone: true,
   imports: [MatIconModule, CommonModule, RouterModule],
   templateUrl: './analyze-data.component.html',
-  styleUrl: './analyze-data.component.scss',
+  styleUrls: ['./analyze-data.component.scss'],
 })
-export class AnalyzeDataComponent {
+export class AnalyzeDataComponent implements OnInit {
   visualizations: VisualizationItem[] = [];
-  destroyRef = inject(DestroyRef);
-
   pythonVisualizations: VisualizationItem[] = [];
   javascriptVisualizations: VisualizationItem[] = [];
   rVisualizations: VisualizationItem[] = [];
-  storyId: number = 0;
+  storyId = 0;
+  currentSection: '' | 'python' | 'javascript' | 'r' = '';
+  destroyRef = inject(DestroyRef);
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -37,25 +43,25 @@ export class AnalyzeDataComponent {
     private router: Router
   ) {}
 
-  get isChildRoute(): boolean {
+  get isChildRoute() {
     return this.router.url.includes('/deploy');
   }
 
   ngOnInit() {
+    window.scrollTo({ top: 0 });
+    this.currentSection = '';
     this.activatedRoute.params
       .pipe(
-        tap((params) => {
-          this.storyId = +params['id'];
-        }),
-        switchMap((params) =>
-          this.appService.getVisualizationsForUserStory(+params['id'])
+        tap((p) => (this.storyId = +p['id'])),
+        switchMap((p) =>
+          this.appService.getVisualizationsForUserStory(+p['id'])
         ),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((data) => {
-        this.visualizations = data.map((item, index) => ({
-          id: `${this.storyId}-${index}`,
-          title: `${item.llm}`,
+        this.visualizations = data.map((item, i) => ({
+          id: `${this.storyId}-${i}`,
+          title: item.llm,
           description: item.code,
           imagePath: item.image_url,
           category:
@@ -66,7 +72,6 @@ export class AnalyzeDataComponent {
               : 'r',
           library: item.library,
         }));
-
         this.pythonVisualizations = this.visualizations.filter(
           (v) => v.category === 'python'
         );
@@ -78,31 +83,37 @@ export class AnalyzeDataComponent {
         );
       });
   }
-  onExplore(visualization: VisualizationItem) {
-    console.log('Exploring visualization:', visualization.title);
-    this.router.navigate(
-      [`/gather/analyze/${this.storyId}/deploy/${visualization.id}`],
-      {
-        state: {
-          id: this.storyId,
-          model: visualization.title,
-          language: visualization.category,
-          library: visualization.library,
-          isDVL: true,
-        },
-      }
-    );
-  }
-  // logic to scroll
-  currentSection = 'python';
 
-  scrollTo(sectionId: string) {
-    const el = document.getElementById(sectionId);
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    this.currentSection = sectionId;
+  scrollTo(section: 'python' | 'javascript' | 'r') {
+    this.currentSection = section;
+    const el = document.getElementById(section);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
-  //
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    for (const sec of ['python', 'javascript', 'r']) {
+      const top = document.getElementById(sec)!.getBoundingClientRect().top;
+      if (top <= 100) {
+        this.currentSection = sec as any;
+        break;
+      }
+    }
+  }
+
+  onExplore(viz: VisualizationItem) {
+    this.router.navigate([`/gather/analyze/${this.storyId}/deploy/${viz.id}`], {
+      state: {
+        id: this.storyId,
+        model: viz.title,
+        language: viz.category,
+        library: viz.library,
+        isDVL: true,
+      },
+    });
+  }
 }
 
 // import { Component, DestroyRef, inject } from '@angular/core';
@@ -118,7 +129,7 @@ export class AnalyzeDataComponent {
 //   title: string;
 //   description: string;
 //   imagePath: string;
-//   category: 'python' | 'javascript';
+//   category: 'python' | 'javascript' | 'r';
 //   library: string;
 // }
 
@@ -135,6 +146,7 @@ export class AnalyzeDataComponent {
 
 //   pythonVisualizations: VisualizationItem[] = [];
 //   javascriptVisualizations: VisualizationItem[] = [];
+//   rVisualizations: VisualizationItem[] = [];
 //   storyId: number = 0;
 
 //   constructor(
@@ -164,7 +176,12 @@ export class AnalyzeDataComponent {
 //           title: `${item.llm}`,
 //           description: item.code,
 //           imagePath: item.image_url,
-//           category: item.language === 'python' ? 'python' : 'javascript',
+//           category:
+//             item.language === 'python'
+//               ? 'python'
+//               : item.language === 'javascript'
+//               ? 'javascript'
+//               : 'r',
 //           library: item.library,
 //         }));
 
@@ -174,17 +191,11 @@ export class AnalyzeDataComponent {
 //         this.javascriptVisualizations = this.visualizations.filter(
 //           (v) => v.category === 'javascript'
 //         );
+//         this.rVisualizations = this.visualizations.filter(
+//           (v) => v.category === 'r'
+//         );
 //       });
 //   }
-
-//   //   onExplore(visualization: VisualizationItem) {
-//   //     console.log('Exploring visualization:', visualization.title);
-//   //     this.router.navigate([
-//   //       `/gather/analyze/${this.storyId}/deploy/${visualization.id}`,
-//   //     ]);
-//   //   }
-//   // }
-
 //   onExplore(visualization: VisualizationItem) {
 //     console.log('Exploring visualization:', visualization.title);
 //     this.router.navigate(
@@ -200,4 +211,14 @@ export class AnalyzeDataComponent {
 //       }
 //     );
 //   }
+//   // logic to scroll
+//   currentSection = 'python';
+
+//   scrollTo(sectionId: string) {
+//     const el = document.getElementById(sectionId);
+//     if (!el) return;
+//     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+//     this.currentSection = sectionId;
+//   }
+//   //
 // }

@@ -1,16 +1,158 @@
+/* host element can stretch inside header bar */
 :host {
-  ::ng-deep {
-    .p-breadcrumb {
-      background-color: #e5e5e5;
-      font-size: 13px;
-      font-weight: 400;
-    }
-    .p-breadcrumb-item-link {
-      color: #b20a2f;
-    }
-    .active-breadcrumb {
-      font-weight: 600;
-      color: gray;
-    }
-  }
+  display: flex;
+  flex: 1 1 auto;
+}
+
+/* STEP BAR CONTAINER*/
+.stepper {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 16px; /* space between steps + lines */
+  padding: 20px 32px;
+  // background: #f4f6fa;
+  font-family: var(--font-ui);
+}
+
+/* CONNECTOR LINE*/
+.step-line {
+  flex: 1 1 auto;
+  height: 1px;
+  background-color: #acb5c3; /* grey */
+  opacity: 0.38; /* 38 % by default (up-coming) */
+  align-self: center; /* always centred on circle */
+}
+
+/* navy line after completed / active step */
+.step.completed + .step-line {
+  opacity: 1;
+  background-color: #1d2033; /* navy */
+}
+
+/* STEP BLOCK*/
+.step {
+  /* grid: 3 columns   circle | text block | check */
+  display: grid;
+  grid-template-columns: 24px auto 24px;
+  grid-auto-rows: auto;
+  column-gap: 12px;
+  align-items: center; /* circle / line centred */
+  text-decoration: none; /* kill anchor underline */
+  // grid-template-rows: auto 21px;
+  // grid-template-rows: auto;
+}
+
+/* number-circle (col-1, spans rows) */
+.step-number {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  place-self: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(29, 32, 51, 0.38); /* grey by default */
+}
+
+/* header label (col-2, row-1) */
+.step-label {
+  grid-row: 1;
+  grid-column: 2;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #201e3d; /* grey by default */
+}
+
+/* tick-mark svg (col-3, spans rows) */
+.step-check {
+  grid-row: 1 / span 2;
+  grid-column: 3;
+  place-self: center;
+}
+
+/* subtitle / supporting text (col-2, row-2) */
+.step-subtext {
+  grid-row: 2;
+  grid-column: 2;
+  font-size: 12px;
+  color: #4c4c58 !important;
+  margin-top: 2px;
+}
+
+/* ────────────  STATE COLOURS  ──────────── */
+.step.completed .step-number,
+.step.active .step-number {
+  background: #1d2033; /* navy */
+}
+
+.step.completed .step-label,
+.step.active .step-label,
+.step.completed .step-subtext {
+  color: #201e3d; /* navy text */
+}
+
+.step.disabled .step-number,
+.step.disabled .step-label,
+.step.disabled .step-subtext {
+  color: rgba(29, 32, 51, 0.38);
+}
+.step:not(.completed) .step-subtext {
+  display: none;
+}
+
+/* current step returns to one-row grid so label and
+   circle share the same centre line */
+.step.active {
+  grid-template-rows: auto;
+  align-items: center !important;
+}
+
+/* upcoming (disabled) step = only one row */
+.step.disabled {
+  grid-template-rows: auto;
+}
+
+/* circle stays on row-1, no span */
+.step.disabled .step-number {
+  grid-row: 1;
+}
+
+/* step-icon (col-1, spans rows) */
+.step-icon {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  place-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ────────────  STATE COLOURS  ──────────── */
+.step.completed .step-icon,
+.step.active .step-icon {
+  color: #4b4b5e; /* navy - this changes the SVG fill */
+}
+
+.step.disabled .step-icon {
+  color: rgba(29, 32, 51, 0.38); /* grey for disabled */
+}
+
+.step.disabled .step-icon {
+  grid-row: 1;
+}
+
+/* active step alignment - sits at same baseline as other steps */
+.step.active {
+  grid-template-rows: auto;
+  align-items: center;
+}
+
+/* active step icon aligns properly with completed/disabled steps */
+.step.active .step-icon {
+  align-self: center;
 }

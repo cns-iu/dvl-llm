@@ -316,7 +316,7 @@ def undo_last_action():
                 error_message=result.get("error_message"),
             )
 
-        # Map to the same fields you use in /refine
+        # Map to the same fields in /refine
         code = result.get("code")
         output_file = result.get("output_html_path")
 

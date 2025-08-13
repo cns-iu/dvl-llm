@@ -1,35 +1,71 @@
 /* You can add global styles to this file, and also import other style files */
 
+@font-face {
+  font-family: "Metropolis";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url(https://cdn.jsdelivr.net/fontsource/fonts/metropolis@latest/latin-500-normal.woff2)
+      format("woff2"),
+    url(https://cdn.jsdelivr.net/fontsource/fonts/metropolis@latest/latin-500-normal.woff)
+      format("woff");
+}
+
+:root {
+  --font-body: "Nunito Sans", sans-serif;
+  --font-ui: "Metropolis", sans-serif;
+}
+
 html,
 body {
   height: 100%;
+  color-scheme: light !important;
 }
+
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: var(--font-body);
+  line-height: 1.6;
 }
-/* Default font for all non-code text */
-body,
+
+/* UI elements: Metropolis */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
 button,
+.refine-button,
+nav a,
+.navbar-item {
+  font-family: var(--font-ui);
+  font-weight: 500;
+}
+
+/* Regular form elements inherit body font */
 select,
 input,
 textarea,
-.dropdown,
-.refine-header,
-.refine-subheader,
-.refine-button {
-  font-family: "Montserrat", sans-serif;
-  font-weight: 600;
+.dropdown {
+  font-family: var(--font-body);
+  font-weight: 500;
 }
 
 /* Font for code editor and code blocks */
 .ace_editor,
 code,
 pre {
-  font-family: "Roboto Mono", monospace !important;
-  font-weight: 400 !important;
+  font-family: var(--font-body);
+  font-weight: 500 !important;
 }
 
-:root {
-  color-scheme: light !important;
+.page-nav,
+.page-nav a,
+.page-nav button {
+  font-family: var(--font-ui);
+  font-weight: 500 !important;
 }
+
+/* html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; } */

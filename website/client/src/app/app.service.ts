@@ -16,6 +16,26 @@ export interface UserStory {
   userstory: string;
   image_url: string;
   visualizations: VisualizationItem[];
+  category: string;
+}
+
+export interface RefinePrompt {
+  keyword: string;
+  description: string;
+}
+
+export interface RefineResponse {
+  updated_code: string;
+  output_path: string;
+}
+
+export interface HistoryItem {
+  userText: string;
+  code: string;
+  time: Date;
+  isDone: boolean;
+  collapsed: boolean;
+  model: string;
 }
 
 @Injectable({
@@ -42,13 +62,20 @@ export class AppService {
       `${this.userStoryApiUrl}/${us_id}`
     );
   }
-  generateVisualization(payload: {
-    id: number;
-    model: string;
-    language: string;
-    library: string;
-    isDVL: boolean;
-  }): Observable<any> {
-    return this.http.post('http://localhost:8000/api/generate', payload);
+  // returns one story, not an array
+  getUserStoryById(id: number): Observable<UserStory> {
+    return this.http.get<UserStory>(`${this.apiUrl}/${id}`);
+  }
+  // to get refine prompts by user story id
+  getRefinePrompts(usId: number): Observable<RefinePrompt[]> {
+    return this.http.get<RefinePrompt[]>(
+      `http://localhost:8000/api/refinements/${usId}`
+    );
+  }
+
+  refineVisualization(prompt: string): Observable<RefineResponse> {
+    return this.http.post<RefineResponse>('http://localhost:8000/api/refine', {
+      prompt,
+    });
   }
 }

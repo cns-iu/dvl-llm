@@ -1,0 +1,124 @@
+.home-container {
+  position: relative;
+  width: 100%;
+  min-height: 653px; /* Figma spec  */
+  /* height: 100vh; */
+  background: url("/assets/bg.png") no-repeat center bottom;
+  background-size: cover;
+}
+
+/* The “splash” section that holds everything */
+.splash {
+  //   max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.splash-content {
+  margin: 160px 40px 280px 40px;
+}
+/* ─── Title ─── */
+.splash-title {
+  font-family: var(--font-ui);
+  font-size: 42px;
+  font-weight: 500;
+  color: #201e3d;
+  margin: 0 0 38px 0;
+  line-height: var(--Display-Line-height, 63px); /* 150% */
+  letter-spacing: var(--Display-Line-spacing, -1.25px);
+}
+
+/* ─── Card row ─── */
+.card-group {
+  display: flex;
+  gap: 40px; /* equal space between cards */
+  flex-wrap: wrap;
+  margin: 0 0 80px 0;
+}
+
+/* ─── Individual card ─── */
+.splash-card {
+  width: 320px;
+  min-height: 102px;
+  background: #fcfcfc;
+  border-radius: 8px;
+  box-shadow: 0 5px 16px rgba(32, 30, 61, 0.24);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+/* ─── Card header ─── */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-step {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  background: #201e3d;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-title {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 500;
+  color: #201e3d;
+}
+
+/* ─── Card text ─── */
+.card-text {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 8px;
+  margin-left: 36px;
+  color: #444444;
+  line-height: 1.4;
+}
+
+/* ─── Get Started button ─── */
+// .get-started {
+//   align-self: flex-start;
+//   background: #e11a3c;
+//   color: #fff;
+//   border: none;
+//   border-radius: 4px;
+//   padding: 8px 16px;
+//   font-size: 1rem;
+//   font-weight: 600;
+//   cursor: pointer;
+//   transition: background 0.2s;
+// }
+// .get-started:hover {
+//   background: #c71331;
+// }
+
+.use-btn {
+  padding: 0.5rem 1rem;
+  background: #e00d3a;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s;
+  width: 121.3125px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.use-btn:hover {
+  background: #e00d3a;
+}

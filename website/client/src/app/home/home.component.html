@@ -1,0 +1,17 @@
+<div class="home-container">
+  <div class="splash">
+    <div class="splash-content">
+      <div class="splash-title">Create data visualizations with AI</div>
+      <div class="card-group">
+        <div class="splash-card" *ngFor="let c of cards">
+          <div class="card-header">
+            <div class="card-step">{{ c.step }}</div>
+            <div class="card-title">{{ c.title }}</div>
+          </div>
+          <div class="card-text">{{ c.text }}</div>
+        </div>
+      </div>
+      <button class="use-btn" (click)="onGetStarted()">Get started</button>
+    </div>
+  </div>
+</div>

@@ -19,6 +19,13 @@ import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { VisualizeService } from './visualize.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import {
+  AppService,
+  UserStory,
+  RefinePrompt,
+  RefineResponse,
+  HistoryItem,
+} from '../app.service';
 
 @Component({
   selector: 'app-visualize',
@@ -46,101 +53,29 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
   isCodeModified: boolean = false;
 
   isGenerating: boolean = false;
+  history: HistoryItem[] = [];
 
   isDVL: boolean = false;
-
-  libraries = [
-    {
-      name: 'altair',
-      language: 'Python',
-      code: `import altair as alt\nimport pandas as pd\n\ndata = pd.DataFrame({\n  'x': ['A', 'B', 'C', 'D'],\n  'y': [5, 3, 6, 7]\n})\nchart = alt.Chart(data).mark_bar().encode(x='x', y='y')\nchart.show()`,
-      jsonPath: '/sample_test_altair.html',
-      type: 'interactive',
-    },
-    {
-      name: 'plotly',
-      language: 'Python',
-      code: `import altair as alt\nimport pandas as pd\n\ndata = pd.DataFrame({\n  'x': ['A', 'B', 'C', 'D'],\n  'y': [5, 3, 6, 7]\n})\nchart = alt.Chart(data).mark_bar().encode(x='x', y='y')\nchart.show()`,
-      jsonPath: '/html_plotly_us1.html',
-      type: 'interactive',
-    },
-    {
-      name: 'pygal',
-      language: 'Python',
-      code: `import altair as alt\nimport pandas as pd\n\ndata = pd.DataFrame({\n  'x': ['A', 'B', 'C', 'D'],\n  'y': [5, 3, 6, 7]\n})\nchart = alt.Chart(data).mark_bar().encode(x='x', y='y')\nchart.show()`,
-      jsonPath: '/html_pygal_us1.html',
-      type: 'interactive',
-    },
-    {
-      name: 'seaborn',
-      language: 'Python',
-      code: `import altair as alt\nimport pandas as pd\n\ndata = pd.DataFrame({\n  'x': ['A', 'B', 'C', 'D'],\n  'y': [5, 3, 6, 7]\n})\nchart = alt.Chart(data).mark_bar().encode(x='x', y='y')\nchart.show()`,
-      jsonPath: '/png_seaborn_us1.png',
-      type: 'non-interactive',
-    },
-    {
-      name: 'bokeh',
-      language: 'Python',
-      code: `import altair as alt\nimport pandas as pd\n\ndata = pd.DataFrame({\n  'x': ['A', 'B', 'C', 'D'],\n  'y': [5, 3, 6, 7]\n})\nchart = alt.Chart(data).mark_bar().encode(x='x', y='y')\nchart.show()`,
-      jsonPath: '/html_bokeh_us1.html',
-      type: 'interactive',
-    },
-    {
-      name: 'plotnine',
-      language: 'Python',
-      code: `import altair as alt\nimport pandas as pd\n\ndata = pd.DataFrame({\n  'x': ['A', 'B', 'C', 'D'],\n  'y': [5, 3, 6, 7]\n})\nchart = alt.Chart(data).mark_bar().encode(x='x', y='y')\nchart.show()`,
-      jsonPath: '/html_plotnine_us1.html',
-      type: 'non-interactive',
-    },
-    {
-      name: 'chartify',
-      language: 'Python',
-      code: `import altair as alt\nimport pandas as pd\n\ndata = pd.DataFrame({\n  'x': ['A', 'B', 'C', 'D'],\n  'y': [5, 3, 6, 7]\n})\nchart = alt.Chart(data).mark_bar().encode(x='x', y='y')\nchart.show()`,
-      jsonPath: '/html_chartify_us1.html',
-      type: 'interactive',
-    },
-    {
-      name: 'ggplot2',
-      language: 'R',
-      code: `library(ggplot2)\ndata <- data.frame(x = c("A", "B", "C", "D"), y = c(5, 3, 6, 7))\nggplot(data, aes(x=x, y=y)) + geom_bar(stat="identity")`,
-      jsonPath: '/cumulative_counts_log.html',
-      type: 'static',
-    },
-    {
-      name: 'googlecharts',
-      language: 'JavaScript',
-      code: `google.charts.load("current", { packages: ["corechart"] });
-google.charts.setOnLoadCallback(() => {
-  const data = google.visualization.arrayToDataTable([
-    ["x", "y"],
-    ["A", 5],
-    ["B", 3],
-    ["C", 6],
-    ["D", 7]
-  ]);
-  new google.visualization.ColumnChart(document.getElementById("chart_div"))
-    .draw(data, { legend: "none" });
-});
-`,
-      jsonPath: '/us1_js_1.html',
-      type: 'static',
-    },
-  ];
-
-  filteredLibraries = this.libraries.filter(
-    (lib) => lib.language === this.selectedLanguage
-  );
-
-  selectedLibrary = this.filteredLibraries[0].name;
+  /** holds the user story */
+  storyDescription = '';
+  storyTitle = '';
+  selectedLibrary = '';
   codeText: string = '';
   visualSrc: SafeResourceUrl = '';
   isDragging = false;
-
   isMouseDown = false;
 
   showDragOverlay = false;
-
+  //refine-prompt suggestions//
   refineText: string = '';
+  suggestions: RefinePrompt[] = [];
+  isUndoing: boolean = false;
+
+  /*Called when clicked on one of the suggestion buttons */
+  setRefinePrompt(description: string): void {
+    this.refineText = description;
+  }
+  //refine-prompt suggestions//
 
   isVisualizationVisible = true;
   isCodeVisible = true;
@@ -187,80 +122,16 @@ google.charts.setOnLoadCallback(() => {
     private visualizeService: VisualizeService,
     private http: HttpClient,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private appService: AppService // ← user story
   ) {
     this.codeText = '';
   }
 
-  getVisualizationTypeIcon(type: string): string {
-    switch (type) {
-      case 'interactive':
-        return 'fas fa-hand-pointer';
-      case 'non-interactive':
-        return 'fas fa-chart-bar';
-      case '3d':
-        return 'fas fa-cube';
-      default:
-        return 'fas fa-question-circle';
-    }
-  }
-
-  getVisualizationTypeTooltip(type: string): string {
-    switch (type) {
-      case 'interactive':
-        return 'Interactive Visualization';
-      case 'non-interactive':
-        return 'Static Visualization';
-      case '3d':
-        return '3D Visualization';
-      default:
-        return 'Unknown Type';
-    }
-  }
-
-  getSelectedLibraryType(): string {
-    const selectedLib = this.libraries.find(
-      (lib) => lib.name === this.selectedLibrary
-    );
-    return selectedLib ? selectedLib.type : '';
-  }
-
-  // ngOnInit() {
-  //   console.log('🧠 Inside ngOnInit');
-  //   console.log('Router state:', this.router.getCurrentNavigation());
-  //   const nav = this.router.getCurrentNavigation();
-  //   const state = history.state as {
-  //     id: number;
-  //     model: string;
-  //     language: string;
-  //     library: string;
-  //     isDVL: boolean;
-  //   };
-  //   console.log('📦 history.state in VisualizeComponent:', state);
-  //   if (state && state.id != null) {
-  //     this.storyId = state.id;
-  //     this.selectedModel = state.model || 'DeepSeek-R1';
-  //     this.selectedLanguage = state.language || 'python';
-  //     this.selectedLibrary = state.library || 'plotly';
-  //     this.isDVL = state.isDVL ?? true;
-
-  //     this.filteredLibraries = this.libraries.filter(
-  //       (lib) =>
-  //         lib.language.toLowerCase() === this.selectedLanguage.toLowerCase()
-  //     );
-  //     console.log('🔥 generateVisualization() calling');
-  //     this.generateVisualization(); // 🔥 auto-trigger generation
-  //     console.log('🔥 generateVisualization() called');
-  //   } else {
-  //     console.warn(
-  //       'No router state received. Cannot auto-generate visualization.'
-  //     );
-  //   }
-  // }
   ngOnInit() {
     // 1) Debug: print any router navigation object (usually null on reload)
     console.log(
-      '🧠 Inside ngOnInit – router.getCurrentNavigation():',
+      'Inside ngOnInit  router.getCurrentNavigation():',
       this.router.getCurrentNavigation()
     );
 
@@ -281,18 +152,19 @@ google.charts.setOnLoadCallback(() => {
       this.selectedLanguage = state.language || 'python';
       this.selectedLibrary = state.library || 'plotly';
       this.isDVL = state.isDVL ?? true;
-
-      // 4) Update any filtered dropdowns, etc.
-      this.filteredLibraries = this.libraries.filter(
-        (lib) =>
-          lib.language.toLowerCase() === this.selectedLanguage.toLowerCase()
-      );
-
+      this.appService.getUserStoryById(this.storyId).subscribe((story) => {
+        this.storyDescription = story.description;
+        this.storyTitle = story.userstory;
+      });
+      //to get refine prompts
+      this.appService.getRefinePrompts(this.storyId).subscribe((prompts) => {
+        this.suggestions = prompts;
+      });
       // 5) Log and generate
-      console.log('🔥 generateVisualization() calling');
+      console.log('generateVisualization() calling');
       this.generateVisualization();
     } else {
-      console.warn('⚠️ No valid state—skipping auto-generate.');
+      console.warn('No valid state—skipping auto-generate.');
     }
   }
 
@@ -378,32 +250,42 @@ google.charts.setOnLoadCallback(() => {
     }, 10);
   }
 
+  // toggleCode() {
+  //   if (!this.isCodeVisible) {
+  //     this.isCodeVisible = true;
+  //     this.isVisualizationVisible = false;
+  //     const splitPane = this.el.nativeElement.querySelector('.split-pane');
+  //     if (splitPane) {
+  //       this.renderer.addClass(splitPane, 'transitioning');
+  //       setTimeout(() => {
+  //         this.renderer.removeClass(splitPane, 'transitioning');
+  //       }, 500);
+  //     }
+  //   } else {
+  //     this.isCodeVisible = false;
+  //     const splitPane = this.el.nativeElement.querySelector('.split-pane');
+  //     if (splitPane) {
+  //       this.renderer.addClass(splitPane, 'transitioning');
+  //       setTimeout(() => {
+  //         this.renderer.removeClass(splitPane, 'transitioning');
+  //       }, 500);
+  //     }
+  //   }
+  //   setTimeout(() => {
+  //     this.updateLayoutBasedOnVisibility();
+  //   }, 10);
+  // }
   toggleCode() {
-    if (!this.isCodeVisible) {
-      this.isCodeVisible = true;
-      this.isVisualizationVisible = false;
-      const splitPane = this.el.nativeElement.querySelector('.split-pane');
-      if (splitPane) {
-        this.renderer.addClass(splitPane, 'transitioning');
-        setTimeout(() => {
-          this.renderer.removeClass(splitPane, 'transitioning');
-        }, 500);
-      }
-    } else {
-      this.isCodeVisible = false;
-      const splitPane = this.el.nativeElement.querySelector('.split-pane');
-      if (splitPane) {
-        this.renderer.addClass(splitPane, 'transitioning');
-        setTimeout(() => {
-          this.renderer.removeClass(splitPane, 'transitioning');
-        }, 500);
-      }
-    }
-    setTimeout(() => {
-      this.updateLayoutBasedOnVisibility();
-    }, 10);
-  }
+    this.isCodeVisible = !this.isCodeVisible;
 
+    // Make sure at least ONE pane is always visible
+    if (!this.isCodeVisible && !this.isVisualizationVisible) {
+      this.isVisualizationVisible = true;
+    }
+
+    // Let the existing layout helper apply the correct classes / sizes
+    setTimeout(() => this.updateLayoutBasedOnVisibility(), 0);
+  }
   private updateLayoutBasedOnVisibility() {
     const leftPane = this.el.nativeElement.querySelector('.left-pane');
     const rightPane = this.el.nativeElement.querySelector('.right-pane');
@@ -466,38 +348,51 @@ google.charts.setOnLoadCallback(() => {
       this.renderer.removeClass(leftPane, 'fullscreen');
       this.renderer.removeClass(rightPane, 'fullscreen');
     } else if (this.isVisualizationVisible && !this.isCodeVisible) {
-      this.renderer.removeClass(splitPane, 'both-visible');
-      this.renderer.addClass(splitPane, 'single-pane');
-      this.renderer.removeClass(leftPane, 'hidden');
-      this.renderer.addClass(rightPane, 'hidden');
-      this.renderer.addClass(leftPane, 'fullscreen');
-      this.renderer.removeClass(rightPane, 'fullscreen');
+      // this.renderer.removeClass(splitPane, 'both-visible');
+      // this.renderer.addClass(splitPane, 'single-pane');
+      // this.renderer.removeClass(leftPane, 'hidden');
+      // this.renderer.addClass(leftPane, 'hidden');
+      // this.renderer.addClass(leftPane, 'fullscreen');
+      // this.renderer.removeClass(rightPane, 'fullscreen');
 
-      this.renderer.setStyle(leftPane, 'flex', '1 1 auto');
-      this.renderer.setStyle(leftPane, 'width', '100%');
-      this.renderer.setStyle(leftPane, 'height', '100%');
-      this.renderer.setStyle(leftPane, 'max-width', '100%');
-      this.renderer.setStyle(leftPane, 'max-height', '100%');
-
-      const iframe = leftPane.querySelector('iframe');
-      if (iframe) {
-        this.renderer.setStyle(iframe, 'width', '100%');
-        this.renderer.setStyle(iframe, 'height', '100%');
-      }
-    } else if (!this.isVisualizationVisible && this.isCodeVisible) {
+      // this.renderer.setStyle(leftPane, 'flex', '1 1 auto');
+      // this.renderer.setStyle(leftPane, 'width', '100%');
+      // this.renderer.setStyle(leftPane, 'height', '100%');
+      // this.renderer.setStyle(leftPane, 'max-width', '100%');
+      // this.renderer.setStyle(leftPane, 'max-height', '100%');
+      //
       this.renderer.removeClass(splitPane, 'both-visible');
       this.renderer.addClass(splitPane, 'single-pane');
       this.renderer.addClass(leftPane, 'hidden');
       this.renderer.removeClass(rightPane, 'hidden');
       this.renderer.removeClass(leftPane, 'fullscreen');
       this.renderer.addClass(rightPane, 'fullscreen');
-
       this.renderer.setStyle(rightPane, 'flex', '1 1 auto');
       this.renderer.setStyle(rightPane, 'width', '100%');
       this.renderer.setStyle(rightPane, 'height', '100%');
       this.renderer.setStyle(rightPane, 'max-width', '100%');
       this.renderer.setStyle(rightPane, 'max-height', '100%');
+      //
+      const iframe = leftPane.querySelector('iframe');
+      if (iframe) {
+        this.renderer.setStyle(iframe, 'width', '100%');
+        this.renderer.setStyle(iframe, 'height', '100%');
+      }
     }
+    // else if (!this.isVisualizationVisible && this.isCodeVisible) {
+    //   this.renderer.removeClass(splitPane, 'both-visible');
+    //   this.renderer.addClass(splitPane, 'single-pane');
+    //   this.renderer.addClass(leftPane, 'hidden');
+    //   this.renderer.removeClass(rightPane, 'hidden');
+    //   this.renderer.removeClass(leftPane, 'fullscreen');
+    //   this.renderer.addClass(rightPane, 'fullscreen');
+
+    //   this.renderer.setStyle(rightPane, 'flex', '1 1 auto');
+    //   this.renderer.setStyle(rightPane, 'width', '100%');
+    //   this.renderer.setStyle(rightPane, 'height', '100%');
+    //   this.renderer.setStyle(rightPane, 'max-width', '100%');
+    //   this.renderer.setStyle(rightPane, 'max-height', '100%');
+    // }
   }
 
   private setInitialPaneSizes() {
@@ -601,13 +496,12 @@ google.charts.setOnLoadCallback(() => {
       // 2) Build payload including storyId
       const payload = {
         id: this.storyId,
-        // model: this.selectedModel,
-        model: 'DeepSeek-R1',
+        model: this.selectedModel,
         language: this.selectedLanguage.toLowerCase(),
         library: this.selectedLibrary,
         isDVL: this.isDVL,
       };
-      console.log('🚀 generateVisualization() payload:', payload);
+      console.log('generateVisualization() payload:', payload);
 
       // 3) Call backend
       this.visualizeService
@@ -646,109 +540,9 @@ google.charts.setOnLoadCallback(() => {
       this.visualSrc = '';
       this.isGenerating = false;
       console.warn(
-        '⚠️ generateVisualization() skipped: missing storyId or selection'
+        'generateVisualization() skipped: missing storyId or selection'
       );
     }
-  }
-
-  // generateVisualization() {
-  //   if (this.selectedModel && this.selectedLanguage && this.selectedLibrary) {
-  //     this.isGenerating = true;
-
-  //     this.shouldDisplayVisualization = true;
-
-  //     const selected = this.libraries.find(
-  //       (lib) => lib.name === this.selectedLibrary
-  //     );
-
-  //     if (selected) {
-  //       this.refineText = '';
-
-  //       const payload = {
-  //         model: this.selectedModel,
-  //         language: this.selectedLanguage.toLowerCase(),
-  //         library: this.selectedLibrary,
-  //         isDVL: this.isDVL,
-  //       };
-
-  //       console.log(payload);
-
-  //       this.visualizeService.generateVisulization(payload).subscribe(
-  //         (response) => {
-  //           const fullPath = response.output_path;
-  //           this.generatedFilename =
-  //             fullPath.split('/').pop()?.replace('.html', '') || 'test';
-
-  //           this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
-  //             `http://localhost:8000${response.output_path}`
-  //           );
-
-  //           this.codeText = response.code;
-
-  //           const key = 'originalCode';
-  //           if (!localStorage.getItem(key)) {
-  //             localStorage.setItem(key, this.codeText);
-  //           }
-
-  //           setTimeout(() => {
-  //             const wrapper =
-  //               this.el.nativeElement.querySelector('.iframe-wrapper');
-  //             if (wrapper) {
-  //               this.renderer.addClass(wrapper, 'scrollable');
-  //             }
-
-  //             const isPng = response.output_path.endsWith('.png');
-
-  //             if (isPng && this.visualImage) {
-  //               const img = this.visualImage.nativeElement;
-  //               this.renderer.setStyle(img, 'width', '100%');
-  //               this.renderer.setStyle(img, 'height', '100%');
-  //               this.renderer.setStyle(img, 'object-fit', 'contain');
-  //               this.renderer.setStyle(img, 'max-width', '100%');
-  //               this.renderer.setStyle(img, 'max-height', '100%');
-  //               this.renderer.setStyle(img, 'display', 'block');
-  //             } else if (
-  //               !isPng &&
-  //               this.visualFrame &&
-  //               this.visualFrame.nativeElement
-  //             ) {
-  //               const iframe = this.visualFrame.nativeElement;
-  //               this.renderer.setStyle(iframe, 'width', '100%');
-  //               this.renderer.setStyle(iframe, 'height', '100%');
-  //               this.renderer.setStyle(iframe, 'border', 'none');
-  //             }
-
-  //             this.isGenerating = false;
-  //           }, 300);
-  //         },
-  //         (error) => {
-  //           console.error('Error generating visualization:', error);
-  //           this.isGenerating = false;
-  //         }
-  //       );
-  //     }
-  //   } else {
-  //     this.shouldDisplayVisualization = false;
-  //     this.visualSrc = '';
-  //     this.isGenerating = false;
-  //   }
-  // }
-
-  selectLanguage(lang: string) {
-    this.selectedLanguage = lang;
-    this.filteredLibraries = this.libraries.filter(
-      (lib) => lib.language === lang
-    );
-    if (this.filteredLibraries.length > 0) {
-      this.selectLibrary(this.filteredLibraries[0].name);
-    }
-
-    this.animateDropdownChange();
-  }
-
-  selectLibrary(libName: string) {
-    this.selectedLibrary = libName;
-    this.animateDropdownChange();
   }
 
   startDragging(event: MouseEvent) {
@@ -1081,25 +875,101 @@ google.charts.setOnLoadCallback(() => {
       }, 300);
     });
   }
-
-  applyRefinement() {
-    if (!this.refineText.trim()) return;
-
+  applyRefinement(): void {
+    const text = this.refineText.trim();
+    if (!text) {
+      return;
+    }
+    this.history.push({
+      userText: this.refineText.trim(),
+      code: '',
+      time: new Date(),
+      isDone: false,
+      collapsed: true,
+      model: this.selectedModel,
+    });
+    this.refineText = '';
+    const currentItem = this.history[this.history.length - 1];
     this.isGenerating = true;
+    currentItem.isDone = false;
 
-    this.visualizeService.refineVisulization(this.refineText).subscribe(
-      (response) => {
-        this.visualSrc =
-          this.sanitizer.bypassSecurityTrustResourceUrl(response);
+    this.appService.refineVisualization(text).subscribe(
+      (res: RefineResponse) => {
+        this.codeText = res.updated_code;
+        // currentItem.code = res.updated_code;
+        currentItem.code = `We are going to change the y-axis to a log scale as requested.
+The previous code already uses a linear scale, so we will adjust the layout to set the y-axis to log.
+We'll update the update_layout method to set yaxis_type='log'.
+Also, note that using a log scale might require handling zero counts. However, our cumulative counts start at 1 and grow, so it should be safe.
+If there are zeros in cumulative counts, we might need to adjust (but in the provided data, the counts are positive). We'll proceed with the log scale.
+However, let's note: the cumulative counts are computed from the 'count' values. Since the initial counts are positive (minimum 1), the cumulative counts will be at least 1. So no problem.
+We'll change the update_layout for yaxis_type from 'linear' to 'log'.
+Also, we can adjust the title and axis labels accordingly.
+But note: the requirement is to change to log scale on y-axis.
+Let's update the code accordingly.
+`;
+        currentItem.isDone = true;
+        this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `http://localhost:8000${res.output_path}`
+        );
         this.isGenerating = false;
       },
-      (error) => {
-        console.error('Error refining visualization:', error);
+      (err) => {
+        console.error(err);
         this.isGenerating = false;
       }
     );
   }
 
+  // UNDO
+  undoVisualization(): void {
+    if (this.isUndoing) {
+      return; // Prevent multiple simultaneous undo requests
+    }
+
+    this.isUndoing = true;
+
+    this.visualizeService
+      .undoVisualization()
+      .subscribe(
+        (response) => {
+          if (response.status === 'success') {
+            // Update the code editor with the reverted code
+            this.codeText = response.updated_code;
+
+            // Update the visualization with the new output
+            this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+              `http://localhost:8000${response.output_path}`
+            );
+
+            // Update the generated filename for downloads
+            const fullPath = response.output_path;
+            this.generatedFilename =
+              fullPath.split('/').pop()?.replace('.html', '') || 'test';
+
+            // Show success message (optional)
+            console.log('Undo successful:', response.message);
+
+            // You could also show a toast/snackbar message here
+            // this.showMessage('Changes undone successfully');
+          } else {
+            // Handle error response
+            console.error('Undo failed:', response.error_message);
+            // this.handleUndoError(response);
+          }
+        },
+        (error) => {
+          // Handle HTTP error
+          console.error('Undo request failed:', error);
+          // this.handleUndoError(error);
+        }
+      )
+      .add(() => {
+        // This runs whether success or error
+        this.isUndoing = false;
+      });
+  }
+  // UNDO
   copiedMessageShown = false;
 
   copyCode() {

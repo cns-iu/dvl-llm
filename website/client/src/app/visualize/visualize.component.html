@@ -1,75 +1,440 @@
 <div class="visualize-wrapper">
-  <div
-    *ngIf="isGenerating"
-    class="loading-spinner"
-    style="width: 100%; text-align: center; padding: 1rem 0"
-  >
-    Generating visualization… Please wait.
+  <!-- 1) Intro header -->
+  <div class="intro-header">
+    <div class="header-text">Optimize with AI</div>
+    <div class="header-description">
+      Improve the visualization code by prompting with AI.
+    </div>
   </div>
 
-  <div class="tab-container">
-    <div class="tab">DeekSeek-R1</div>
-    <div class="tab">Python</div>
-    <div class="tab">Altair</div>
-    <button
-      class="toggle-button visualization-toggle"
-      (click)="toggleCode()"
-      [title]="isCodeVisible ? 'Close Code Editor' : 'Open Code Editor'"
-      aria-label="Toggle visualization visibility"
-    >
-      <span class="eye-icon">
-        <svg
-          *ngIf="isCodeVisible"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-        <svg
-          *ngIf="!isCodeVisible"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path
-            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94"
-          ></path>
-          <path
-            d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"
-          ></path>
-          <path d="M10.88 10.88a3 3 0 0 0 4.24 4.24"></path>
-          <line x1="1" y1="1" x2="23" y2="23"></line>
-        </svg>
-      </span>
-    </button>
+  <!-- 2) Story + Properties -->
+  <!-- <div class="story-header">
+    <div class="story-info">
+      <h3>Selected Dataset : {{ storyTitle }}</h3>
+      <p>{{ storyDescription }}</p>
+    </div>
+    <div class="info-panel">
+      <h3>Properties</h3>
+      <table class="info-table">
+        <tr>
+          <td>Model</td>
+          <td>{{ selectedModel }}</td>
+        </tr>
+        <tr>
+          <td>Language</td>
+          <td>{{ selectedLanguage }}</td>
+        </tr>
+        <tr>
+          <td>Library</td>
+          <td>{{ selectedLibrary }}</td>
+        </tr>
+      </table>
+    </div>
+  </div> -->
+  <div *ngIf="isGenerating" class="loading-spinner">
+    Generating visualization… Please wait...
   </div>
+  <!-- 5) Split-pane: Code editor on the left, visualization on the right -->
+  <div class="split-pane" #splitPane>
+    <!-- LEFT: ACE editor pane -->
+    <div class="left-pane" #leftPane>
+      <div class="pane-card">
+        <!-- header with title + icons -->
+        <div class="pane-header">
+          <span class="pane-title">Code</span>
+          <div class="pane-icons">
+            <!-- Copy button -->
+            <!-- <button title="Copy code" (click)="copyCode()"> -->
+            <button title="Copy code" (click)="copyCode()">
+              <svg
+                width="17"
+                height="20"
+                viewBox="0 0 17 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6 16C5.45 16 4.97917 15.8042 4.5875 15.4125C4.19583 15.0208 4 14.55 4 14V2C4 1.45 4.19583 0.979167 4.5875 0.5875C4.97917 0.195833 5.45 0 6 0H15C15.55 0 16.0208 0.195833 16.4125 0.5875C16.8042 0.979167 17 1.45 17 2V14C17 14.55 16.8042 15.0208 16.4125 15.4125C16.0208 15.8042 15.55 16 15 16H6ZM2 20C1.45 20 0.979167 19.8042 0.5875 19.4125C0.195833 19.0208 0 18.55 0 18V5C0 4.71667 0.0958333 4.47917 0.2875 4.2875C0.479167 4.09583 0.716667 4 1 4C1.28333 4 1.52083 4.09583 1.7125 4.2875C1.90417 4.47917 2 4.71667 2 5V18H12C12.2833 18 12.5208 18.0958 12.7125 18.2875C12.9042 18.4792 13 18.7167 13 19C13 19.2833 12.9042 19.5208 12.7125 19.7125C12.5208 19.9042 12.2833 20 12 20H2Z"
+                  fill="#201E3D"
+                />
+              </svg>
+            </button>
+            <!-- </button> -->
+            <!-- Revert button -->
+            <!-- <button
+              class="action-button revert-button"
+              title="Revert code"
+              (click)="revertCode()"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M1 4v6h6"></path>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+            </button> -->
+            <!-- Copied message -->
+            <div class="copied-message" *ngIf="copiedMessageShown">Copied!</div>
+          </div>
+        </div>
+        <!-- content area -->
+        <div class="pane-content">
+          <ace-editor
+            [(text)]="codeText"
+            [mode]="selectedLanguage.toLowerCase()"
+            [theme]="'monokai'"
+            style="width: 100%; height: 100%"
+            [readOnly]="false"
+          ></ace-editor>
+        </div>
+      </div>
+    </div>
 
-  <!-- Improved split pane with fixed height alignment -->
-  <div
-    class="split-pane"
-    #splitPane
-    [ngClass]="{ 'both-visible': isVisualizationVisible && isCodeVisible }"
-  >
-    <!-- Left pane with code editor -->
+    <!-- unchanged drag handle -->
     <div
-      class="left-pane"
-      #leftPane
-      [ngClass]="{ hidden: !isCodeVisible }"
-      [@fadeInOut]="isCodeVisible"
+      class="drag-bar"
+      #dragBar
+      (mousedown)="startDragging($event)"
+      (touchstart)="startTouchDragging($event)"
+    ></div>
+
+    <!-- RIGHT: Visualization pane -->
+    <div class="right-pane" #rightPane>
+      <div class="pane-card">
+        <!-- header with title + download icon -->
+        <div class="pane-header">
+          <span class="pane-title">Visualization</span>
+          <div class="pane-icons">
+            <!-- Undo -->
+            <button
+              title="Undo"
+              (click)="undoVisualization()"
+              [disabled]="isUndoing"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <mask
+                  id="mask0_4407_3008"
+                  style="mask-type: alpha"
+                  maskUnits="userSpaceOnUse"
+                  x="0"
+                  y="0"
+                  width="24"
+                  height="24"
+                >
+                  <rect width="24" height="24" fill="#D9D9D9" />
+                </mask>
+                <g mask="url(#mask0_4407_3008)">
+                  <path
+                    d="M7.9998 19C7.71647 19 7.47897 18.9042 7.2873 18.7125C7.09564 18.5208 6.9998 18.2833 6.9998 18C6.9998 17.7167 7.09564 17.4792 7.2873 17.2875C7.47897 17.0958 7.71647 17 7.9998 17H14.0998C15.1498 17 16.0623 16.6667 16.8373 16C17.6123 15.3333 17.9998 14.5 17.9998 13.5C17.9998 12.5 17.6123 11.6667 16.8373 11C16.0623 10.3333 15.1498 10 14.0998 10H7.7998L9.6998 11.9C9.88314 12.0833 9.9748 12.3167 9.9748 12.6C9.9748 12.8833 9.88314 13.1167 9.6998 13.3C9.51647 13.4833 9.28314 13.575 8.9998 13.575C8.71647 13.575 8.48314 13.4833 8.2998 13.3L4.6998 9.7C4.5998 9.6 4.52897 9.49167 4.4873 9.375C4.44564 9.25834 4.4248 9.13334 4.4248 9C4.4248 8.86667 4.44564 8.74167 4.4873 8.625C4.52897 8.50834 4.5998 8.4 4.6998 8.3L8.2998 4.7C8.48314 4.51667 8.71647 4.425 8.9998 4.425C9.28314 4.425 9.51647 4.51667 9.6998 4.7C9.88314 4.88334 9.9748 5.11667 9.9748 5.4C9.9748 5.68334 9.88314 5.91667 9.6998 6.1L7.7998 8H14.0998C15.7165 8 17.104 8.525 18.2623 9.575C19.4206 10.625 19.9998 11.9333 19.9998 13.5C19.9998 15.0667 19.4206 16.375 18.2623 17.425C17.104 18.475 15.7165 19 14.0998 19H7.9998Z"
+                    fill="#201E3D"
+                  />
+                </g>
+              </svg>
+            </button>
+            <!-- Undo -->
+            <!-- // -->
+            <button
+              title="{{ isCodeVisible ? 'Hide code' : 'Show code' }}"
+              (click)="toggleCode()"
+            >
+              <!-- eye-open when code is visible, eye-off when it is hidden -->
+              <svg
+                *ngIf="isCodeVisible"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <mask
+                  id="mask0_4407_749"
+                  style="mask-type: alpha"
+                  maskUnits="userSpaceOnUse"
+                  x="0"
+                  y="0"
+                  width="24"
+                  height="24"
+                >
+                  <rect width="24" height="24" fill="#D9D9D9" />
+                </mask>
+                <g mask="url(#mask0_4407_749)">
+                  <path
+                    d="M19.0984 21.8996L15.5984 18.4496C15.0151 18.6329 14.4234 18.7704 13.8234 18.8621C13.2234 18.9538 12.6151 18.9996 11.9984 18.9996C9.7651 18.9996 7.72344 18.3996 5.87344 17.1996C4.02344 15.9996 2.57344 14.4163 1.52344 12.4496C1.4401 12.2996 1.3776 12.1454 1.33594 11.9871C1.29427 11.8288 1.27344 11.6663 1.27344 11.4996C1.27344 11.3329 1.29427 11.1704 1.33594 11.0121C1.3776 10.8538 1.4401 10.6996 1.52344 10.5496C1.8901 9.89961 2.28177 9.26628 2.69844 8.64961C3.1151 8.03294 3.59844 7.48294 4.14844 6.99961L2.07344 4.89961C1.8901 4.71628 1.79844 4.48711 1.79844 4.21211C1.79844 3.93711 1.89844 3.69961 2.09844 3.49961C2.28177 3.31628 2.5151 3.22461 2.79844 3.22461C3.08177 3.22461 3.3151 3.31628 3.49844 3.49961L20.4984 20.4996C20.6818 20.6829 20.7776 20.9121 20.7859 21.1871C20.7943 21.4621 20.6984 21.6996 20.4984 21.8996C20.3151 22.0829 20.0818 22.1746 19.7984 22.1746C19.5151 22.1746 19.2818 22.0829 19.0984 21.8996ZM11.9984 15.9996C12.1818 15.9996 12.3568 15.9913 12.5234 15.9746C12.6901 15.9579 12.8568 15.9246 13.0234 15.8746L7.62344 10.4746C7.57344 10.6413 7.5401 10.8079 7.52344 10.9746C7.50677 11.1413 7.49844 11.3163 7.49844 11.4996C7.49844 12.7496 7.93594 13.8121 8.81094 14.6871C9.68594 15.5621 10.7484 15.9996 11.9984 15.9996ZM11.9984 3.99961C14.2318 3.99961 16.2776 4.60378 18.1359 5.81211C19.9943 7.02044 21.4484 8.60794 22.4984 10.5746C22.5818 10.7079 22.6443 10.8538 22.6859 11.0121C22.7276 11.1704 22.7484 11.3329 22.7484 11.4996C22.7484 11.6663 22.7318 11.8288 22.6984 11.9871C22.6651 12.1454 22.6068 12.2913 22.5234 12.4246C22.2068 13.0413 21.8526 13.6246 21.4609 14.1746C21.0693 14.7246 20.6318 15.2413 20.1484 15.7246C19.9151 15.9579 19.6401 16.0663 19.3234 16.0496C19.0068 16.0329 18.7318 15.9079 18.4984 15.6746L16.4984 13.6746C16.3818 13.5579 16.3068 13.4204 16.2734 13.2621C16.2401 13.1038 16.2484 12.9413 16.2984 12.7746C16.3651 12.5579 16.4151 12.3496 16.4484 12.1496C16.4818 11.9496 16.4984 11.7329 16.4984 11.4996C16.4984 10.2496 16.0609 9.18711 15.1859 8.31211C14.3109 7.43711 13.2484 6.99961 11.9984 6.99961C11.7651 6.99961 11.5484 7.01628 11.3484 7.04961C11.1484 7.08294 10.9401 7.13294 10.7234 7.19961C10.5568 7.24961 10.3901 7.25794 10.2234 7.22461C10.0568 7.19128 9.9151 7.11628 9.79844 6.99961L8.97344 6.17461C8.65677 5.85794 8.5526 5.49128 8.66094 5.07461C8.76927 4.65794 9.03177 4.39128 9.44844 4.27461C9.8651 4.19128 10.2859 4.12461 10.7109 4.07461C11.1359 4.02461 11.5651 3.99961 11.9984 3.99961ZM13.9734 9.64961C14.1568 9.86628 14.3109 10.1038 14.4359 10.3621C14.5609 10.6204 14.6401 10.8913 14.6734 11.1746C14.6901 11.3079 14.6401 11.3996 14.5234 11.4496C14.4068 11.4996 14.2984 11.4746 14.1984 11.3746L12.1484 9.32461C12.0484 9.22461 12.0276 9.11628 12.0859 8.99961C12.1443 8.88294 12.2401 8.82461 12.3734 8.82461C12.6901 8.85794 12.9818 8.94544 13.2484 9.08711C13.5151 9.22878 13.7568 9.41628 13.9734 9.64961Z"
+                    fill="#201E3D"
+                  />
+                </g>
+              </svg>
+
+              <svg
+                *ngIf="!isCodeVisible"
+                height="18"
+                width="18"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
+                  fill="#201E3D"
+                />
+                <circle cx="12" cy="12" r="3" fill="#fff" />
+              </svg>
+            </button>
+            <!-- // -->
+            <!-- Dataset -->
+            <button
+              title="Dataset"
+              onclick="window.open('https://github.com/cns-iu/dvl-llm/tree/main/data/hra', '_blank')"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9 8C11.5 8 13.625 7.60833 15.375 6.825C17.125 6.04167 18 5.1 18 4C18 2.9 17.125 1.95833 15.375 1.175C13.625 0.391667 11.5 0 9 0C6.5 0 4.375 0.391667 2.625 1.175C0.875 1.95833 0 2.9 0 4C0 5.1 0.875 6.04167 2.625 6.825C4.375 7.60833 6.5 8 9 8ZM9 10.5C9.68333 10.5 10.5375 10.4292 11.5625 10.2875C12.5875 10.1458 13.575 9.91667 14.525 9.6C15.475 9.28333 16.2917 8.87083 16.975 8.3625C17.6583 7.85417 18 7.23333 18 6.5V9C18 9.73333 17.6583 10.3542 16.975 10.8625C16.2917 11.3708 15.475 11.7833 14.525 12.1C13.575 12.4167 12.5875 12.6458 11.5625 12.7875C10.5375 12.9292 9.68333 13 9 13C8.31667 13 7.4625 12.9292 6.4375 12.7875C5.4125 12.6458 4.425 12.4167 3.475 12.1C2.525 11.7833 1.70833 11.3708 1.025 10.8625C0.341667 10.3542 0 9.73333 0 9V6.5C0 7.23333 0.341667 7.85417 1.025 8.3625C1.70833 8.87083 2.525 9.28333 3.475 9.6C4.425 9.91667 5.4125 10.1458 6.4375 10.2875C7.4625 10.4292 8.31667 10.5 9 10.5ZM9 15.5C9.68333 15.5 10.5375 15.4292 11.5625 15.2875C12.5875 15.1458 13.575 14.9167 14.525 14.6C15.475 14.2833 16.2917 13.8708 16.975 13.3625C17.6583 12.8542 18 12.2333 18 11.5V14C18 14.7333 17.6583 15.3542 16.975 15.8625C16.2917 16.3708 15.475 16.7833 14.525 17.1C13.575 17.4167 12.5875 17.6458 11.5625 17.7875C10.5375 17.9292 9.68333 18 9 18C8.31667 18 7.4625 17.9292 6.4375 17.7875C5.4125 17.6458 4.425 17.4167 3.475 17.1C2.525 16.7833 1.70833 16.3708 1.025 15.8625C0.341667 15.3542 0 14.7333 0 14V11.5C0 12.2333 0.341667 12.8542 1.025 13.3625C1.70833 13.8708 2.525 14.2833 3.475 14.6C4.425 14.9167 5.4125 15.1458 6.4375 15.2875C7.4625 15.4292 8.31667 15.5 9 15.5Z"
+                  fill="#201E3D"
+                />
+              </svg>
+            </button>
+            <!-- Dataset -->
+            <button
+              title="Download visualization"
+              (click)="downloadVisualization()"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M8 11.575C7.86667 11.575 7.74167 11.5542 7.625 11.5125C7.50833 11.4708 7.4 11.4 7.3 11.3L3.7 7.7C3.5 7.5 3.40417 7.26667 3.4125 7C3.42083 6.73333 3.51667 6.5 3.7 6.3C3.9 6.1 4.1375 5.99583 4.4125 5.9875C4.6875 5.97917 4.925 6.075 5.125 6.275L7 8.15V1C7 0.716667 7.09583 0.479167 7.2875 0.2875C7.47917 0.0958333 7.71667 0 8 0C8.28333 0 8.52083 0.0958333 8.7125 0.2875C8.90417 0.479167 9 0.716667 9 1V8.15L10.875 6.275C11.075 6.075 11.3125 5.97917 11.5875 5.9875C11.8625 5.99583 12.1 6.1 12.3 6.3C12.4833 6.5 12.5792 6.73333 12.5875 7C12.5958 7.26667 12.5 7.5 12.3 7.7L8.7 11.3C8.6 11.4 8.49167 11.4708 8.375 11.5125C8.25833 11.5542 8.13333 11.575 8 11.575ZM2 16C1.45 16 0.979167 15.8042 0.5875 15.4125C0.195833 15.0208 0 14.55 0 14V12C0 11.7167 0.0958333 11.4792 0.2875 11.2875C0.479167 11.0958 0.716667 11 1 11C1.28333 11 1.52083 11.0958 1.7125 11.2875C1.90417 11.4792 2 11.7167 2 12V14H14V12C14 11.7167 14.0958 11.4792 14.2875 11.2875C14.4792 11.0958 14.7167 11 15 11C15.2833 11 15.5208 11.0958 15.7125 11.2875C15.9042 11.4792 16 11.7167 16 12V14C16 14.55 15.8042 15.0208 15.4125 15.4125C15.0208 15.8042 14.55 16 14 16H2Z"
+                  fill="#201E3D"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <!-- content area -->
+        <div class="pane-content">
+          <div class="iframe-wrapper" *ngIf="visualSrc">
+            <iframe
+              *ngIf="!visualSrc.toString().endsWith('.png')"
+              [src]="visualSrc"
+              class="visual-frame"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+            <img
+              *ngIf="visualSrc.toString().endsWith('.png')"
+              [src]="visualSrc"
+              class="image-frame"
+              alt="Visualization PNG"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 4) Refine -->
+  <!-- <div *ngIf="!isGenerating" class="refine-section">
+    <h2 class="refine-header">How Can I help optimize this visualization?</h2>
+    <div class="refine-controls">
+      <textarea
+        class="refine-input"
+        [(ngModel)]="refineText"
+        placeholder="Suggest an Improvement or Edit"
+      ></textarea>
+      <button class="refine-button" (click)="applyRefinement()">Submit</button>
+    </div>
+    <div class="suggestions">
+      <button
+        *ngFor="let s of suggestions"
+        type="button"
+        class="suggestion-button"
+        (click)="setRefinePrompt(s.description)"
+      >
+        {{ s.keyword }}
+      </button>
+    </div>
+  </div> -->
+
+  <!-- // -->
+  <!--  CHAT HISTORY -->
+  <section class="history-list" *ngIf="history.length">
+    <article *ngFor="let h of history; let last = last" class="history-item">
+      <!-- user pill (right) -->
+      <div class="user-pill">{{ h.userText }}</div>
+
+      <!-- avatar + header (left) -->
+      <div class="assistant-message">
+        <div class="assistant-header">
+          <div class="avatar"></div>
+          <span class="assistant-name">{{ h.model }}</span>
+          <span class="timestamp"
+            >Today at {{ h.time | date : "shortTime" }}</span
+          >
+        </div>
+
+        <!-- assistant body -->
+        <div class="assistant-body" [ngClass]="{ waiting: !h.isDone }">
+          <ng-container *ngIf="!h.isDone">
+            <!-- <span class="thinking-icon">⚡</span> Thinking… -->
+            <span class="thinking-icon"
+              ><svg
+                width="19"
+                height="19"
+                viewBox="0 0 19 19"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M13.1502 10.6694L11.0002 14.1194C10.8169 14.4028 10.5627 14.5194 10.2377 14.4694C9.9127 14.4194 9.70853 14.2278 9.6252 13.8944L8.9252 11.0944L2.1002 17.9194C1.91686 18.1028 1.6877 18.1986 1.4127 18.2069C1.1377 18.2153 0.900195 18.1194 0.700195 17.9194C0.516862 17.7361 0.425195 17.5028 0.425195 17.2194C0.425195 16.9361 0.516862 16.7028 0.700195 16.5194L7.5252 9.66944L4.7252 8.96944C4.39186 8.88611 4.2002 8.68194 4.1502 8.35694C4.1002 8.03194 4.21686 7.77777 4.5002 7.59444L7.9502 5.46944L7.6502 1.39444C7.61686 1.0611 7.7502 0.819438 8.0502 0.669438C8.3502 0.519438 8.6252 0.552771 8.8752 0.769438L12.0002 3.39444L15.7752 1.86944C16.0919 1.7361 16.3669 1.7861 16.6002 2.01944C16.8335 2.25277 16.8835 2.52777 16.7502 2.84444L15.2252 6.61944L17.8502 9.71944C18.0669 9.96944 18.1002 10.2444 17.9502 10.5444C17.8002 10.8444 17.5585 10.9778 17.2252 10.9444L13.1502 10.6694ZM0.350195 3.96944C0.250195 3.86944 0.200195 3.75277 0.200195 3.61944C0.200195 3.4861 0.250195 3.36944 0.350195 3.26944L1.6502 1.96944C1.7502 1.86944 1.86686 1.81944 2.0002 1.81944C2.13353 1.81944 2.2502 1.86944 2.3502 1.96944L3.6502 3.26944C3.7502 3.36944 3.8002 3.4861 3.8002 3.61944C3.8002 3.75277 3.7502 3.86944 3.6502 3.96944L2.3502 5.26944C2.2502 5.36944 2.13353 5.41944 2.0002 5.41944C1.86686 5.41944 1.7502 5.36944 1.6502 5.26944L0.350195 3.96944ZM14.6502 18.2694L13.3502 16.9694C13.2502 16.8694 13.2002 16.7528 13.2002 16.6194C13.2002 16.4861 13.2502 16.3694 13.3502 16.2694L14.6502 14.9694C14.7502 14.8694 14.8669 14.8194 15.0002 14.8194C15.1335 14.8194 15.2502 14.8694 15.3502 14.9694L16.6502 16.2694C16.7502 16.3694 16.8002 16.4861 16.8002 16.6194C16.8002 16.7528 16.7502 16.8694 16.6502 16.9694L15.3502 18.2694C15.2502 18.3694 15.1335 18.4194 15.0002 18.4194C14.8669 18.4194 14.7502 18.3694 14.6502 18.2694Z"
+                  fill="#E00D3A"
+                />
+              </svg>
+            </span>
+            <span class="thinking-text">Thinking...</span>
+          </ng-container>
+          <ng-container *ngIf="h.isDone">
+            <pre class="code-preview" [class.collapsed]="h.collapsed"
+              >{{ h.code }} </pre
+            >
+
+            <!-- <button class="toggle-btn" (click)="h.collapsed = !h.collapsed">
+            {{ h.collapsed ? "Show more" : "Show less" }}
+          </button> -->
+            <button class="toggle-btn" (click)="h.collapsed = !h.collapsed">
+              <ng-container *ngIf="h.collapsed; else expanded">
+                <!-- ▼ Show more -->
+                <svg
+                  width="24"
+                  height="25"
+                  viewBox="0 0 24 25"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <mask
+                    id="showMoreMask"
+                    maskUnits="userSpaceOnUse"
+                    x="0"
+                    y="0"
+                    width="24"
+                    height="25"
+                  >
+                    <rect y="0.619446" width="24" height="24" fill="#D9D9D9" />
+                  </mask>
+                  <g mask="url(#showMoreMask)">
+                    <path
+                      d="M12 15.5944c-.134 0-.259-.022-.376-.063a.998.998 0 0 1-.325-.18L6.7 10.719a1.02 1.02 0 0 1 0-1.438 1 1 0 0 1 1.4 0L12 13.22l3.9-3.939a1 1 0 0 1 1.4 1.438l-4.6 4.6a.998.998 0 0 1-.325.18c-.117.041-.242.063-.375.063z"
+                      fill="#B20A2F"
+                    />
+                  </g>
+                </svg>
+                <span>Show more</span>
+              </ng-container>
+
+              <ng-template #expanded>
+                <!-- ▲ Show less -->
+                <svg
+                  width="24"
+                  height="25"
+                  viewBox="0 0 24 25"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <mask
+                    id="showLessMask"
+                    maskUnits="userSpaceOnUse"
+                    x="0"
+                    y="0"
+                    width="24"
+                    height="25"
+                  >
+                    <rect y="0.619385" width="24" height="24" fill="#D9D9D9" />
+                  </mask>
+                  <g mask="url(#showLessMask)">
+                    <path
+                      d="M12 11.4194l-3.9 3.9a1 1 0 0 1-1.4-1.437l4.6-4.6a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1-1.4 1.437l-3.9-3.9z"
+                      fill="#B20A2F"
+                    />
+                  </g>
+                </svg>
+                <span>Show less</span>
+              </ng-template>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </article>
+  </section>
+  <!-- CHAT HISTORY END -->
+
+  <!-- // -->
+  <div class="refine-box">
+    <!-- ❶  multi-line input -->
+    <textarea
+      class="refine-input"
+      [(ngModel)]="refineText"
+      placeholder="Optimize visualization with AI"
     >
-      <!-- Code editor action buttons -->
-      <div class="button-container">
-        <!-- Copy button -->
+    </textarea>
+
+    <!-- ❷  chips + arrow share one grid row -->
+    <div class="chip-row">
+      <div class="suggestions">
+        <button
+          *ngFor="let s of suggestions"
+          class="suggestion-button"
+          (click)="setRefinePrompt(s.description)"
+        >
+          {{ s.keyword }}
+        </button>
+      </div>
+
+      <!-- submit icon -->
+      <button
+        [disabled]="isGenerating"
+        class="submit-icon"
+        (click)="applyRefinement()"
+      >
+        <!-- Arrow -->
+        <svg
+          width="12"
+          height="13"
+          viewBox="0 0 12 13"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5.00078 3.41984L2.10078 6.31984C1.91745 6.50317 1.68411 6.59484 1.40078 6.59484C1.11745 6.59484 0.884115 6.50317 0.700781 6.31984C0.517448 6.1365 0.425781 5.90317 0.425781 5.61984C0.425781 5.3365 0.517448 5.10317 0.700781 4.91984L5.30078 0.319836C5.50078 0.119836 5.73411 0.0198364 6.00078 0.0198364C6.26745 0.0198364 6.50078 0.119836 6.70078 0.319836L11.3008 4.91984C11.4841 5.10317 11.5758 5.3365 11.5758 5.61984C11.5758 5.90317 11.4841 6.1365 11.3008 6.31984C11.1174 6.50317 10.8841 6.59484 10.6008 6.59484C10.3174 6.59484 10.0841 6.50317 9.90078 6.31984L7.00078 3.41984V11.6198C7.00078 11.9032 6.90495 12.1407 6.71328 12.3323C6.52161 12.524 6.28411 12.6198 6.00078 12.6198C5.71745 12.6198 5.47995 12.524 5.28828 12.3323C5.09661 12.1407 5.00078 11.9032 5.00078 11.6198V3.41984Z"
+            fill="#201E3D"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="split-pane" #splitPane>
+    LEFT: ACE editor - c
+    <div class="left-pane" #leftPane>
+      <span class="button-container">
+        Copy button - c
         <button
           class="action-button copy-button"
           title="Copy code"
@@ -91,7 +456,8 @@
           </svg>
         </button>
         <div class="copied-message" *ngIf="copiedMessageShown">Copied!</div>
-        <!-- Revert button -->
+
+        Revert button -c
         <button
           class="action-button revert-button"
           title="Revert code"
@@ -110,7 +476,8 @@
             <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
           </svg>
         </button>
-      </div>
+      </span>
+
       <ace-editor
         [(text)]="codeText"
         [mode]="selectedLanguage.toLowerCase()"
@@ -118,146 +485,68 @@
         style="width: 100%; height: 100%"
         [readOnly]="false"
       ></ace-editor>
-    </div>
-    <div
-      class="drag-bar-vertical"
-      (mousedown)="startDragging($event)"
-      (touchstart)="startTouchDragging($event)"
-      *ngIf="isVisualizationVisible && isCodeVisible"
-    ></div>
-    <!-- Right pane with visualization -->
-    <div
-      class="right-pane"
-      #rightPane
-      [ngClass]="{ hidden: !isVisualizationVisible }"
-      [@fadeInOut]="isVisualizationVisible"
-    >
-      <div class="visualization-container" #visualizationContainer>
-        <div class="download-container">
-          <button
-            class="download-button"
-            title="Download visualization"
-            (click)="downloadVisualization()"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-          </button>
-        </div>
-        <div class="iframe-wrapper scrollable">
-          <!-- Conditionally render iframe or img -->
-          <ng-container *ngIf="selectedLibrary && visualSrc">
-            <iframe
-              *ngIf="!visualSrc.toString().endsWith('.png')"
-              #visualFrame
-              class="visual-frame"
-              [src]="visualSrc"
-              frameborder="0"
-              allowfullscreen
-            ></iframe>
-            <img
-              #visualImage
-              *ngIf="visualSrc.toString().endsWith('.png')"
-              class="image-frame"
-              [src]="visualSrc"
-              alt="PNG visualization"
-            />
-          </ng-container>
-        </div>
+      <ace-editor
+        [(text)]="codeText"
+        [mode]="selectedLanguage.toLowerCase()"
+        [theme]="'twilight'"
+        [readOnly]="false"
+        [autoUpdateContent]="true"
+        [durationBeforeCallback]="1000"
+        style="width: 100%; height: 100%"
+      ></ace-editor>
+      <div class="code-buttons">
+        <button (click)="copyCode()" title="Copy code">Copy</button>
+        <button (click)="revertCode()" title="Undo">Undo</button>
       </div>
     </div>
-    <!-- Overlay div to capture events during dragging -->
-    <div *ngIf="showDragOverlay" class="drag-overlay" #dragOverlay></div>
-  </div>
-  <!-- Refine feature at the bottom -->
-  <div class="refine-section">
-    <h2 class="refine-header">Refine</h2>
-    <textarea
-      class="refine-input"
-      [(ngModel)]="refineText"
-      placeholder="Enter natural language instructions to refine your visualization..."
-    ></textarea>
-    <button class="refine-button" (click)="applyRefinement()">Submit</button>
 
-    <div class="snackbar-container">
-      <button
-        class="snackbar visualize"
-        (click)="insertText('Apply linear scale on y-axis', $event)"
-      >
-        <span class="snackbar-text">Apply linear scale on y-axis</span>
-        <span class="tag visualize">Visualize</span>
-      </button>
-      <button
-        class="snackbar visualize"
-        (click)="
-          insertText(
-            'Assign custom color per group using color brewer colors',
-            $event
-          )
-        "
-      >
-        <span class="snackbar-text"
-          >Assign custom color per group using color brewer colors</span
+    DRAG HANDLE-c
+    <div
+      class="drag-bar"
+      #dragBar
+      (mousedown)="startDragging($event)"
+      (touchstart)="startTouchDragging($event)"
+    ></div>
+
+    RIGHT: Visualization-c
+    <div class="right-pane" #rightPane>
+      <div class="download-container">
+        <button
+          class="download-button"
+          title="Download visualization"
+          (click)="downloadVisualization()"
         >
-        <span class="tag visualize">Visualize</span>
-      </button>
-      <button
-        class="snackbar analyze"
-        (click)="insertText('Apply logarithmic scale on y-axis', $event)"
-      >
-        <span class="snackbar-text">Apply logarithmic scale on y-axis</span>
-        <span class="tag analyze">Analyze</span>
-      </button>
-      <button
-        class="snackbar analyze"
-        (click)="
-          insertText(
-            'Convert and sort the x-axis by date time descending',
-            $event
-          )
-        "
-      >
-        <span class="snackbar-text"
-          >Convert and sort the x-axis by date time descending</span
-        >
-        <span class="tag analyze">Analyze</span>
-      </button>
-      <button
-        class="snackbar deploy"
-        (click)="
-          insertText('Export the figure as .HTML for interactivity', $event)
-        "
-      >
-        <span class="snackbar-text"
-          >Export the figure as .HTML for interactivity</span
-        >
-        <span class="tag deploy">Deploy</span>
-      </button>
-      <button
-        class="snackbar deploy"
-        (click)="
-          insertText(
-            'Generate a high-resolution image of the plot by setting resolution to 300 DPI with all content tightly fitted in the saved file',
-            $event
-          )
-        "
-      >
-        <span class="snackbar-text"
-          >Generate a high-resolution image of the plot by setting resolution to
-          300 DPI with all content tightly fitted in the saved file</span
-        >
-        <span class="tag deploy">Deploy</span>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="iframe-wrapper">
+        <ng-container *ngIf="visualSrc">
+          <iframe
+            *ngIf="!visualSrc.toString().endsWith('.png')"
+            [src]="visualSrc"
+            class="visual-frame"
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+          <img
+            *ngIf="visualSrc.toString().endsWith('.png')"
+            [src]="visualSrc"
+            class="image-frame"
+            alt="Visualization PNG"
+          />
+        </ng-container>
+      </div>
     </div>
-  </div>
-</div>
+  </div> -->
