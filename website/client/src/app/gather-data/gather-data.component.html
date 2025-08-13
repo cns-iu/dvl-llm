@@ -1,34 +1,109 @@
-@if (!isChildRoute) {
-<div class="gather-container">
-  <h2>Acquire Data</h2>
-  <table class="data-table">
-    <tbody>
-      @for (story of userStories; track story.id) {
-      <tr class="data-row">
-        <td class="img-cell">
-          <img
-            [src]="story.image_url"
-            alt="User Story {{ story.id }}"
-            style="width: 3cm; height: 3cm"
-          />
-        </td>
-        <td class="text-cell">
-          <div class="user-story">{{ story.userstory }}</div>
-          <div class="description">{{ story.description }}</div>
-        </td>
-        <td class="btn-cell">
-          <button class="explore-btn" (click)="onExplore(story.id)">
-            Explore →
-          </button>
-        </td>
-      </tr>
-      } @empty {
-      <tr>
-        <td colspan="3">There are no user stories.</td>
-      </tr>
-      }
-    </tbody>
-  </table>
+<!-- Only show on /gather, hide on /gather/analyze/... -->
+<div *ngIf="!isChildRoute" class="gather-container">
+  <div class="content-container">
+    <div class="main-content">
+      <div class="header">Select dataset</div>
+      <p class="header-content">
+        Select a
+        <!-- <span class="hra-highlight">Human Reference Atlas</span> -->
+        <a
+          class="hra-highlight"
+          href="https://humanatlas.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Human Reference Atlas</a
+        >
+        dataset to get started.
+      </p>
+
+      <!-- <nav class="page-nav" *ngIf="sectionIds.length">
+    <ul>
+      <li
+        *ngFor="let cat of sectionIds"
+        [class.active]="currentSection === cat"
+      >
+        <button (click)="scrollTo(cat)">{{ cat }}</button>
+      </li>
+    </ul>
+   </nav> -->
+      <!-- 2. One section per category -->
+      <div
+        class="category-section"
+        *ngFor="let cat of sectionIds"
+        [attr.id]="cat"
+      >
+        <h2 class="category-title">{{ cat }}</h2>
+
+        <div class="card-list">
+          <div
+            class="dataset-card"
+            *ngFor="let story of getStoriesByCategory(cat)"
+          >
+            <img
+              class="dataset-image"
+              [src]="story.image_url"
+              [alt]="'Dataset ' + story.id"
+            />
+            <div class="card-content">
+              <h3 class="dataset-title">{{ story.userstory }}</h3>
+              <p class="dataset-description">{{ story.description }}</p>
+            </div>
+            <button class="use-btn" (click)="onExplore(story.id)">
+              Use dataset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="sidebar">
+      <nav class="page-nav" *ngIf="sectionIds.length">
+        <ul>
+          <span>On this page</span>
+          <li
+            *ngFor="let cat of sectionIds"
+            [class.active]="currentSection === cat"
+          >
+            <button (click)="scrollTo(cat)">{{ cat }}</button>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+  </div>
 </div>
-}
+
 <router-outlet></router-outlet>
+
+<!-- Only show on /gather, hide on /gather/analyze/... -->
+<!-- <div *ngIf="!isChildRoute" class="gather-container">
+  <h2>Select Dataset</h2>
+  <hr />
+  <p>
+    Select a
+    <span class="hra-highlight">Human Reference Atlas</span>
+    dataset to get started.
+  </p> -->
+<!-- grid of cards -->
+<!-- <div class="card-list">
+    <div class="dataset-card" *ngFor="let story of userStories">
+      <img
+        class="dataset-image"
+        [src]="story.image_url"
+        [alt]="'Dataset ' + story.id"
+      /> -->
+
+<!-- title & description -->
+<!-- <div class="card-content">
+        <h3 class="dataset-title">{{ story.userstory }}</h3>
+        <p class="dataset-description">{{ story.description }}</p>
+        <p>{{ story.category }}</p>
+      </div> -->
+
+<!-- action -->
+<!-- <button class="use-btn" (click)="onExplore(story.id)">
+        Use dataset →
+      </button>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet> -->

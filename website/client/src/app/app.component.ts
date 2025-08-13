@@ -7,6 +7,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import { FooterComponent } from './footer/footer.component';
+import { HomeComponent } from './home/home.component';
+import { StatusIndicatorComponent } from './status-indicator/status-indicator.component';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -19,9 +23,12 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
     FormsModule,
     HttpClientModule,
     BreadcrumbComponent,
+    FooterComponent,
+    HomeComponent,
+    StatusIndicatorComponent,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
   title = 'dvl-llm';

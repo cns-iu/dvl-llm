@@ -1,0 +1,57 @@
+.app-footer {
+  background-color: #4b4b5e;
+  color: #fff;
+}
+
+/* 1 280px-wide container (border-box), centered, with 80/40 padding */
+.footer-container {
+  box-sizing: border-box;
+  width: 100%;
+  /* max-width: 1280px; */
+  margin: 0 auto;
+  padding: 80px 0; /* ← CHANGE: Remove left/right padding completely */
+  display: flex;
+  align-items: center;
+}
+
+.footer-logo {
+  flex: 0 0 142px;
+  width: 142px;
+  height: 48.16px;
+  display: block;
+  margin-left: 40px; /* ← ADD: 40px margin only on logo */
+}
+
+.footer-text {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 500;
+  gap: 0.5rem;
+  padding-right: 40px; /* ← ADD: 40px padding only on text */
+}
+
+/* © icon sizing */
+.copyright-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  .footer-logo {
+    margin-bottom: 1rem;
+  }
+  .footer-text {
+    justify-content: center;
+  }
+}

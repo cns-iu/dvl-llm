@@ -1,12 +1,50 @@
 <mat-toolbar color="primary">
   <img
-    src="https://cdn.humanatlas.io/ui/dashboard-ui/assets/logo/hra-logo-2.svg"
+    src="https://raw.githubusercontent.com/hubmapconsortium/hra-ui/main/libs/design-system/assets/brand/mark/small.svg"
     height="40"
-    style="margin-right: 16px"
+    style="margin-right: 8px"
   />
-  <span>Data Visualization Literacy Framework</span>
+  <svg
+    class="brand-image"
+    width="40"
+    height="40"
+    viewBox="0 0 40 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="40" height="40" rx="20" fill="#201E3D" />
+    <mask
+      id="mask0_3557_116033"
+      style="mask-type: alpha"
+      maskUnits="userSpaceOnUse"
+      x="8"
+      y="8"
+      width="24"
+      height="24"
+    >
+      <rect x="8" y="8" width="24" height="24" fill="#D9D9D9" />
+    </mask>
+    <g mask="url(#mask0_3557_116033)">
+      <path
+        d="M24.1492 21.0491L21.9992 24.4991C21.8159 24.7824 21.5617 24.8991 21.2367 24.8491C20.9117 24.7991 20.7076 24.6074 20.6242 24.2741L19.9242 21.4741L13.0992 28.2991C12.9159 28.4824 12.6867 28.5782 12.4117 28.5866C12.1367 28.5949 11.8992 28.4991 11.6992 28.2991C11.5159 28.1157 11.4242 27.8824 11.4242 27.5991C11.4242 27.3157 11.5159 27.0824 11.6992 26.8991L18.5242 20.0491L15.7242 19.3491C15.3909 19.2657 15.1992 19.0616 15.1492 18.7366C15.0992 18.4116 15.2159 18.1574 15.4992 17.9741L18.9492 15.8491L18.6492 11.7741C18.6159 11.4407 18.7492 11.1991 19.0492 11.0491C19.3492 10.8991 19.6242 10.9324 19.8742 11.1491L22.9992 13.7741L26.7742 12.2491C27.0909 12.1157 27.3659 12.1657 27.5992 12.3991C27.8326 12.6324 27.8826 12.9074 27.7492 13.2241L26.2242 16.9991L28.8492 20.0991C29.0659 20.3491 29.0992 20.6241 28.9492 20.9241C28.7992 21.2241 28.5576 21.3574 28.2242 21.3241L24.1492 21.0491ZM11.3492 14.3491C11.2492 14.2491 11.1992 14.1324 11.1992 13.9991C11.1992 13.8657 11.2492 13.7491 11.3492 13.6491L12.6492 12.3491C12.7492 12.2491 12.8659 12.1991 12.9992 12.1991C13.1326 12.1991 13.2492 12.2491 13.3492 12.3491L14.6492 13.6491C14.7492 13.7491 14.7992 13.8657 14.7992 13.9991C14.7992 14.1324 14.7492 14.2491 14.6492 14.3491L13.3492 15.6491C13.2492 15.7491 13.1326 15.7991 12.9992 15.7991C12.8659 15.7991 12.7492 15.7491 12.6492 15.6491L11.3492 14.3491ZM25.6492 28.6491L24.3492 27.3491C24.2492 27.2491 24.1992 27.1324 24.1992 26.9991C24.1992 26.8657 24.2492 26.7491 24.3492 26.6491L25.6492 25.3491C25.7492 25.2491 25.8659 25.1991 25.9992 25.1991C26.1326 25.1991 26.2492 25.2491 26.3492 25.3491L27.6492 26.6491C27.7492 26.7491 27.7992 26.8657 27.7992 26.9991C27.7992 27.1324 27.7492 27.2491 27.6492 27.3491L26.3492 28.6491C26.2492 28.7491 26.1326 28.7991 25.9992 28.7991C25.8659 28.7991 25.7492 28.7491 25.6492 28.6491Z"
+        fill="white"
+      />
+    </g>
+  </svg>
+
+  <div class="brand-section">
+    <span class="brand-name">Visualize Human Reference Atlas Data</span>
+    <app-status-indicator statusText="AI preview app"></app-status-indicator>
+  </div>
+  <!-- <span class="brand-name">Visualize Human Reference Atlas Data</span> -->
+  <!-- <span class="spacer"></span> -->
+
+  <!-- stepper in the toolbar -->
+  <app-breadcrumb></app-breadcrumb>
 </mat-toolbar>
-
-<app-breadcrumb></app-breadcrumb>
-
-<router-outlet></router-outlet>
+<!-- <app-breadcrumb></app-breadcrumb> -->
+<div class="content-container">
+  <router-outlet></router-outlet>
+</div>
+<!-- <router-outlet></router-outlet> -->
+<app-footer></app-footer>

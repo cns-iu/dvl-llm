@@ -1,0 +1,38 @@
+{
+  "1": [
+    {
+      "keyword": "lin/log",
+      "description": "Use log scale on y-axis"
+    },
+    {
+      "keyword": "line color",
+      "description": "Use color brewer colors"
+    },
+    {
+      "keyword": "background color",
+      "description": "set background color to white"
+    },
+    {
+      "keyword": "legend",
+      "description": "Move legend outside"
+    },
+    {
+      "keyword": "tick_formatting",
+      "description": "Use tick formatting on x-axis"
+    },
+    {
+      "keyword": "png",
+      "description": "Save the output as png"
+    }
+  ],
+  "2": [
+    {
+      "keyword": "sort",
+      "description": "Sort bars in descending order"
+    },
+    {
+      "keyword": "gridlines",
+      "description": "Add horizontal grid lines"
+    }
+  ]
+}
