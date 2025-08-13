@@ -54,7 +54,7 @@ def execute_code(req: CodeRequest):
     # 2. Prepare for execution
     uid = str(uuid.uuid4())[:8]
     code_file = f"/tmp/temp_{uid}.py"
-    output_file = os.path.join(OUTPUT_DIR, f"{req.filename_prefix}.html")
+    output_file = os.path.join(OUTPUT_DIR, f"{req.filename_prefix}")
 
     try:
         with open(code_file, "w") as f:
@@ -73,7 +73,7 @@ def execute_code(req: CodeRequest):
             return {"status": "success", "code": req.code, "output_html_path": output_file}
         else:
             if result.returncode == 0 and not os.path.exists(output_file):
-                return create_error_response(1100, stdout=result.stdout, stderr="Script finished with exit code 0 but the output file was not found.")
+                return create_error_response(1100, stdout=result.stdout, stderr=f"Script finished with exit code 0 but the output file {output_file} was not found.")
             else:
                 return create_error_response(1000, stderr=result.stderr, stdout=result.stdout)
 
