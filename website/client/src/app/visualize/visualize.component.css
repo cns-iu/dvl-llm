@@ -725,7 +725,8 @@ tr:nth-child(2) {
 
 .thinking-text {
   color: #4c4c58;
-  animation: pulse-fade 300ms linear infinite;
+  font-family: var(--font-ui);
+  animation: pulse-fade 600ms linear infinite;
 }
 
 .assistant-body.waiting {
