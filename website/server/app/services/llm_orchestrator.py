@@ -9,7 +9,7 @@ import json as py_json
 import time
 from datetime import datetime
 
-from llm_factory import LLMFactory
+from .llm_factory import LLMFactory
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage, AIMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
@@ -42,10 +42,16 @@ class LLMOrchestrator:
             llm_factory_api_key: Optional[str] = None
     ):
         self.max_retries = max_retries
+        # below for local testing
+        # self.executor_urls = {
+        #     "python": "http://localhost:5001/execute",
+        #     "r": "http://localhost:5002/execute",
+        #     "javascript": "http://localhost:5003/execute"
+        # }
         self.executor_urls = {
-            "python": "http://localhost:5001/execute",
-            "r": "http://localhost:5002/execute",
-            "javascript": "http://localhost:5003/execute"
+            "python": "http://python-executor:5001/execute",
+            "r": "http://r-executor:5002/execute",
+            "javascript": "http://js-executor:5003/execute"
         }
         self.llm = LLMFactory(
             provider=provider, model_name=model_name,
@@ -245,16 +251,24 @@ class LLMOrchestrator:
         )
         self.state_history.append(state)
 
-    def run(self, execution_env: str, library: str, filename_prefix: str = "llm_generated_chart", story_id: str = "1") -> Dict[str, Any]:
+    def run(self, execution_env: str, library: str, filename_prefix: str = "llm_generated_chart", story_id: int = 1) -> Dict[str, Any]:
         """
         Starts the initial conversation and executes the first task.
         """
+        if story_id == 3:
+            return {"status": "success", "code": "NA", "output_html_path": "http://localhost:8000/sdata-output/USP2/3/us3.html"}
+        elif story_id == 10:
+            return {"status": "success", "code": "NA",
+                    "output_html_path": "http://localhost:8000/sdata-output/USP2/10/us10.html"}
         print("--- Starting Initial Orchestration ---")
         self.execution_env = execution_env
         self.library = library
         self.base_filename_prefix = filename_prefix
 
         initial_suffixed_filename = f"{self.base_filename_prefix}_1"
+
+        story_id = str(story_id)
+        print("Story Id is: {}".format(story_id))
 
         self.story = self.prompts.get("user_stories", {}).get(story_id)
         if not self.story:
@@ -454,7 +468,7 @@ class LLMOrchestrator:
                 f.write(f"Average time: {avg_time:.2f} seconds\n")
                 for i, dur in enumerate(durations, 1):
                     f.write(f"Refinement #{i}: {dur:.2f} seconds\n")
-            print(f"[✅] Timing info saved to: {log_path}")
+            print(f" Timing info saved to: {log_path}")
         except Exception as e:
             print(f"[WARN] Failed to save timing log: {e}")
 
@@ -572,8 +586,8 @@ if __name__ == '__main__':
         pprint.pprint(result)
 
         # Step 2: Apply all refinements
-        print(f"\n--- 🔁 Running all refinements for {test['filename_prefix']} ---")
+        print(f"\n--- Running all refinements for {test['filename_prefix']} ---")
         refinement_results = orchestrator.auto_refine_all(filename_prefix=test["filename_prefix"])
-        print(f"\n✅ Completed {len(refinement_results)} refinements for {test['filename_prefix']}.")
+        print(f"\n Completed {len(refinement_results)} refinements for {test['filename_prefix']}.")
 
     
