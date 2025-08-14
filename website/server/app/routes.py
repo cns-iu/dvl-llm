@@ -45,12 +45,12 @@ def generate(req: GenerateRequest):
             provider="jetstream",
             model_name=req.model,
             llm_factory_api_key="sk-d124b81a3ead4cbd95b77249ca755831",
-            prompt_file_path="/app/data/input/prompts.json" 
+            prompt_file_path="/app/data/input/prompts_updated.json"
         )
 
         # 1. Initial Run
         result = orchestrator.run(
-            execution_env=req.language, library=req.library, filename_prefix="test_run"
+            execution_env=req.language, library=req.library, filename_prefix="test_run", story_id=req.id
         )
         code = result["code"]
         output_file = result["output_html_path"]

@@ -29,7 +29,16 @@ services:
 #      - "5002:5002"
 #    volumes:
 #      - ./data:/app/data
-
+#  r-executor:
+#    build: ./r_executor
+#    platform: linux/arm64
+#    ports:
+#      - "5002:5002"
+#    volumes:
+#      - ./data:/app/data
+#      - ./r_executor/app.R:/app/app.R
+#      - ./r_executor/run_plumber.R:/app/run_plumber.R
+#
 #  js-executor:
 #    build: ./js_executor
 #    ports:

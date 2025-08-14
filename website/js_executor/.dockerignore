@@ -1,0 +1,10 @@
+# Ignore node_modules, as it will be installed inside the container
+node_modules
+
+# Ignore other local/unnecessary files
+.git
+.gitignore
+README.md
+
+# Python virtual environment if you have one
+.venv

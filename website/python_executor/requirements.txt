@@ -9,9 +9,14 @@ pandas
 matplotlib
 seaborn
 plotly
+kaleido==0.2.1
 altair
+altair_saver
+vl-convert-python
 bokeh
 holoviews
 pygal
 plotnine
 plotext
+selenium
+cairosvg
