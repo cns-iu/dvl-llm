@@ -4,42 +4,72 @@ from typing import Optional, Any, Literal, Dict, List, AsyncIterator, Iterator
 
 from langchain.chat_models import init_chat_model
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import BaseMessage, AIMessage, AIMessageChunk
-from langchain_core.outputs import ChatResult, ChatGeneration, ChatGenerationChunk
+from langchain_core.messages import BaseMessage, AIMessage
+from langchain_core.outputs import ChatResult, ChatGenerationChunk
 from langchain_core.callbacks import CallbackManagerForLLMRun, AsyncCallbackManagerForLLMRun
 
 # --- Helper Function and Filtering Wrapper ---
 
-def filter_think_tags(text: str) -> str:
+def filter_think_block(text: str) -> str:
     if not isinstance(text, str):
         return text
     return re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()
 
+
 class FilteredChatModel(BaseChatModel):
+    """
+    Thin wrapper that can optionally strip <think>...</think> blocks from AI outputs.
+    If strip_think_tags=False, content is left intact so callers can parse the block.
+    """
     model: BaseChatModel
+    strip_think_tags: bool = True
 
-    def _generate(self, messages: List[BaseMessage], stop: Optional[List[str]] = None,
-                  run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs: Any) -> ChatResult:
+    def _generate(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any
+    ) -> ChatResult:
         result = self.model._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
-        for generation in result.generations:
-            if isinstance(generation.message, AIMessage) and isinstance(generation.message.content, str):
-                generation.message.content = filter_think_tags(generation.message.content)
+        if self.strip_think_tags:
+            for generation in result.generations:
+                if isinstance(generation.message, AIMessage) and isinstance(generation.message.content, str):
+                    generation.message.content = filter_think_block(generation.message.content)
         return result
 
-    async def _agenerate(self, messages: List[BaseMessage], stop: Optional[List[str]] = None,
-                         run_manager: Optional[AsyncCallbackManagerForLLMRun] = None, **kwargs: Any) -> ChatResult:
+    async def _agenerate(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
+        **kwargs: Any
+    ) -> ChatResult:
         result = await self.model._agenerate(messages, stop=stop, run_manager=run_manager, **kwargs)
-        for generation in result.generations:
-            if isinstance(generation.message, AIMessage) and isinstance(generation.message.content, str):
-                generation.message.content = filter_think_tags(generation.message.content)
+        if self.strip_think_tags:
+            for generation in result.generations:
+                if isinstance(generation.message, AIMessage) and isinstance(generation.message.content, str):
+                    generation.message.content = filter_think_block(generation.message.content)
         return result
 
-    def _stream(self, messages: List[BaseMessage], stop: Optional[List[str]] = None,
-                run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs: Any) -> Iterator[ChatGenerationChunk]:
+    def _stream(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any
+    ) -> Iterator[ChatGenerationChunk]:
+        # Streaming path left as pass-through
         yield from self.model._stream(messages, stop=stop, run_manager=run_manager, **kwargs)
 
-    async def _astream(self, messages: List[BaseMessage], stop: Optional[List[str]] = None,
-                       run_manager: Optional[AsyncCallbackManagerForLLMRun] = None, **kwargs: Any) -> AsyncIterator[ChatGenerationChunk]:
+    async def _astream(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[AsyncCallbackManagerForLLMRun] = None,
+        **kwargs: Any
+    ) -> AsyncIterator[ChatGenerationChunk]:
+        # Streaming path left as pass-through
         async for chunk in self.model._astream(messages, stop=stop, run_manager=run_manager, **kwargs):
             yield chunk
 
@@ -64,16 +94,18 @@ class LLMConnectorError(Exception):
 
 class LLMFactory:
     def __new__(
-            cls,
-            provider: UserProviderType,
-            model_name: str,
-            default_google_api_key: Optional[str] = None,
-            default_openai_api_key: Optional[str] = None,
-            default_jetstream_api_key: Optional[str] = None,
-            default_jetstream_base_url: Optional[str] = None,
-            api_key_override: Optional[str] = None,
-            jetstream_base_url_override: Optional[str] = None,
-            **kwargs: Any,
+        cls,
+        provider: UserProviderType,
+        model_name: str,
+        default_google_api_key: Optional[str] = None,
+        default_openai_api_key: Optional[str] = None,
+        default_jetstream_api_key: Optional[str] = None,
+        default_jetstream_base_url: Optional[str] = None,
+        api_key_override: Optional[str] = None,
+        jetstream_base_url_override: Optional[str] = None,
+        # NEW: allow caller to control <think> stripping behavior
+        strip_think_tags: bool = True,
+        **kwargs: Any,
     ) -> BaseChatModel:
 
         google_api_key = default_google_api_key or os.getenv("GOOGLE_API_KEY")
@@ -118,29 +150,26 @@ class LLMFactory:
             )
 
             if provider_lower == "jetstream":
-                return FilteredChatModel(model=model)
+                # IMPORTANT: expose control to keep or strip <think> blocks
+                return FilteredChatModel(model=model, strip_think_tags=strip_think_tags)
 
             return model
 
         except ImportError as ie:
-            raise LLMConnectorError(
-                f"Missing provider package for '{provider}': {ie}"
-            )
+            raise LLMConnectorError(f"Missing provider package for '{provider}': {ie}")
         except TypeError as te:
-            raise LLMConnectorError(
-                f"TypeError initializing model '{model_name}' for provider '{provider}': {te}"
-            )
+            raise LLMConnectorError(f"TypeError initializing model '{model_name}' for provider '{provider}': {te}")
         except Exception as e:
-            raise LLMConnectorError(
-                f"Error initializing model '{model_name}' for provider '{provider}': {e}"
-            )
+            raise LLMConnectorError(f"Error initializing model '{model_name}' for provider '{provider}': {e}")
+
 
 if __name__ == "__main__":
     llm = LLMFactory(
         provider="jetstream",
         model_name="DeepSeek-R1",
         default_jetstream_api_key="sk-ffb6c536e10d40dc902f28e93159a039",
-        temperature=0
+        temperature=0,
+        strip_think_tags=False  # show raw content including <think> for demo
     )
     response = llm.invoke(["Tell me about LangChain"])
     print(response.content)

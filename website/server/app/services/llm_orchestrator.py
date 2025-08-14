@@ -3,7 +3,7 @@ import re
 import json
 import requests
 import pprint
-from typing import List, Dict, Any, Optional, NamedTuple
+from typing import List, Dict, Any, Optional, NamedTuple, Tuple
 import copy
 import json as py_json
 import time
@@ -15,9 +15,6 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
 from jinja2 import Environment, StrictUndefined
-
-import re
-import json as py_json  # avoid conflict with loaded json module
 
 
 # A simple structure to hold a snapshot of the orchestrator's state
@@ -34,12 +31,12 @@ class LLMOrchestrator:
     """
 
     def __init__(
-            self,
-            provider: str,
-            model_name: str,
-            prompt_file_path: str = "prompts.json",
-            max_retries: int = 2,
-            llm_factory_api_key: Optional[str] = None
+        self,
+        provider: str,
+        model_name: str,
+        prompt_file_path: str = "prompts_updated.json",
+        max_retries: int = 2,
+        llm_factory_api_key: Optional[str] = None
     ):
         self.max_retries = max_retries
         # below for local testing
@@ -53,9 +50,13 @@ class LLMOrchestrator:
             "r": "http://r-executor:5002/execute",
             "javascript": "http://js-executor:5003/execute"
         }
+        # IMPORTANT: keep <think> so we can parse it locally
         self.llm = LLMFactory(
-            provider=provider, model_name=model_name,
-            default_jetstream_api_key=llm_factory_api_key, temperature=0
+            provider=provider,
+            model_name=model_name,
+            default_jetstream_api_key=llm_factory_api_key,
+            temperature=0,
+            strip_think_tags=False  # <-- changed from default True
         )
         self._load_prompts(prompt_file_path)
         self.messages: List[BaseMessage] = []
@@ -67,13 +68,14 @@ class LLMOrchestrator:
             trim_blocks=True,
             lstrip_blocks=True
         )
-        # --- NEW: Define the host path for the shared output directory ---
-        # This assumes the script is run from a directory where './data/output' is accessible.
+        # Host path for the shared output directory
         self.host_output_path = os.path.abspath("../../../data/output")
+
+        # holds the most recent thinking text extracted in generation loop
+        self._last_thinking_text: str = "LLM Responded"
 
     def _render_template(self, template_str: str, context: dict) -> str:
         return self.jinja.from_string(template_str).render(**context)
-
 
     def _load_prompts(self, filepath: str):
         """Loads system, user, and error prompts from a JSON file."""
@@ -83,8 +85,6 @@ class LLMOrchestrator:
 
             self.prompts = prompts
 
-            # Store system prompts by type
-            # NEW
             self.system_prompts = {
                 "python": prompts["system_prompts"]["python"],
                 "r": prompts["system_prompts"]["r"],
@@ -104,30 +104,30 @@ class LLMOrchestrator:
         match = re.search(r"```(?:python|r|javascript)?\n(.*?)```", raw_text, re.DOTALL)
         return match.group(1).strip() if match else raw_text.strip()
 
-    # def _execute_code(self, execution_env: str, code: str, filename_prefix: str) -> Dict[str, Any]:
-    #     """Routes code to the correct executor microservice."""
-    #     url = self.executor_urls.get(execution_env.lower())
-    #     if not url:
-    #         return {"status": "error", "error_code": 2000,
-    #                 "error_message": f"Service Level Error: No executor for '{execution_env}'."}
-    #     try:
-    #         response = requests.post(url, json={"code": code, "filename_prefix": filename_prefix}, timeout=40)
-    #         response.raise_for_status()
-    #         return response.json()
-    #     except requests.exceptions.RequestException as e:
-    #         return {"status": "error", "error_code": 2000,
-    #                 "error_message": "Service Level Error: Could not connect to executor.",
-    #                 "details": {"stderr": str(e)}}
-    # import ast
+    # NEW: split out <think> ... </think> and return (thinking_text, code_text)
+    def _split_think_and_code(self, raw_text: str) -> Tuple[str, str]:
+        """
+        Extracts any <think>...</think> content and returns it along with the code-only portion.
+        - thinking_text: the full text inside the first (or concatenated) <think> blocks, or "LLM Responded" if none.
+        - code_text: the original text with all <think> blocks removed, then stripped/fenced-code extracted.
+        """
+        # capture all <think> blocks (non-greedy)
+        think_blocks = re.findall(r"<think>(.*?)</think>", raw_text, flags=re.DOTALL)
+        thinking_text = "\n\n".join([b.strip() for b in think_blocks]) if think_blocks else "LLM Responded"
+
+        # remove ALL think blocks from the content prior to code extraction
+        without_think = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
+
+        # now extract the code from the remaining content (handles fenced or raw)
+        code_text = self._extract_code(without_think)
+        return thinking_text, code_text
 
     def _sanitize_code(self, code: str, execution_env: str) -> str:
         try:
             code_clean = code.encode("utf-8", errors="ignore").decode("utf-8")
-
             # Only strip control chars for JavaScript
             if execution_env.lower() in ["javascript", "js"]:
                 code_clean = re.sub(r"[\x00-\x1F\x7F]", "", code_clean)
-
             return code_clean
         except Exception as e:
             print(f"[WARN] Failed to sanitize code properly: {e}")
@@ -142,15 +142,12 @@ class LLMOrchestrator:
                 "error_message": f"Service Level Error: No executor for '{execution_env}'."
             }
 
-        # --- CLEANING: Ensure UTF-8 and strip null/control characters ---
         code_clean = self._sanitize_code(code, execution_env)
-
         payload = {
             "code": code_clean,
             "filename_prefix": filename_prefix
         }
 
-        # --- LOG: Print the actual payload being sent ---
         print(f"[DEBUG] Sending request to executor at {url}")
         print("[DEBUG] Full JSON Payload:")
         print(py_json.dumps(payload, indent=2))
@@ -185,7 +182,6 @@ class LLMOrchestrator:
                 "details": {"stderr": str(e)}
             }
 
-
     def _generation_and_execution_loop(self) -> Dict[str, Any]:
         """
         The private core engine. It contains the retry loop and handles
@@ -194,7 +190,6 @@ class LLMOrchestrator:
         self.iteration_count += 1
         current_filename_prefix = f"{self.base_filename_prefix}_{self.iteration_count}"
 
-        # Use .html as default if viz_file_format is not yet set (i.e., during .run())
         viz_file_format = getattr(self, "viz_file_format", ".html")
         output_filename = f"{current_filename_prefix}{viz_file_format}"
 
@@ -208,8 +203,14 @@ class LLMOrchestrator:
 
             print("Generating code...")
             chain = ChatPromptTemplate.from_messages(self.messages) | self.llm | StrOutputParser()
-            generated_code = self._extract_code(chain.invoke({}))
+            raw_text = chain.invoke({})
 
+            # NEW: extract thinking + code
+            thinking_text, generated_code = self._split_think_and_code(raw_text)
+            # stash the latest thinking for whoever needs it (e.g., refine())
+            self._last_thinking_text = thinking_text
+
+            # keep transcript clean: store only the code as the AI's message
             if self.messages[-1].type == "human":
                 self.messages.append(AIMessage(content=generated_code))
             else:
@@ -251,15 +252,23 @@ class LLMOrchestrator:
         )
         self.state_history.append(state)
 
-    def run(self, execution_env: str, library: str, filename_prefix: str = "llm_generated_chart", story_id: int = 1) -> Dict[str, Any]:
+    def run(
+        self,
+        execution_env: str,
+        library: str,
+        filename_prefix: str = "llm_generated_chart",
+        story_id: int = 1
+    ) -> Dict[str, Any]:
         """
         Starts the initial conversation and executes the first task.
+        Returns exactly what it returned before (no shape change).
         """
         if story_id == 3:
             return {"status": "success", "code": "NA", "output_html_path": "http://localhost:8000/sdata-output/USP2/3/us3.html"}
         elif story_id == 10:
             return {"status": "success", "code": "NA",
                     "output_html_path": "http://localhost:8000/sdata-output/USP2/10/us10.html"}
+
         print("--- Starting Initial Orchestration ---")
         self.execution_env = execution_env
         self.library = library
@@ -309,11 +318,12 @@ class LLMOrchestrator:
 
         result = self._generation_and_execution_loop()
         self._save_state(result)
-        return result
+        return result  # unchanged
 
     def refine(self, refine_prompt: str) -> Dict[str, Any]:
         """
         Adds a user's refinement prompt to the conversation and reruns the loop.
+        Returns the executor result + an extra field 'thinking_text'.
         """
         if not self.messages:
             return {"status": "error", "error_code": 3000,
@@ -333,16 +343,11 @@ class LLMOrchestrator:
         elif ".pdf" in refine_prompt.lower():
             self.viz_file_format = '.pdf'
 
-        # full_refine_prompt = (
-        #     f"{refine_prompt}\n\n"
-        #     f"IMPORTANT: Please save the new output to '{new_suffixed_filename}{self.viz_file_format}'."
-        # )
-        # self.messages.append(HumanMessage(content=full_refine_prompt))
         if self.execution_env.lower() in ('js', 'javascript'):
             context = {
                 "execution_env": self.execution_env,
                 "library": getattr(self, "library", ""),
-                "previous_filename_prefix": f"{self.base_filename_prefix}_{self.iteration_count}"+".html",
+                "previous_filename_prefix": f"{self.base_filename_prefix}_{self.iteration_count}" + ".html",
                 "filename_prefix": new_suffixed_filename,
                 "story_id": getattr(self, "story", {}).get("id", ""),
             }
@@ -351,7 +356,8 @@ class LLMOrchestrator:
                 "execution_env": self.execution_env,
                 "library": getattr(self, "library", ""),
                 "filename_prefix": new_suffixed_filename,
-                "story_id": getattr(self, "story", {}).get("id", "") }
+                "story_id": getattr(self, "story", {}).get("id", "")
+            }
         rendered_refine = self._render_template(refine_prompt, context)
         full_refine_prompt = (
             f"{rendered_refine}\n\n"
@@ -361,13 +367,16 @@ class LLMOrchestrator:
 
         result = self._generation_and_execution_loop()
         self._save_state(result)
-        return result
 
+        # IMPORTANT: attach thinking_text ONLY in refine()
+        return {
+            **result,
+            "thinking_text": getattr(self, "_last_thinking_text", "LLM Responded")
+        }
 
     def get_refine_options(self) -> List[Dict[str, str]]:
         """Return refine prompts for the current user story."""
         return getattr(self, "refine_prompts", [])
-
 
     def undo(self) -> Dict[str, Any]:
         """
@@ -383,12 +392,11 @@ class LLMOrchestrator:
         # Pop the state that is being undone
         state_to_undo = self.state_history.pop()
 
-        # --- NEW: File Deletion Logic ---
+        # Delete orphaned file if the undone result was successful
         undone_result = state_to_undo.result
         if undone_result.get("status") == "success":
             file_path_from_executor = undone_result.get("output_html_path")
             if file_path_from_executor:
-                # Construct the path on the host machine
                 filename = os.path.basename(file_path_from_executor)
                 print(f"File path from executor: {filename}")
                 host_path_to_delete = os.path.join(self.host_output_path, filename)
@@ -401,18 +409,12 @@ class LLMOrchestrator:
                 except Exception as e:
                     print(f"Warning: An error occurred while deleting file: {e}")
 
-        # Get the new "last" state from the history
         previous_state = self.state_history[-1]
-
-        # Restore the orchestrator's attributes from the previous state
         self.messages = copy.deepcopy(previous_state.messages)
         self.iteration_count = previous_state.iteration_count
 
         print(f"Reverted to iteration {self.iteration_count}. Returning previous result.")
         return previous_state.result
-
-    import time
-    from datetime import datetime
 
     def auto_refine_all(self, filename_prefix: str = "refine_timings") -> List[Dict[str, Any]]:
         """
@@ -450,14 +452,12 @@ class LLMOrchestrator:
 
         avg_time = sum(durations) / len(durations) if durations else 0.0
 
-        # --- Construct log filename with env and library ---
         env_safe = self.execution_env.replace(" ", "_").lower()
         lib_safe = getattr(self, "library", "unknown").replace(" ", "_").lower()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         log_filename = f"{filename_prefix}_{env_safe}_{lib_safe}_{timestamp}.txt"
         log_path = os.path.join(self.host_output_path, log_filename)
 
-        # --- Save timing log to host output path ---
         try:
             os.makedirs(self.host_output_path, exist_ok=True)
             with open(log_path, "w") as f:
@@ -480,91 +480,14 @@ if __name__ == '__main__':
     import pprint
 
     python_test_cases = [
-        # {"execution_env": "python", "library": "matplotlib", "filename_prefix": "test_python_matplotlib",
-        #  "story_id": "1"},
-        # {"execution_env": "python", "library": "altair", "filename_prefix": "linechartaltairaug4_python_altair", "story_id": "1"},
-        # {"execution_env": "python", "library": "seaborn", "filename_prefix": "inechartaltairaug4_python_seaborn", "story_id": "1"},
-        # {"execution_env": "python", "library": "pygal", "filename_prefix": "aug6pygal_python_pygal", "story_id": "1"},
-        # {"execution_env": "python", "library": "bokeh", "filename_prefix": "linechartbokehaug4_python_bokeh", "story_id": "1"},
-        # {"execution_env": "python", "library": "plotly", "filename_prefix": "linechartaug3_python_plotly", "story_id": "1"},
-        # {"execution_env": "python", "library": "holoviews", "filename_prefix": "linechartaug6_python_holoviews",
-        #  "story_id": "1"},
-        # {"execution_env": "python", "library": "plotnine", "filename_prefix": "test_python_plotnine", "story_id": "1"},
-        # {"execution_env": "python", "library": "plotly", "filename_prefix": "sankey_python_plotly", "story_id": "7"},
-        # {"execution_env": "python", "library": "altair", "filename_prefix": "sankey_python_altair", "story_id": "7"},
-        # {"execution_env": "python", "library": "seaborn", "filename_prefix": "sankey_python_seaborn", "story_id": "7"},
-        # {"execution_env": "python", "library": "pysankey", "filename_prefix": "sankey_python_pysankey", "story_id": "7"},
-        # {"execution_env": "python", "library": "bokeh", "filename_prefix": "sankey_python_bokeh", "story_id": "7"},
-        # {"execution_env": "python", "library": "holoviews", "filename_prefix": "sankey_python_holoviews",
-        #  "story_id": "7"},
-        # {"execution_env": "python", "library": "networkx + PyVis", "filename_prefix": "sankey_python_networkxpyvis", "story_id": "7"},
+        {"execution_env": "python", "library": "matplotlib", "filename_prefix": "test_python_matplotlib",
+         "story_id": "1"}
     ]
 
-    r_test_cases = [
-        # {"execution_env": "r", "library": "ggplot2", "filename_prefix": "aug111linechartR_r_ggplot", "story_id": "1"},
-        # {"execution_env": "r", "library": "default", "filename_prefix": "aug12linechartaug7R_r_default", "story_id": "1"},
-        # {"execution_env": "r", "library": "lattice", "filename_prefix": "aug111linechartaug11R_r_lattice", "story_id": "1"},
-        # {"execution_env": "r", "library": "plotly", "filename_prefix": "aug111linechartaug7R_r_plotly", "story_id": "1"},
-        # {"execution_env": "r", "library": "base R", "filename_prefix": "aug12test_r_baseR", "story_id": "1"},
-        # {"execution_env": "r", "library": "graphics", "filename_prefix": "aug12test_r_graphics", "story_id": "1"},
-        # {"execution_env": "r", "library": "ggvis", "filename_prefix": "aug12test_r_ggvis", "story_id": "1"},
-        # {
-        #     "execution_env": "r",
-        #     "library": "networkD3",
-        #     "filename_prefix": "Aug12chromesankeyaug3_r_networkd3",
-        #     "story_id": "7"
-        # },
-        # {
-        #     "execution_env": "r",
-        #     "library": "plotly",
-        #     "filename_prefix": "sankeyaug3_r_plotly",
-        #     "story_id": "7"
-        # },
-        # {
-        #     "execution_env": "r",
-        #     "library": "ggalluvial",
-        #     "filename_prefix": "sankey_r_ggalluvial",
-        #     "story_id": "7"
-        # }
-    ]
+    r_test_cases = []
 
     js_test_cases = [
-        # {"execution_env": "javascript", "library": "chart.js", "filename_prefix": "aug13test_js_chartjs", "story_id": "1"},
-        # {"execution_env": "javascript", "library": "vega.js", "filename_prefix": "aug131test_js_vegajs", "story_id": "1"},
-        {"execution_env": "javascript", "library": "plotly", "filename_prefix": "aug13test_js_plotly", "story_id": "1"},
-        # {"execution_env": "javascript", "library": "d3.js", "filename_prefix": "aug12test_js_d3js", "story_id": "1"},
-        # {"execution_env": "javascript", "library": "highcharts.js", "filename_prefix": "aug12test_js_highcharts",
-        #  "story_id": "1"},
-        # {"execution_env": "javascript", "library": "googlecharts.js", "filename_prefix": "aug12test_js_googlecharts",
-        #  "story_id": "1"},
-        # {"execution_env": "javascript", "library": "apache echarts.js", "filename_prefix": "aug12test_js_echarts",
-        #  "story_id": "1"},
-        # [
-        #     {
-        #         "execution_env": "javascript",
-        #         "library": "d3.js",
-        #         "filename_prefix": "sankey_js_d3",
-        #         "story_id": "7"
-        #     },
-        #     {
-        #         "execution_env": "javascript",
-        #         "library": "googlecharts.js",
-        #         "filename_prefix": "sankey_js_googlecharts",
-        #         "story_id": "7"
-        #     },
-        #     {
-        #         "execution_env": "javascript",
-        #         "library": "apache_echarts.js",
-        #         "filename_prefix": "sankey_js_apacheecharts",
-        #         "story_id": "7"
-        #     },
-        #     {
-        #         "execution_env": "javascript",
-        #         "library": "highcharts.js",
-        #         "filename_prefix": "sankey_js_highcharts",
-        #         "story_id": "7"
-        #     }
-        # ]
+        # {"execution_env": "javascript", "library": "plotly", "filename_prefix": "aug13test_js_plotly", "story_id": "1"},
     ]
 
     all_test_cases = python_test_cases + r_test_cases + js_test_cases
@@ -585,9 +508,6 @@ if __name__ == '__main__':
         )
         pprint.pprint(result)
 
-        # Step 2: Apply all refinements
         print(f"\n--- Running all refinements for {test['filename_prefix']} ---")
         refinement_results = orchestrator.auto_refine_all(filename_prefix=test["filename_prefix"])
         print(f"\n Completed {len(refinement_results)} refinements for {test['filename_prefix']}.")
-
-    

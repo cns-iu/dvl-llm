@@ -45,12 +45,14 @@ def generate(req: GenerateRequest):
             provider="jetstream",
             model_name=req.model,
             llm_factory_api_key="sk-d124b81a3ead4cbd95b77249ca755831",
-            prompt_file_path="/app/data/input/prompts_updated.json"
+            prompt_file_path="/app/sdata/input/prompts/prompts_updated.json"
         )
 
         # 1. Initial Run
         result = orchestrator.run(
-            execution_env=req.language, library=req.library, filename_prefix="test_run", story_id=req.id
+            execution_env=req.language, library=req.library,
+            filename_prefix=f"{req.model}{req.id}_{req.language}_{req.library}",
+            story_id=req.id
         )
         code = result["code"]
         output_file = result["output_html_path"]
@@ -155,21 +157,30 @@ def get_top_rows(us_id: str, n: int = Query(5, gt=0, le=20)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-# REFINEMENT_FILE = os.path.join(os.getcwd(), "website", "data", "refinements.json")
-REFINEMENT_FILE = os.path.join("sdata", "input", "refinements.json")
+REFINEMENT_FILE = os.path.join("sdata", "input", "prompts", "prompts_updated.json")
+
 @router.get("/refinements/{user_story_id}")
 def get_refinements(user_story_id: str):
     if not os.path.exists(REFINEMENT_FILE):
         raise HTTPException(status_code=500, detail="Refinement data file not found")
-    
+
     with open(REFINEMENT_FILE, "r") as f:
-        all_refinements = json.load(f)
-    
-    if user_story_id not in all_refinements:
+        data = json.load(f)
+
+    # 1) make sure the story exists
+    user_stories = data.get("user_stories", {})
+    if user_story_id not in user_stories:
+        raise HTTPException(status_code=404, detail="User story not found")
+
+    # 2) get refinements (should be a list)
+    refinements = user_stories[user_story_id].get("refine_prompts", [])
+
+    # 3) validate
+    if not isinstance(refinements, list) or not refinements:
         raise HTTPException(status_code=404, detail="No refinements found for this user story")
-    
-    # return JSONResponse(content={"user_story_id": user_story_id, "refinements": all_refinements[user_story_id]})
-    return all_refinements[user_story_id]
+
+    # 4) return the list directly
+    return refinements
 
 # @router.post("/refine", response_model=RefineResponse, summary="Refine an existing visualization")
 # async def refine_visualization(req: RefineRequest):
@@ -288,10 +299,12 @@ def refine(req: RefineRequest):
         output_file = result["output_html_path"]
         filename = output_file.split("/")[-1]
         output_path = f"/static-output/{filename}"
+        thinking_text = result["thinking_text"]
 
         return {
             "updated_code": code,
-            "output_path": output_path
+            "output_path": output_path,
+            "thinking_text": thinking_text
         }
 
     except Exception as exc:

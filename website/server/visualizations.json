@@ -5,19 +5,11 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/plotly-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/plotly-deepseek.png"
         }
       },
       "altair": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/altair-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/altair-deepseek.png"
         }
       },
@@ -25,19 +17,11 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/bokeh-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/bokeh-deepseek.png"
         }
       },
       "holoviews": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/holoviews-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/holoviews-deepseek.png"
         }
       },
@@ -45,19 +29,11 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/matplotlib-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/matplotlib-deepseek.png"
         }
       },
       "pygal": {
         "DeepSeek-R1": {
           "code": "# pygal-deepseek (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/pygal-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/pygal-deepseek.png"
         }
       },
@@ -65,19 +41,11 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/seaborn-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/seaborn-deepseek.png"
         }
       },
       "plotnine": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/plotnine-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/plotnine-deepseek.png"
         }
       }
@@ -88,19 +56,11 @@
         "DeepSeek-R1": {
           "code": "# ggplot2 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/baser-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/R/baser-deepseek.png"
         }
       },
       "default": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/R/default-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/default-deepseek.png"
         }
       },
@@ -108,19 +68,11 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/ggplot-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/R/ggplot-deepseek.png"
         }
       },
       "ggvis": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/R/ggvis-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/ggvis-deepseek.png"
         }
       },
@@ -128,29 +80,17 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/graphics-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/R/graphics-deepseek.png"
         }
       },
       "lattice": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/lattice-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/R/lattice-deepseek.png"
         }
       },
       "plotly": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/R/plotly-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/plotly-deepseek.png"
         }
       }
@@ -160,19 +100,11 @@
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/apacheechartjs-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/apacheechartjs-deepseek.png"
         }
       },
       "chart": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/chartjs-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/chartjs-deepseek.png"
         }
       },
@@ -180,19 +112,11 @@
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/d3js-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/d3js-deepseek.png"
         }
       },
       "googlechart": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/googlechartjs-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/googlechartjs-deepseek.png"
         }
       },
@@ -200,29 +124,17 @@
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/highchartjs-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/highchartjs-deepseek.png"
         }
       },
       "plotly": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/plotly-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/plotly-deepseek.png"
         }
       },
       "vega": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/vegajs-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/vegajs-deepseek.png"
         }
       }
@@ -234,10 +146,6 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/2/python/plotly/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/2/python/plotly/llama.png"
         }
       }
     },
@@ -246,10 +154,6 @@
         "DeepSeek-R1": {
           "code": "# ggplot2 (DeepSeek) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/2/R/ggplot2/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/2/R/ggplot2/llama.png"
         }
       }
     },
@@ -258,162 +162,16 @@
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/2/JS/d3/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/2/JS/d3/llama.png"
         }
       }
     }
   },
   "3": {
-    "python": {
-      "plotly": {
-        "DeepSeek-R1": {
+    "RUI": {
+      "RUI": {
+        "RUI": {
           "code": "# Plotly (DeepSeek) code for story 3",
-          "image_url": "http://localhost:8000/sdata-output/3/python/plotly/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 3",
-          "image_url": "http://localhost:8000/sdata-output/3/python/plotly/llama.png"
-        }
-      }
-    },
-    "r": {
-      "ggplot2": {
-        "DeepSeek-R1": {
-          "code": "# ggplot2 (DeepSeek) code for story 3",
-          "image_url": "http://localhost:8000/sdata-output/3/R/ggplot2/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 3",
-          "image_url": "http://localhost:8000/sdata-output/3/R/ggplot2/llama.png"
-        }
-      }
-    },
-    "javascript": {
-      "d3": {
-        "DeepSeek-R1": {
-          "code": "// D3 (DeepSeek) code for story 3",
-          "image_url": "http://localhost:8000/sdata-output/3/JS/d3/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 3",
-          "image_url": "http://localhost:8000/sdata-output/3/JS/d3/llama.png"
-        }
-      }
-    }
-  },
-  "4": {
-    "python": {
-      "plotly": {
-        "DeepSeek-R1": {
-          "code": "# Plotly (DeepSeek) code for story 4",
-          "image_url": "http://localhost:8000/sdata-output/4/python/plotly/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 4",
-          "image_url": "http://localhost:8000/sdata-output/4/python/plotly/llama.png"
-        }
-      }
-    },
-    "r": {
-      "ggplot2": {
-        "DeepSeek-R1": {
-          "code": "# ggplot2 (DeepSeek) code for story 4",
-          "image_url": "http://localhost:8000/sdata-output/4/R/ggplot2/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 4",
-          "image_url": "http://localhost:8000/sdata-output/4/R/ggplot2/llama.png"
-        }
-      }
-    },
-    "javascript": {
-      "d3": {
-        "DeepSeek-R1": {
-          "code": "// D3 (DeepSeek) code for story 4",
-          "image_url": "http://localhost:8000/sdata-output/4/JS/d3/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 4",
-          "image_url": "http://localhost:8000/sdata-output/4/JS/d3/llama.png"
-        }
-      }
-    }
-  },
-  "5": {
-    "python": {
-      "plotly": {
-        "DeepSeek-R1": {
-          "code": "# Plotly (DeepSeek) code for story 5",
-          "image_url": "http://localhost:8000/sdata-output/5/python/plotly/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 5",
-          "image_url": "http://localhost:8000/sdata-output/5/python/plotly/llama.png"
-        }
-      }
-    },
-    "r": {
-      "ggplot2": {
-        "DeepSeek-R1": {
-          "code": "# ggplot2 (DeepSeek) code for story 5",
-          "image_url": "http://localhost:8000/sdata-output/5/R/ggplot2/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 5",
-          "image_url": "http://localhost:8000/sdata-output/5/R/ggplot2/llama.png"
-        }
-      }
-    },
-    "javascript": {
-      "d3": {
-        "DeepSeek-R1": {
-          "code": "// D3 (DeepSeek) code for story 5",
-          "image_url": "http://localhost:8000/sdata-output/5/JS/d3/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 5",
-          "image_url": "http://localhost:8000/sdata-output/5/JS/d3/llama.png"
-        }
-      }
-    }
-  },
-  "6": {
-    "python": {
-      "plotly": {
-        "DeepSeek-R1": {
-          "code": "# Plotly (DeepSeek) code for story 6",
-          "image_url": "http://localhost:8000/sdata-output/6/python/plotly/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 6",
-          "image_url": "http://localhost:8000/sdata-output/6/python/plotly/llama.png"
-        }
-      }
-    },
-    "r": {
-      "ggplot2": {
-        "DeepSeek-R1": {
-          "code": "# ggplot2 (DeepSeek) code for story 6",
-          "image_url": "http://localhost:8000/sdata-output/6/R/ggplot2/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 6",
-          "image_url": "http://localhost:8000/sdata-output/6/R/ggplot2/llama.png"
-        }
-      }
-    },
-    "javascript": {
-      "d3": {
-        "DeepSeek-R1": {
-          "code": "// D3 (DeepSeek) code for story 6",
-          "image_url": "http://localhost:8000/sdata-output/6/JS/d3/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 6",
-          "image_url": "http://localhost:8000/sdata-output/6/JS/d3/llama.png"
+          "image_url": "http://localhost:8000/sdata-output/3/us3.png"
         }
       }
     }
@@ -424,29 +182,17 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/bokeh-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/bokeh-deepseek.png"
         }
       },
       "plotly": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 7",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/plotly-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 7",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/plotly-deepseek.png"
         }
       },
       "seaborn": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/seaborn-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/python/seaborn-deepseek.png"
         }
       }
@@ -456,29 +202,17 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/7/R/ggalluvial-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/R/ggalluvial-deepseek.png"
         }
       },
       "network3d": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 7",
           "image_url": "http://localhost:8000/sdata-output/USP2/7/R/network3d-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 7",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/R/network3d-deepseek.png"
         }
       },
       "plotly": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/R/plotly-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/7/R/plotly-deepseek.png"
         }
       }
@@ -488,19 +222,11 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/apacheechart-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/apacheechart-deepseek.png"
         }
       },
       "d3": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 7",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/d3js-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 7",
           "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/d3js-deepseek.png"
         }
       },
@@ -508,134 +234,22 @@
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/googlechart-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/googlechart-deepseek.png"
         }
       },
       "highchart": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/highchart-deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/highchart-deepseek.png"
-        }
-      }
-    }
-  },
-  "8": {
-    "python": {
-      "plotly": {
-        "DeepSeek-R1": {
-          "code": "# Plotly (DeepSeek) code for story 8",
-          "image_url": "http://localhost:8000/sdata-output/8/python/plotly/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 8",
-          "image_url": "http://localhost:8000/sdata-output/8/python/plotly/llama.png"
-        }
-      }
-    },
-    "r": {
-      "ggplot2": {
-        "DeepSeek-R1": {
-          "code": "# ggplot2 (DeepSeek) code for story 8",
-          "image_url": "http://localhost:8000/sdata-output/8/R/ggplot2/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 8",
-          "image_url": "http://localhost:8000/sdata-output/8/R/ggplot2/llama.png"
-        }
-      }
-    },
-    "javascript": {
-      "d3": {
-        "DeepSeek-R1": {
-          "code": "// D3 (DeepSeek) code for story 8",
-          "image_url": "http://localhost:8000/sdata-output/8/JS/d3/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 8",
-          "image_url": "http://localhost:8000/sdata-output/8/JS/d3/llama.png"
-        }
-      }
-    }
-  },
-  "9": {
-    "python": {
-      "plotly": {
-        "DeepSeek-R1": {
-          "code": "# Plotly (DeepSeek) code for story 9",
-          "image_url": "http://localhost:8000/sdata-output/9/python/plotly/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 9",
-          "image_url": "http://localhost:8000/sdata-output/9/python/plotly/llama.png"
-        }
-      }
-    },
-    "r": {
-      "ggplot2": {
-        "DeepSeek-R1": {
-          "code": "# ggplot2 (DeepSeek) code for story 9",
-          "image_url": "http://localhost:8000/sdata-output/9/R/ggplot2/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 9",
-          "image_url": "http://localhost:8000/sdata-output/9/R/ggplot2/llama.png"
-        }
-      }
-    },
-    "javascript": {
-      "d3": {
-        "DeepSeek-R1": {
-          "code": "// D3 (DeepSeek) code for story 9",
-          "image_url": "http://localhost:8000/sdata-output/9/JS/d3/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 9",
-          "image_url": "http://localhost:8000/sdata-output/9/JS/d3/llama.png"
         }
       }
     }
   },
   "10": {
-    "python": {
-      "plotly": {
-        "DeepSeek-R1": {
-          "code": "# Plotly (DeepSeek) code for story 10",
-          "image_url": "http://localhost:8000/sdata-output/10/python/plotly/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# Plotly (LLaMA) code for story 10",
-          "image_url": "http://localhost:8000/sdata-output/10/python/plotly/llama.png"
-        }
-      }
-    },
-    "r": {
-      "ggplot2": {
-        "DeepSeek-R1": {
-          "code": "# ggplot2 (DeepSeek) code for story 10",
-          "image_url": "http://localhost:8000/sdata-output/10/R/ggplot2/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "# ggplot2 (LLaMA) code for story 10",
-          "image_url": "http://localhost:8000/sdata-output/10/R/ggplot2/llama.png"
-        }
-      }
-    },
-    "javascript": {
-      "d3": {
-        "DeepSeek-R1": {
-          "code": "// D3 (DeepSeek) code for story 10",
-          "image_url": "http://localhost:8000/sdata-output/10/JS/d3/deepseek.png"
-        },
-        "LLaMA": {
-          "code": "// D3 (LLaMA) code for story 10",
-          "image_url": "http://localhost:8000/sdata-output/10/JS/d3/llama.png"
+    "EUI": {
+      "EUI": {
+        "EUI": {
+          "code": "# Plotly (DeepSeek) code for story 3",
+          "image_url": "http://localhost:8000/sdata-output/10/us10.png"
         }
       }
     }

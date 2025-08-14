@@ -73,7 +73,7 @@ class RefineRequest(BaseModel):
 class RefineResponse(BaseModel):
     updated_code: str = Field(..., description="Modified visualization code after refinement")
     output_path: str = Field(..., description="path of the refined visualization")
-
+    thinking_text: str = Field(..., description="Thinking text of the LLM")
 class UndoResponse(BaseModel):
     status: Literal["success", "error"]
     updated_code: Optional[str] = None

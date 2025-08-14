@@ -1,0 +1,105 @@
+{
+  "system_prompts": {
+    "python": "You are an expert code generator specializing in data visualization. You will be given a request to generate code in a specific language and library. You MUST follow these rules:\n1. Your response must contain ONLY raw, executable code for the requested language. Do not wrap it in markdown backticks (```), explanations, or any other text.\n2. The code will be executed in a sandboxed, isolated Docker environment. It has NO internet access but you have access to standard python libraries such as pandas and numpy.\n3. The environment has a pre-mounted data volume at '/app/data/'. All file I/O must use this path (e.g., read from '/app/data/input/' and write to '/app/data/output/').\n4. Do NOT include any code that attempts to create directories, install packages, or perform any file system operations outside of the designated data paths.\n5. Do NOT generate any harmful, malicious, or system-level code (e.g., using 'os' or 'subprocess'). Such code will be rejected.",
+    "r": "You are an expert code generator specializing in data visualization. You will be given a request to generate code in a specific language and library. You MUST follow these rules:\n1. Your response must contain ONLY raw, executable code for the requested language. Do not wrap it in markdown backticks (```), explanations, or any other text.\n2. The code will be executed in a sandboxed, isolated Docker environment. It has NO internet access but you have access to standard R libraries such as dplyr.\n3. The environment has a pre-mounted data volume at '/app/data/'. All file I/O must use this path (e.g., read from '/app/data/input/' and write to '/app/data/output/').\n4. Do NOT include any code that attempts to create directories, install packages, or perform any file system operations outside of the designated data paths.\n5. Do NOT generate any harmful, malicious, or system-level code (e.g., using 'os' or 'subprocess'). Such code will be rejected.",
+    "javascript": "You are an expert JavaScript code generator for a server-side visualization microservice.\\n\\nYou will receive a prompt describing a data visualization task using a specific JavaScript library and a CSV dataset.\\n\\nYou MUST follow these rules:\\n1.\\tGenerate a complete Node.js script that reads a CSV file from the path /app/data/input/, processes the data, and saves a self-contained static HTML file with the visualization to /app/data/output/. Your response must contain only the raw executable JavaScript code. Do not include markdown, comments, or explanations.\\n2.\\tThe code will be executed in a sandboxed, isolated Docker environment using Node.js. You have access to standard node js libraries such as csv-parser and papaparse.\\n3.\\tUse Node.js-compatible libraries where available:\\n•\\tUse d3, d3-sankey, chart.js, highcharts, echarts, or vega/vega-lite (via vega-embed) as needed.\\n•\\tFor browser-only libraries like Plotly or Google Charts, DO NOT require() them. Instead, include their <script src=\\\"...\\\"> tags in the HTML.\\n4.\\tDo NOT include any code that attempts to create directories, install packages, or perform any file system operations outside of the designated data paths.\\n5.\\tDo NOT generate any harmful, malicious, or system-level code (e.g., using 'os' or 'subprocess'). Such code will be rejected."
+  },
+
+  "error_correction_prompts": {
+    "1000": "The previously generated code failed to execute. It produced the following error. Please fix the code and provide a new, complete script.\n\nError Traceback:\n{stderr}",
+    "1100": "The previously generated code executed without crashing, but it failed to create the required output file. This usually means you forgot to include the final command to save the visualization to a file. Please review the code, add the necessary save command, and provide a new, complete script."
+  },
+
+  "user_stories": {
+    "1": {
+      "initial_prompt": "Create a line chart using {{library}} library in {{execution_env}} comparing cumulative counts over time across different biological groups with linear scale on y-axis and with legend for each group.The first five rows of  data looks like below: \\n group,date,count,order \\n experts,2019-04-24,1,2 \\n experts,2019-07-30,1,2 \\n experts,2020-01-01,2,2 \\n experts,2021-03-12,32,2 \\n experts,2021-05-06,16,2 \\n Read the data from the CSV file at '/app/data/input/dvl-llm-1-hra-growth-over-time.csv'. Save the output visualization file to '/app/data/output/{{filename_prefix}}'. {% if execution_env | lower == 'python' %}\n    {% if library | lower in ['plotly', 'altair', 'pygal', 'bokeh'] %}\n        Save the visualization as an `.html` file to `/app/data/output/`.\n    {% elif library | lower in ['matplotlib', 'seaborn', 'plotnine'] %}\n        Save the visualization as a `.png` file to `/app/data/output/`.\n    {% endif %}\n{% elif execution_env | lower == 'r' %}\n    {% if library | lower == 'plotly' %}\n        Save the visualization as an `.html` file to `/app/data/output/`.\n    {% else %}\n        Save the visualization as a `.png` file to `/app/data/output/`.\n    {% endif %}\n {% else %} Save the visualization as a `.html` file to `/app/data/output/`. {% endif %}",
+      "refine_prompts": [
+        {
+    "dvl_type": "style",
+    "keyword": "title",
+    "description": "Update the chart title to 'HRA Growth Per Release'. Ensure proper capitalization and font weight. Position top left"
+  },
+  {
+    "dvl_type": "style",
+    "keyword": "x-axis title",
+    "description": "Update the x-axis label to 'Date' with bold formatting, and ensure it appears in the same font"
+  },
+  {
+    "dvl_type": "style",
+    "keyword": "y-axis title",
+    "description": "Update the y-axis label to 'Cumulative Count' with bold formatting and consistent font style"
+  },
+  {
+    "dvl_type": "axis",
+    "keyword": "log y-axis ticks",
+    "description": "Format y-axis ticks on a log scale with granular tick marks for only: 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000 and 10000."
+  },
+  {
+    "dvl_type": "axis",
+    "keyword": "x-axis formatting",
+    "description": "Format x-axis dates as 'Mon YYYY' (e.g., Apr 2019, Oct 2020), and tilt the x-axis tick labels to 45 degrees for readability."
+  },
+  {
+    "dvl_type": "style",
+    "keyword": "use color brewer",
+    "description": "Apply a color palette from ColorBrewer for accessible and visually distinct group lines."
+  },
+  {
+    "dvl_type": "style",
+    "keyword": "grid lines opacity",
+    "description": "Use light grey grid lines with 0.3 opacity for both x and y axes to improve clarity. Since using log scale, make sure the grey grid lines do not clutter for higher order. Show y-axis grid lines only for the corresponding y-axis tick marks"
+  },
+  {
+    "dvl_type": "style",
+    "keyword": "background color",
+    "description": "Set the entire chart background to white with no borders or background shading."
+  },
+  {
+    "dvl_type": "legend",
+    "keyword": "legend styling",
+    "description": "Set the legend title to 'Measure', position the legend to the right of the plot, and apply consistent bold font styling."
+  },
+  {
+    "dvl_type": "style",
+    "keyword": "line thickness",
+    "description": "Use consistent line thickness for all series, preferably around 2px for better visibility."
+  },
+         {
+           "dvl_type": "deploy",
+  "keyword": "file format",
+  "description": "Save the visualization as a .png image to /app/data/output/. {% if execution_env | lower == 'python' %} Python-specific export rules: {% if library | lower == 'altair' %} Use chart.save('/app/data/output/foo.png', engine='vl-convert'). The environment has vl-convert installed and configured. {% elif library | lower == 'bokeh' %} Use bokeh.io.export.export_png() with manual WebDriver setup, e.g.: from selenium import webdriver; from selenium.webdriver.firefox.options import Options; from selenium.webdriver.firefox.service import Service; from bokeh.io.webdriver import webdriver_control; options = Options(); options.add_argument('–headless'); options.add_argument('–no-sandbox'); options.add_argument('–disable-dev-shm-usage'); options.add_argument('–window-size=1920,1080'); service = Service('/usr/local/bin/geckodriver'); driver = webdriver.Firefox(service=service, options=options); webdriver_control.current = driver; export_png(plot_object, filename='/app/data/output/foo.png'); driver.quit(); Firefox is at /usr/bin/firefox and Geckodriver is at /usr/local/bin/geckodriver; headless rendering via Selenium is supported. {% elif library | lower == 'pygal' %} cairosvg is available in the environment. {% else %} For other libraries (e.g., Plotly, Matplotlib, Seaborn), use their standard image export methods. {% endif %} {% elif execution_env | lower == 'r' %} R-specific export rules: {% if library | lower == 'plotly' %} reticulate is available in the environment. Append at top: library(reticulate); reticulate::py_module_available('kaleido'); then use save_image(fig, '/app/data/output/foo.png', format='png').  {% elif library | lower == 'networkd3' %} using the **webshot2** package and headless Chrome/Chromium installed in the container:\n   - Open the saved HTML.\n   - Export it as a PNG to `/app/data/output/{{filename_prefix}}.png`.\n   - Use `chromote::find_chrome()` and `webshot2::webshot()` to ensure proper headless browser capture. {% else %} Ensure a PNG is saved to '/app/data/output/figure.png'. {% endif %} {% elif execution_env | lower in ['javascript', 'js'] %}\nJavaScript-specific export rules:\nThe visualization HTML is saved to `/app/data/output/{{previous_filename_prefix}}.html`, use Puppeteer to open it and save a PNG screenshot to `/app/data/output/{{filename_prefix}}.png`. \nExample:\n```javascript\nconst puppeteer = require('puppeteer');\n(async () => {\n  const browser = await puppeteer.launch({\n    executablePath: '/usr/bin/chromium',\n    args: ['--no-sandbox', '--disable-dev-shm-usage']\n  });\n  const page = await browser.newPage();\n  await page.goto(`file:///app/data/output/{{ previous_filename_prefix }}.html`);\n  await page.waitForTimeout(3000); // wait for chart to render\n  await page.screenshot({\n    path: `/app/data/output/{{ filename_prefix }}.png`,\n    fullPage: true\n  });\n  await browser.close();\n})(); {% else %} Always save a PNG to '/app/data/output/foo.png'. {% endif %}"
+    }
+      ]
+    },
+    "7": {
+      "initial_prompt": "You are an expert {{execution_env}} programmer. Generate {{execution_env}} code to read a dataset and produce a Sankey diagram using:\\n\\nProgramming language: {{execution_env}}\\nLibrary: {{library}}\\n\\nData profile:\\n    •   The dataset has these columns:\\n    •   portal (categorical): e.g., HuBMAP, SenNet, LungMap.\\n    •   donor_age (numeric): 0–99.\\n    •   donor_sex (categorical): Male, Female, Unknown.\\n    •   donor_bmi (numeric): 10–50.\\n    •   donor_race (categorical): mapped races like White, Black/African American, etc.\\n    •   organ_name (categorical): organ names of the samples.\\n    •   cell_type_annotation_tool (categorical): scRNA annotation tools.\\n    •   is_rui_registered (boolean string(\"true\"/ \"false\")): whether RUI-registered.\\n    •   is_atlas_dataset (boolean string(\"true\"/ \"false\")): whether part of an Atlas dataset.  \\n\\nRequired data transformations:\\n    1.  Read dataset:\\n    •   Read from '/app/data/input/dvl-llm-7-sankey.csv'.\\n    2. Replace missing/NA values in portal, donor_age, donor_sex, donor_bmi, donor_race, organ_name, cell_type_annotation_tool, is_rui_registered, is_atlas_dataset with descriptive placeholders (e.g., \\\"Unknown Age\\\", “Unknown Sex”, “Unknown Race”, \\\"Unknown Organ\\\").\\n    3.  Standardize portal names:\\n    •   Replace “HCA” and “CxG” with “CZ CELLxGENE”.\\n    •   Replace \\\"NHLBI/LungMap\\\" with \\\"LungMap\\\"\\n    •   Replace “HRA” with “HRA-OMAP”.\\n    4.  Standardize inconsistent donor_race values (“unknown”, “na”, “n/a” (and case variants) → \\\"Unknown Race\\\").\\n    5.  Standardize inconsistent donor_sex values (“unknown”, “na”, “n/a” (and case variants) → \\\"Unknown Sex\\\").\\n    6.  CT annotation tool replacement:\\n    •   Replace cell_type_annotation_tool values of “azimuth”, “celltypist” and “popv” with “sc_transcriptomics with Cell Summary”.\\n    7.  Label conversions for booleans. Convert\\n    •   is_atlas_dataset: \"true\"/\"false\" → “Atlas Dataset”/“Not Atlas Dataset”.\\n    8.  Filter is_atlas_dataset to only \\\"Atlas Dataset\\\" and drop any duplicates in any.\\n    9.  Construct a Sankey diagram with these columns in this order:\\n    •   portal → donor_sex → donor_age → donor_race →  donor_bmi → organ_name → cell_type_annotation_tool → is_rui_registered → is_atlas_dataset\\n    •   Build nodes/links using unique value group counts.\\n    •   Export the HTML as '/app/data/output/{{filename_prefix}}.html'.\\n\\nDeliverable:\\n    •   Provide clean {{execution_env}} code in a single script to perform these transformations and generate the interactive Sankey diagram.",
+      "refine_prompts": [
+        {
+          "dvl_type": "labeling",
+          "keyword": "Refine age axis",
+          "description": "Transform donor_age column:\\nBin donor_age into WHO-inspired bins: <1 year, 1-4, 5-9, 10-14, 15-19, …, 95-99 years.\\nReplace donor_age with donor_age_binned in the Sankey diagram, maintaining the existing flow order."
+        },
+        {
+          "dvl_type": "labeling",
+          "keyword": "Refine BMI axis",
+          "description": "Transform donor_bmi column:\\nBin donor_bmi into categories: underweight (0-18.5), healthy (18.5-24.9), overweight (24.9-29.9), obese (29.9+).\\nReplace donor_bmi with donor_bmi_binned in the Sankey diagram, maintaining the existing flow order."
+        },
+        {
+          "dvl_type": "labeling",
+          "keyword": "Refine organ axis",
+          "description": "Clean organ_name column:\\nCombine “left kidney”, “right kidney” (and case variants) into “Kidney”.\\nUpdate organ_name in the Sankey diagram. \\nRebuild and re-export the Sankey HTML."
+        },
+        {
+          "dvl_type": "labeling",
+          "keyword": "Refine RUI registration axis",
+          "description": "Transform is_rui_registered column:\\nReplace \"true\"/\"false\" with “RUI-registered”/“Not RUI-registered”.\\nUpdate is_rui_registered in the Sankey diagram.\\nRebuild and re-export the Sankey HTML."
+        },
+         {
+           "dvl_type": "deploy",
+  "keyword": "file format",
+  "description": "Save the visualization as a .png image to /app/data/output/. {% if execution_env | lower == 'python' %} Python-specific export rules: {% if library | lower == 'altair' %} Use chart.save('/app/data/output/foo.png', engine='vl-convert'). The environment has vl-convert installed and configured. {% elif library | lower == 'bokeh' %} Use bokeh.io.export.export_png() with manual WebDriver setup, e.g.: from selenium import webdriver; from selenium.webdriver.firefox.options import Options; from selenium.webdriver.firefox.service import Service; from bokeh.io.webdriver import webdriver_control; options = Options(); options.add_argument('–headless'); options.add_argument('–no-sandbox'); options.add_argument('–disable-dev-shm-usage'); options.add_argument('–window-size=1920,1080'); service = Service('/usr/local/bin/geckodriver'); driver = webdriver.Firefox(service=service, options=options); webdriver_control.current = driver; export_png(plot_object, filename='/app/data/output/foo.png'); driver.quit(); Firefox is at /usr/bin/firefox and Geckodriver is at /usr/local/bin/geckodriver; headless rendering via Selenium is supported. {% elif library | lower == 'pygal' %} cairosvg is available in the environment. {% else %} For other libraries (e.g., Plotly, Matplotlib, Seaborn), use their standard image export methods. {% endif %} {% elif execution_env | lower == 'r' %} R-specific export rules: {% if library | lower == 'plotly' %} reticulate is available in the environment. Append at top: library(reticulate); reticulate::py_module_available('kaleido'); then use save_image(fig, '/app/data/output/foo.png', format='png').  {% elif library | lower == 'networkd3' %} using the **webshot2** package and headless Chrome/Chromium installed in the container:\n   - Open the saved HTML.\n   - Export it as a PNG to `/app/data/output/{{filename_prefix}}.png`.\n   - Use `chromote::find_chrome()` and `webshot2::webshot()` to ensure proper headless browser capture. {% else %} Ensure a PNG is saved to '/app/data/output/figure.png'. {% endif %} {% elif execution_env | lower in ['javascript', 'js'] %}\nJavaScript-specific export rules:\nThe visualization HTML is saved to `/app/data/output/{{previous_filename_prefix}}.html`, use Puppeteer to open it and save a PNG screenshot to `/app/data/output/{{filename_prefix}}.png`. \nExample:\n```javascript\nconst puppeteer = require('puppeteer');\n(async () => {\n  const browser = await puppeteer.launch({\n    executablePath: '/usr/bin/chromium',\n    args: ['--no-sandbox', '--disable-dev-shm-usage']\n  });\n  const page = await browser.newPage();\n  await page.goto(`file:///app/data/output/{{ previous_filename_prefix }}.html`);\n  await page.waitForTimeout(3000); // wait for chart to render\n  await page.screenshot({\n    path: `/app/data/output/{{ filename_prefix }}.png`,\n    fullPage: true\n  });\n  await browser.close();\n})(); {% else %} Always save a PNG to '/app/data/output/foo.png'. {% endif %}"
+    }
+      ]
+    }
+  }
+}

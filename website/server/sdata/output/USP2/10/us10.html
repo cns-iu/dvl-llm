@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Regular metadata. Customize as you see fit -->
+    <meta charset="utf-8" />
+    <title>CDE Visualization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <!-- The important bits -->
+    <link href="https://cdn.humanatlas.io/ui/cde-visualization-wc/styles.css" rel="stylesheet" />
+    <script src="https://cdn.humanatlas.io/ui/cde-visualization-wc/wc.js" type="module"></script>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const cde = document.querySelector('#cde');
+
+        // Set data from javascript
+        cde.metadata = {
+          title: 'colon-cycif-sorgerlab / CRC01002',
+          organ: 'Large Intestine',
+          technology: 'CyCIF',
+          thickness: 5,
+          pixelSize: 0.65,
+          creationTimestamp: 1710399803000,
+          sourceFileName: '2D Large Intestine Sample',
+        };
+
+        // Listen to events
+        cde.addEventListener('nodeClick', (event) => {
+          console.log('Node clicked: ', event.detail);
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <cde-visualization id="cde" nodes="http://localhost:8000/sdata-output/USP2/10/dvl-llm-10-cde-nodes.csv" edges="http://localhost:8000/sdata-output/USP2/10/dvl-llm-9-cde-edges.csv"> </cde-visualization>
+  </body>
+</html>
