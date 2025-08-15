@@ -20,3 +20,5 @@ plotnine
 plotext
 selenium
 cairosvg
+networkx
+pyvis
