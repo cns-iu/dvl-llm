@@ -896,18 +896,18 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
     this.appService.refineVisualization(text).subscribe(
       (res: RefineResponse) => {
         this.codeText = res.updated_code;
-        // currentItem.code = res.updated_code;
-        currentItem.code = `We are going to change the y-axis to a log scale as requested.
-The previous code already uses a linear scale, so we will adjust the layout to set the y-axis to log.
-We'll update the update_layout method to set yaxis_type='log'.
-Also, note that using a log scale might require handling zero counts. However, our cumulative counts start at 1 and grow, so it should be safe.
-If there are zeros in cumulative counts, we might need to adjust (but in the provided data, the counts are positive). We'll proceed with the log scale.
-However, let's note: the cumulative counts are computed from the 'count' values. Since the initial counts are positive (minimum 1), the cumulative counts will be at least 1. So no problem.
-We'll change the update_layout for yaxis_type from 'linear' to 'log'.
-Also, we can adjust the title and axis labels accordingly.
-But note: the requirement is to change to log scale on y-axis.
-Let's update the code accordingly.
-`;
+        currentItem.code = res.thinking_text;
+        //         currentItem.code = `We are going to change the y-axis to a log scale as requested.
+        // The previous code already uses a linear scale, so we will adjust the layout to set the y-axis to log.
+        // We'll update the update_layout method to set yaxis_type='log'.
+        // Also, note that using a log scale might require handling zero counts. However, our cumulative counts start at 1 and grow, so it should be safe.
+        // If there are zeros in cumulative counts, we might need to adjust (but in the provided data, the counts are positive). We'll proceed with the log scale.
+        // However, let's note: the cumulative counts are computed from the 'count' values. Since the initial counts are positive (minimum 1), the cumulative counts will be at least 1. So no problem.
+        // We'll change the update_layout for yaxis_type from 'linear' to 'log'.
+        // Also, we can adjust the title and axis labels accordingly.
+        // But note: the requirement is to change to log scale on y-axis.
+        // Let's update the code accordingly.
+        // `;
         currentItem.isDone = true;
         this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
           `http://localhost:8000${res.output_path}`

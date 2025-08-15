@@ -27,6 +27,7 @@ export interface RefinePrompt {
 export interface RefineResponse {
   updated_code: string;
   output_path: string;
+  thinking_text: string;
 }
 
 export interface HistoryItem {

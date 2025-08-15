@@ -8,14 +8,24 @@ from fastapi.responses import FileResponse, JSONResponse
 from typing import List
 import os, json, shutil
 import pandas as pd
-
+from pathlib import Path
 
 router = APIRouter(prefix="/api", tags=["generate"])
 
 json_path = os.path.join(os.getcwd(), "visualizations.json")
 with open(json_path,"r") as f:
     user_story_visuals = json.load(f)
+# test
+# DEFAULT_JSON = Path(__file__).resolve().parents[1] / "visualizations.json"
+# JSON_PATH = Path(os.getenv("VISUALS_JSON", DEFAULT_JSON))
 
+# try:
+#     with JSON_PATH.open("r", encoding="utf-8") as f:
+#         user_story_visuals = json.load(f)
+# except FileNotFoundError:
+#     # choose one:
+#     user_story_visuals = {}
+# test
 orchestrator = None
 
 @router.post("/generate", response_model=GenerateResponse)
