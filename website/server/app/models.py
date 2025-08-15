@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import List
 from typing import Optional, Literal
+from enum import Enum
+
 
 class GenerateRequest(BaseModel):
     """
@@ -14,8 +16,8 @@ class GenerateRequest(BaseModel):
     )
     language: str = Field(
         default="python",
-        pattern="python",
-        description="Target programming language ('python', 'R' or 'Java Script')"
+        pattern="^(python|r|javascript|other)$",
+        description="Target programming language ('python', 'r', 'javascript', 'other')"
     )
     library: str = Field(
         ..., 

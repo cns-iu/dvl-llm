@@ -52,7 +52,7 @@
     },
 
     "r": {
-      "baser": {
+      "base R": {
         "DeepSeek-R1": {
           "code": "# ggplot2 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/baser-deepseek.png"
@@ -64,7 +64,7 @@
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/default-deepseek.png"
         }
       },
-      "ggplot": {
+      "ggplot2": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 2",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/R/ggplot-deepseek.png"
@@ -96,31 +96,31 @@
       }
     },
     "javascript": {
-      "apachechart": {
+      "apache echarts.js": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/apacheechartjs-deepseek.png"
         }
       },
-      "chart": {
+      "chart.js": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/chartjs-deepseek.png"
         }
       },
-      "d3": {
+      "d3.js": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/d3js-deepseek.png"
         }
       },
-      "googlechart": {
+      "googlecharts.js": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/googlechartjs-deepseek.png"
         }
       },
-      "highchart": {
+      "highcharts.js": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/highchartjs-deepseek.png"
@@ -132,7 +132,7 @@
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/plotly-deepseek.png"
         }
       },
-      "vega": {
+      "vega.js": {
         "DeepSeek-R1": {
           "code": "// D3 (DeepSeek) code for story 1",
           "image_url": "http://localhost:8000/sdata-output/USP2/1/JS/vegajs-deepseek.png"
@@ -140,60 +140,28 @@
       }
     }
   },
-  "2": {
-    "python": {
-      "plotly": {
-        "DeepSeek-R1": {
-          "code": "# Plotly (DeepSeek) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/2/python/plotly/deepseek.png"
-        }
-      }
-    },
-    "r": {
-      "ggplot2": {
-        "DeepSeek-R1": {
-          "code": "# ggplot2 (DeepSeek) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/2/R/ggplot2/deepseek.png"
-        }
-      }
-    },
-    "javascript": {
-      "d3": {
-        "DeepSeek-R1": {
-          "code": "// D3 (DeepSeek) code for story 2",
-          "image_url": "http://localhost:8000/sdata-output/2/JS/d3/deepseek.png"
-        }
-      }
-    }
-  },
   "3": {
-    "RUI": {
-      "RUI": {
-        "RUI": {
+    "EUI": {
+      "EUI": {
+        "EUI": {
           "code": "# Plotly (DeepSeek) code for story 3",
-          "image_url": "http://localhost:8000/sdata-output/3/us3.png"
+          "image_url": "http://localhost:8000/sdata-output/USP2/3/us3.png"
         }
       }
     }
   },
   "7": {
     "python": {
-      "bokeh": {
+      "holoviews": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/bokeh-deepseek.png"
+          "image_url": "http://localhost:8000/sdata-output/USP2/7/python/holoviews-deepseek.png"
         }
       },
       "plotly": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 7",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/plotly-deepseek.png"
-        }
-      },
-      "seaborn": {
-        "DeepSeek-R1": {
-          "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/1/python/seaborn-deepseek.png"
+          "image_url": "http://localhost:8000/sdata-output/USP2/7/python/plotly-deepseek.png"
         }
       }
     },
@@ -221,37 +189,43 @@
       "apacheechart": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/apacheechart-deepseek.png"
+          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/echarts-deepseek.png"
         }
       },
-      "d3": {
+      "d3.js": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 7",
           "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/d3js-deepseek.png"
         }
       },
-      "googlechart": {
+      "googlecharts.js": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/googlechart-deepseek.png"
+          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/gcharts-deepseek.png"
         }
       },
-      "highchart": {
+      "highcharts.js": {
         "DeepSeek-R1": {
           "code": "# Plotly (DeepSeek) code for story 1",
-          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/highchart-deepseek.png"
+          "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/highcharts-deepseek.png"
         }
-      }
+      },
+        "chart.js": {
+          "DeepSeek-R1": {
+            "code": "# Plotly (DeepSeek) code for story 1",
+            "image_url": "http://localhost:8000/sdata-output/USP2/7/JS/chartjs-deepseek.png"
+          }
+        }
     }
-  },
-  "10": {
-    "EUI": {
-      "EUI": {
-        "EUI": {
-          "code": "# Plotly (DeepSeek) code for story 3",
-          "image_url": "http://localhost:8000/sdata-output/10/us10.png"
+    },
+    "10": {
+      "RUI": {
+        "RUI": {
+          "RUI": {
+            "code": "# Plotly (DeepSeek) code for story 3",
+            "image_url": "http://localhost:8000/sdata-output/USP2/10/us10.png"
+          }
         }
       }
     }
   }
-}

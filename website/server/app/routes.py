@@ -1,5 +1,5 @@
 import httpx
-from fastapi import APIRouter, HTTPException, Query, UploadFile, File
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Body
 from app.models import GenerateRequest, GenerateResponse, UserStoryResponse
 from app.models import RefineRequest, RefineResponse, UndoResponse
 from app.services.llm_orchestrator import LLMOrchestrator
@@ -19,13 +19,6 @@ with open(json_path,"r") as f:
 # DEFAULT_JSON = Path(__file__).resolve().parents[1] / "visualizations.json"
 # JSON_PATH = Path(os.getenv("VISUALS_JSON", DEFAULT_JSON))
 
-# try:
-#     with JSON_PATH.open("r", encoding="utf-8") as f:
-#         user_story_visuals = json.load(f)
-# except FileNotFoundError:
-#     # choose one:
-#     user_story_visuals = {}
-# test
 orchestrator = None
 
 @router.post("/generate", response_model=GenerateResponse)
@@ -54,7 +47,7 @@ def generate(req: GenerateRequest):
         orchestrator = LLMOrchestrator(
             provider="jetstream",
             model_name=req.model,
-            llm_factory_api_key="sk-d124b81a3ead4cbd95b77249ca755831",
+            llm_factory_api_key=stored_api_key,
             prompt_file_path="/app/sdata/input/prompts/prompts_updated.json"
         )
 
@@ -67,6 +60,9 @@ def generate(req: GenerateRequest):
         code = result["code"]
         output_file = result["output_html_path"]
         filename = output_file.split("/")[-1]  # test.html
+        # if req.id in (3,10): #directly serve static html files
+        #     output_path = output_file
+        # else:
         output_path = f"/static-output/{filename}"
         # image_b64 = run_python(code)
         return GenerateResponse(code=code, output_path=output_path)
@@ -361,3 +357,16 @@ def undo_last_action():
     except Exception as exc:
         # Any unexpected error -> 500
         raise HTTPException(status_code=500, detail=str(exc))
+
+
+stored_api_key = None
+
+@router.post("/save-api-key")
+def save_api_key(api_key: str = Body(..., embed=True)):
+    """
+    Save the provided API key in memory for future use.
+    This is for local single-user use; no database persistence.
+    """
+    global stored_api_key
+    stored_api_key = api_key
+    return {"message": "API key saved successfully"}

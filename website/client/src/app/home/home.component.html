@@ -2,6 +2,7 @@
   <div class="splash">
     <div class="splash-content">
       <div class="splash-title">Create data visualizations with AI</div>
+
       <div class="card-group">
         <div class="splash-card" *ngFor="let c of cards">
           <div class="card-header">
@@ -11,7 +12,42 @@
           <div class="card-text">{{ c.text }}</div>
         </div>
       </div>
-      <button class="use-btn" (click)="onGetStarted()">Get started</button>
+
+      <!-- New: API key + Get started, side-by-side -->
+            <!-- API key + Get started, side-by-side -->
+      <div class="cta-row">
+        <div class="api-key-box">
+          <div class="api-input-wrap">
+            <input
+              id="apiKey"
+              [(ngModel)]="apiKey"
+              [type]="showKey ? 'text' : 'password'"
+              class="api-input"
+              placeholder="Enter your API key here"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+            />
+            <button
+              type="button"
+              class="toggle-visibility"
+              (click)="toggleKeyVisibility()"
+              [attr.aria-pressed]="showKey"
+              [attr.aria-label]="showKey ? 'Hide API key' : 'Show API key'"
+              title="{{ showKey ? 'Hide API key' : 'Show API key' }}"
+            >
+              <svg *ngIf="!showKey" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 12a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/>
+              </svg>
+              <svg *ngIf="showKey" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2 4.27 3.28 3 21 20.72 19.73 22l-2.6-2.6A12.2 12.2 0 0 1 12 19.5C7 19.5 2.73 16.39 1 12c.79-2 2.21-3.73 4-5l-3-2.73zM12 6.5c5 0 9.27 3.11 11 7.5-.66 1.66-1.8 3.13-3.24 4.28L17.4 15.9a4.5 4.5 0 0 0-5.3-5.3L8.22 6.72C9.4 6.57 10.68 6.5 12 6.5z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button class="use-btn" (click)="onGetStarted()">Get started</button>
+      </div>
     </div>
   </div>
 </div>

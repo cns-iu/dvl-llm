@@ -896,7 +896,7 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
     this.appService.refineVisualization(text).subscribe(
       (res: RefineResponse) => {
         this.codeText = res.updated_code;
-        currentItem.code = res.thinking_text;
+        // currentItem.code = res.updated_code;
         //         currentItem.code = `We are going to change the y-axis to a log scale as requested.
         // The previous code already uses a linear scale, so we will adjust the layout to set the y-axis to log.
         // We'll update the update_layout method to set yaxis_type='log'.
@@ -908,6 +908,7 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
         // But note: the requirement is to change to log scale on y-axis.
         // Let's update the code accordingly.
         // `;
+        currentItem.code = res.thinking_text;
         currentItem.isDone = true;
         this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
           `http://localhost:8000${res.output_path}`
