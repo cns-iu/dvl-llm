@@ -13,12 +13,25 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 })
 export class HomeComponent {
   cards = [
-    { step: '1', title: 'Select a dataset', text: 'Choose a dataset from the Human Reference Atlas' },
-    { step: '2', title: 'Select visualization', text: 'Choose an AI model, programming language, visualization library and type' },
-    { step: '3', title: 'Optimize with AI', text: 'Edit the visualization, code, and deploy the results' },
+    {
+      step: '1',
+      title: 'Select a dataset',
+      text: 'Choose a dataset from the Human Reference Atlas',
+    },
+    {
+      step: '2',
+      title: 'Select visualization',
+      text: 'Choose an AI model, programming language, visualization library and type',
+    },
+    {
+      step: '3',
+      title: 'Optimize with AI',
+      text: 'Edit the visualization, code, and deploy the results',
+    },
   ];
 
   apiKey = '';
+  selectedProvider = '';
   showKey = false;
 
   constructor(private router: Router, private http: HttpClient) {}
@@ -29,20 +42,30 @@ export class HomeComponent {
 
   onGetStarted() {
     const key = (this.apiKey || '').trim();
+    const provider = (this.selectedProvider || '').trim();
     if (!key) {
       alert('Please enter your API key.');
       return;
     }
+    if (!provider) {
+      alert('Please select a provider.');
+      return;
+    }
 
-    this.http.post('http://localhost:8000/api/save-api-key', { api_key: key }).subscribe({
-      next: () => {
-        console.log('API key saved successfully');
-        this.router.navigate(['/gather']);
-      },
-      error: err => {
-        console.error('Failed to save API key', err);
-        alert('Failed to save API key');
-      }
-    });
+    this.http
+      .post('http://localhost:8000/api/save-api-key', {
+        api_key: key,
+        provider: provider,
+      })
+      .subscribe({
+        next: () => {
+          console.log('API key saved successfully');
+          this.router.navigate(['/gather']);
+        },
+        error: (err) => {
+          console.error('Failed to save API key/provider', err);
+          alert('Failed to save API key/provider');
+        },
+      });
   }
 }
