@@ -4,7 +4,6 @@
     <div class="main-content">
       <div class="section-header">
         <h2 class="header-text">Select visualization</h2>
-        <!-- <hr /> -->
         <p class="header-content">
           Select a large language model, a programming language, a visualization
           library, and a visualization type.
@@ -19,8 +18,12 @@
         </span>
       </div>
 
-      <!-- Python, JS, R sections… -->
-      <div class="category-section" id="python">
+      <!-- Python section - only show if there are python visualizations -->
+      <div
+        class="category-section"
+        id="python"
+        *ngIf="pythonVisualizations.length > 0"
+      >
         <div class="category-title">Python visualizations</div>
         <div class="visualization-grid">
           <div
@@ -56,7 +59,13 @@
           </div>
         </div>
       </div>
-      <div class="category-section" id="javascript">
+
+      <!-- JavaScript section - only show if there are javascript visualizations -->
+      <div
+        class="category-section"
+        id="javascript"
+        *ngIf="javascriptVisualizations.length > 0"
+      >
         <h3 class="category-title">JavaScript visualizations</h3>
         <div class="visualization-grid">
           <div
@@ -90,7 +99,9 @@
           </div>
         </div>
       </div>
-      <div class="category-section" id="r">
+
+      <!-- R section - only show if there are r visualizations -->
+      <div class="category-section" id="r" *ngIf="rVisualizations.length > 0">
         <h3 class="category-title">R visualizations</h3>
         <div class="visualization-grid">
           <div class="visualization-card" *ngFor="let viz of rVisualizations">
@@ -121,26 +132,81 @@
           </div>
         </div>
       </div>
+
+      <!-- Other section - only show if there are other visualizations -->
+      <div
+        class="category-section"
+        id="other"
+        *ngIf="otherVisualizations.length > 0"
+      >
+        <h3 class="category-title">Other visualizations</h3>
+        <div class="visualization-grid">
+          <div
+            class="visualization-card"
+            *ngFor="let viz of otherVisualizations"
+          >
+            <div class="card-body">
+              <div class="info-panel">
+                <table class="info-table">
+                  <tr>
+                    <td>Model</td>
+                    <td>{{ viz.title }}</td>
+                  </tr>
+                  <tr>
+                    <td>Language</td>
+                    <td>{{ viz.category | titlecase }}</td>
+                  </tr>
+                  <tr>
+                    <td>Library</td>
+                    <td>{{ viz.library }}</td>
+                  </tr>
+                </table>
+                <button class="use-vis-btn" (click)="onExplore(viz)">
+                  Use visualization
+                </button>
+              </div>
+              <div class="chart-panel">
+                <img [src]="viz.imagePath" [alt]="viz.description" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR - only show navigation for sections that have content -->
     <aside class="sidebar">
       <nav class="page-nav">
         <div>
           <span>On this page</span>
           <ul>
-            <li [class.active]="currentSection === 'python'">
+            <li
+              [class.active]="currentSection === 'python'"
+              *ngIf="pythonVisualizations.length > 0"
+            >
               <button (click)="scrollTo('python')">
                 Python visualizations
               </button>
             </li>
-            <li [class.active]="currentSection === 'javascript'">
+            <li
+              [class.active]="currentSection === 'javascript'"
+              *ngIf="javascriptVisualizations.length > 0"
+            >
               <button (click)="scrollTo('javascript')">
                 JavaScript visualizations
               </button>
             </li>
-            <li [class.active]="currentSection === 'r'">
+            <li
+              [class.active]="currentSection === 'r'"
+              *ngIf="rVisualizations.length > 0"
+            >
               <button (click)="scrollTo('r')">R visualizations</button>
+            </li>
+            <li
+              [class.active]="currentSection === 'other'"
+              *ngIf="otherVisualizations.length > 0"
+            >
+              <button (click)="scrollTo('other')">Other visualizations</button>
             </li>
           </ul>
         </div>
@@ -149,289 +215,3 @@
   </div>
 </div>
 <router-outlet></router-outlet>
-
-<!-- src/app/analyze-data/analyze-data.component.html -->
-
-<!-- <div *ngIf="!isChildRoute" class="visualizations-page">
-  <div class="content-container">
-    <div class="section-header">
-      <h1>Select visualization type</h1>
-      <hr />
-      <p>Select a visualization type to continue</p>
-    </div>
-
-    <div class="info-banner">
-      <mat-icon>info</mat-icon>
-      <span>
-        Visualization images were captured on [2025-00-00]. Results with
-        artificial intelligence (AI) may vary.
-      </span>
-    </div>
-
-    <nav class="page-nav">
-      <span>On this page</span>
-      <ul>
-        <li [class.active]="currentSection === 'python'">
-          <button (click)="scrollTo('python')">Python visualizations</button>
-        </li>
-        <li [class.active]="currentSection === 'javascript'">
-          <button (click)="scrollTo('javascript')">
-            JavaScript visualizations
-          </button>
-        </li>
-        <li [class.active]="currentSection === 'r'">
-          <button (click)="scrollTo('r')">R visualizations</button>
-        </li>
-      </ul>
-    </nav>
-
-    <div class="category-section" id="python">
-      <h3 class="category-title">Python visualizations</h3>
-      <div class="visualization-grid">
-        <div
-          class="visualization-card"
-          *ngFor="let viz of pythonVisualizations"
-        >
-          <div class="card-body">
-            <div class="info-panel">
-              <table class="info-table">
-                <tr>
-                  <td>Model</td>
-                  <td>{{ viz.title }}</td>
-                </tr>
-                <tr>
-                  <td>Language</td>
-                  <td>{{ viz.category | titlecase }}</td>
-                </tr>
-                <tr>
-                  <td>Library</td>
-                  <td>{{ viz.library }}</td>
-                </tr>
-              </table>
-              <button class="use-vis-btn" (click)="onExplore(viz)">
-                Use visualization →
-              </button>
-            </div>
-            <div class="chart-panel">
-              <img [src]="viz.imagePath" [alt]="viz.description" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="category-section" id="javascript">
-      <h3 class="category-title">JavaScript visualizations</h3>
-      <div class="visualization-grid">
-        <div
-          class="visualization-card"
-          *ngFor="let viz of javascriptVisualizations"
-        >
-          <div class="card-body">
-            <div class="info-panel">
-              <table class="info-table">
-                <tr>
-                  <td>Model</td>
-                  <td>{{ viz.title }}</td>
-                </tr>
-                <tr>
-                  <td>Language</td>
-                  <td>{{ viz.category | titlecase }}</td>
-                </tr>
-                <tr>
-                  <td>Library</td>
-                  <td>{{ viz.library }}</td>
-                </tr>
-              </table>
-              <button class="use-vis-btn" (click)="onExplore(viz)">
-                Use visualization →
-              </button>
-            </div>
-            <div class="chart-panel">
-              <img [src]="viz.imagePath" [alt]="viz.description" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="category-section" id="r">
-      <h3 class="category-title">R visualizations</h3>
-      <div class="visualization-grid">
-        <div class="visualization-card" *ngFor="let viz of rVisualizations">
-          <div class="card-body">
-            <div class="info-panel">
-              <table class="info-table">
-                <tr>
-                  <td>Model</td>
-                  <td>{{ viz.title }}</td>
-                </tr>
-                <tr>
-                  <td>Language</td>
-                  <td>{{ viz.category | titlecase }}</td>
-                </tr>
-                <tr>
-                  <td>Library</td>
-                  <td>{{ viz.library }}</td>
-                </tr>
-              </table>
-              <button class="use-vis-btn" (click)="onExplore(viz)">
-                Use visualization →
-              </button>
-            </div>
-            <div class="chart-panel">
-              <img [src]="viz.imagePath" [alt]="viz.description" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<router-outlet></router-outlet> -->
-
-<!-- @if(!isChildRoute) {
-<div class="visualizations-page">
-  <div class="content-container">
-    <div class="section-header">
-      <h1>Select visualization type</h1>
-      <hr />
-      <p>Select a visualization type to continue</p>
-    </div>
-    <div class="info-banner">
-      <mat-icon>info</mat-icon>
-      <span>
-        Visualization images were captured on [2025-00-00]. Results with
-        artificial intelligence (AI) may vary.
-      </span>
-    </div>
-    <nav class="page-nav">
-      <span>On this page</span>
-      <ul>
-        <li [class.active]="currentSection === 'python'">
-          <button (click)="scrollTo('python')">Python visualizations</button>
-        </li>
-        <li [class.active]="currentSection === 'javascript'">
-          <button (click)="scrollTo('javascript')">
-            JavaScript visualizations
-          </button>
-        </li>
-        <li [class.active]="currentSection === 'r'">
-          <button (click)="scrollTo('r')">R visualizations</button>
-        </li>
-      </ul>
-    </nav>
-
-    <div class="category-section" id="python">
-      <h3 class="category-title">Python visualizations</h3>
-
-      <div class="visualization-grid">
-        <div
-          class="visualization-card"
-          *ngFor="let viz of pythonVisualizations"
-          id="python"
-        >
-          <div class="card-body">
-            <div class="info-panel">
-              <table class="info-table">
-                <tr>
-                  <td>Model</td>
-                  <td>{{ viz.title }}</td>
-                </tr>
-                <tr>
-                  <td>Language</td>
-                  <td>{{ viz.category | titlecase }}</td>
-                </tr>
-                <tr>
-                  <td>Library</td>
-                  <td>{{ viz.library }}</td>
-                </tr>
-              </table>
-
-              <button class="use-vis-btn" (click)="onExplore(viz)">
-                Use visualization →
-              </button>
-            </div>
-            <div class="chart-panel">
-              <img [src]="viz.imagePath" [alt]="viz.description" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="category-section" id="javascript">
-      <h3 class="category-title">JavaScript Visualizations</h3>
-
-      <div class="visualization-grid">
-        <div
-          class="visualization-card"
-          *ngFor="let viz of javascriptVisualizations"
-        >
-          <div class="card-body">
-            <div class="info-panel">
-              <table class="info-table">
-                <tr>
-                  <td>Model</td>
-                  <td>{{ viz.title }}</td>
-                </tr>
-                <tr>
-                  <td>Language</td>
-                  <td>{{ viz.category | titlecase }}</td>
-                </tr>
-                <tr>
-                  <td>Library</td>
-                  <td>{{ viz.library }}</td>
-                </tr>
-              </table>
-
-              <button class="use-vis-btn" (click)="onExplore(viz)">
-                Use visualization →
-              </button>
-            </div>
-            <div class="chart-panel">
-              <img [src]="viz.imagePath" [alt]="viz.description" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="category-section" id="r">
-      <h3 class="category-title">R Visualizations</h3>
-
-      <div class="visualization-grid">
-        <div class="visualization-card" *ngFor="let viz of rVisualizations">
-          <div class="card-body">
-            <div class="info-panel">
-              <table class="info-table">
-                <tr>
-                  <td>Model</td>
-                  <td>{{ viz.title }}</td>
-                </tr>
-                <tr>
-                  <td>Language</td>
-                  <td>{{ viz.category | titlecase }}</td>
-                </tr>
-                <tr>
-                  <td>Library</td>
-                  <td>{{ viz.library }}</td>
-                </tr>
-              </table>
-
-              <button class="use-vis-btn" (click)="onExplore(viz)">
-                Use visualization →
-              </button>
-            </div>
-            <div class="chart-panel">
-              <img [src]="viz.imagePath" [alt]="viz.description" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-}
-<router-outlet></router-outlet> -->
