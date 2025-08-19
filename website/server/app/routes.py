@@ -45,7 +45,8 @@ def generate(req: GenerateRequest):
     global orchestrator
     try:
         orchestrator = LLMOrchestrator(
-            provider="jetstream",
+            # provider="jetstream",
+            provider = stored_provider,
             model_name=req.model,
             llm_factory_api_key=stored_api_key,
             prompt_file_path="/app/sdata/input/prompts/prompts_updated.json"
@@ -57,7 +58,7 @@ def generate(req: GenerateRequest):
             filename_prefix=f"{req.model}{req.id}_{req.language}_{req.library}",
             story_id=req.id
         )
-        code = result["code"]
+        code = result["code"]  
         output_file = result["output_html_path"]
         filename = output_file.split("/")[-1]  # test.html
         # if req.id in (3,10): #directly serve static html files
@@ -240,25 +241,76 @@ def get_refinements(user_story_id: str):
 #     except KeyError:
 #         raise HTTPException(status_code=404, detail="User story not found")
     
+# @router.get("/userstory/{us_id}")
+# def get_all_visualizations(us_id: str):
+#     try:
+#         story_data = user_story_visuals[us_id]
+#         result = []
+#         for language, libraries in story_data.items():
+#             for library, llms in libraries.items():
+#                 for llm, content in llms.items():
+#                     result.append({
+#                         "language": language,
+#                         "library": library,
+#                         "llm": llm,
+#                         "code": content["code"] + " "+" Check "+language + library + llm + "  user story" + us_id,
+#                         "image_url": content["image_url"]
+#                     })
+#         return result
+
+#     except KeyError:
+#         raise HTTPException(status_code=404, detail="User story not found")
+
 @router.get("/userstory/{us_id}")
 def get_all_visualizations(us_id: str):
     try:
         story_data = user_story_visuals[us_id]
         result = []
+
+        if us_id in ["3", "10"]:
+            for language, libraries in story_data.items():
+                for library, llms in libraries.items():
+                    for llm, content in llms.items():
+                        result.append({
+                            "language": language,
+                            "library": library,
+                            "llm": llm,
+                            "code": content["code"] + " "+" Check "+language + library + llm + "  user story" + us_id,
+                            "image_url": content["image_url"]
+                        })
+            return result
+        
+        # Define provider to LLM mapping
+        provider_llm_mapping = {
+            "jetstream": ["DeepSeek-R1", "llama-4-scout"],
+            "google": ["gemini-2.5-flash"],
+            "openai": ["GPT-4o"]
+        }
+        
+        # Get allowed LLMs based on provider
+        if stored_provider is None:
+            allowed_llms = None  # Return all
+        else:
+            allowed_llms = provider_llm_mapping.get(stored_provider.lower(), [])
+        
         for language, libraries in story_data.items():
             for library, llms in libraries.items():
                 for llm, content in llms.items():
-                    result.append({
-                        "language": language,
-                        "library": library,
-                        "llm": llm,
-                        "code": content["code"] + " "+" Check "+language + library + llm + "  user story" + us_id,
-                        "image_url": content["image_url"]
-                    })
+                    # Filter by provider if specified
+                    if allowed_llms is None or llm in allowed_llms:
+                        result.append({
+                            "language": language,
+                            "library": library,
+                            "llm": llm,
+                            "code": content["code"] + " "+" Check "+language + library + llm + "  user story" + us_id,
+                            "image_url": content["image_url"]
+                        })
+        
         return result
 
     except KeyError:
         raise HTTPException(status_code=404, detail="User story not found")
+
 @router.get("/userstory/{us_id}/{language}/{library}/{llm}")
 def get_visualization(us_id: str, language: str, library: str, llm: str):
     try:
@@ -359,14 +411,28 @@ def undo_last_action():
         raise HTTPException(status_code=500, detail=str(exc))
 
 
+# stored_api_key = None
+
+# @router.post("/save-api-key")
+# def save_api_key(api_key: str = Body(..., embed=True)):
+#     """
+#     Save the provided API key in memory for future use.
+#     This is for local single-user use; no database persistence.
+#     """
+#     global stored_api_key
+#     stored_api_key = api_key
+#     return {"message": "API key saved successfully"}
+
 stored_api_key = None
+stored_provider = None
 
 @router.post("/save-api-key")
-def save_api_key(api_key: str = Body(..., embed=True)):
+def save_api_key(api_key: str = Body(..., embed=True), provider: str = Body(..., embed=True)):
     """
-    Save the provided API key in memory for future use.
+    Save the provided API key and provider in memory for future use.
     This is for local single-user use; no database persistence.
     """
-    global stored_api_key
+    global stored_api_key, stored_provider
     stored_api_key = api_key
+    stored_provider = provider
     return {"message": "API key saved successfully"}

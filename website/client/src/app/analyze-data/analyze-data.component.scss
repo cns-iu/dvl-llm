@@ -52,15 +52,11 @@
 .visualization-card {
   .card-body {
     display: grid;
-    // grid-template-columns: 1fr 3fr;
     grid-template-columns: 300px 1fr;
     gap: 40px;
     padding: 16px 16px 16px 0px;
     background-color: #fcfcfc;
   }
-  // .chart-panel {
-  //   // margin: 5px;
-  // }
 }
 
 /* --- left panel styles --- */
@@ -179,9 +175,6 @@
         font-size: 32px;
         font-weight: 500;
         color: #201e3d;
-        // margin-bottom: 1.5rem;
-        // padding-bottom: 0.5rem;
-        // border-bottom: 2px solid #e9ecef;
         border-bottom: 1px solid #acb5c3;
         margin-bottom: 32px;
       }
@@ -338,7 +331,7 @@
   background: #a8a8a8;
 }
 
-/* 1) Turn your container into two columns: main content + sidebar */
+/* 1)  container into two columns: main content + sidebar */
 .content-container {
   display: grid;
   grid-template-columns: 1fr 250px; /* left is fluid, right (sidebar) is 250px */
@@ -347,12 +340,9 @@
 
 .sidebar {
   position: fixed;
-  /* sit just below top app bar */
-  // top: 40px;
   margin: 40px 12px 40px 12px;
-  /* pull it in from the right edge by the same gutter used in the grid */
   right: 0;
-  width: 200px; /* same as second column */
+  width: 200px;
   z-index: 10;
 }
 
@@ -360,7 +350,7 @@
   position: fixed;
   margin: 40px 12px 40px 12px;
   right: 0;
-  width: 200px; /* same second column */
+  width: 200px;
   z-index: 10;
   height: auto;
 }
@@ -374,7 +364,6 @@
     flex-direction: column;
     height: 40px;
     line-height: 24px;
-    // gap: 0.5rem;
   }
 
   li {
@@ -388,21 +377,20 @@
       cursor: pointer;
       font-size: 14px;
       font-weight: 400;
-      padding: 0.5rem 0.75rem; /* comfortable click area */
-      border-radius: 4px; /* small rounding (or 0 for a perfect square) */
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
       line-height: 21px;
       height: 32px;
 
       &:hover {
         background: var(--state-layers-secondary-s-40-hra-blue-8, #201e3d14);
-        /* light grey hover */
       }
     }
 
     &.active button {
       color: #4c4c58;
-      background: #e00d3a33; /* your pink highlight */
-      font-weight: bold; /* make it stand out */
+      background: #e00d3a33;
+      font-weight: bold;
     }
   }
 }

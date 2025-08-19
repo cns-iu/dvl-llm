@@ -19,8 +19,6 @@ mat-toolbar {
 
   display: flex; /* horizontal flow */
   align-items: center;
-  /* gap: 80px;  */
-  /* space between logo, title, stepper */
 
   height: 80px; /* fixed height per spec */
   padding: 12px 16px !important; /* top/bottom 12px, left/right 16px */
@@ -84,23 +82,9 @@ router-outlet {
   flex: 1 1 auto;
 }
 
-/* .brand-name {
-  font-family: var(--font-ui);
-  font-size: 16px;
-  margin-right: 64px;
-} */
-
 .brand-image {
   margin-right: 8px;
 }
-
-/* .brand-section {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  margin-right: 64px;
-} */
 
 .brand-name {
   font-family: var(--font-ui);
