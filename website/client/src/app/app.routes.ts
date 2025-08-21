@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './home/home.component'; // ← your new homepage
 import { GatherDataComponent } from './gather-data/gather-data.component';
 import { AnalyzeDataComponent } from './analyze-data/analyze-data.component';
+import { ErrorComponent } from './error/error.component';
 
 export const routes: Routes = [
   // 1) Root path shows your new splash/home
@@ -31,8 +32,8 @@ export const routes: Routes = [
       },
     ],
   },
-
-  // 3) (optional) catch all—redirect back to home
+  { path: 'error', component: ErrorComponent },
+  // catch all—redirect back to home
   {
     path: '**',
     redirectTo: '',

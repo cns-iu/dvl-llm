@@ -124,7 +124,13 @@
 }
 
 // key+provider
-
+.provider-key-text {
+  font-family: var(--font-ui);
+  font-size: 32px;
+  font-weight: 500px;
+  line-height: 48px;
+  color: #4c4c58;
+}
 .cta-row {
   display: flex;
   gap: 20px;

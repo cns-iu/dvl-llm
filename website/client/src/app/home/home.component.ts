@@ -63,8 +63,14 @@ export class HomeComponent {
           this.router.navigate(['/gather']);
         },
         error: (err) => {
-          console.error('Failed to save API key/provider', err);
-          alert('Failed to save API key/provider');
+          // console.error('Failed to save API key/provider', err);
+          // alert('Failed to save API key/provider');
+          this.router.navigate(['/error'], {
+            state: {
+              message:
+                'Could not save your API key. Please Check if your backend is running and try again.',
+            },
+          });
         },
       });
   }

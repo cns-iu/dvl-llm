@@ -1000,33 +1000,75 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
     }
   }
 
+  // downloadVisualization() {
+  //   if (!this.generatedFilename) {
+  //     console.warn('No file to download.');
+  //     return;
+  //   }
+
+  //   this.visualizeService
+  //     .downloadVisualization(this.generatedFilename)
+  //     .subscribe(
+  //       (blob) => {
+  //         const reader = new FileReader();
+  //         reader.onload = () => {
+  //           const htmlText = reader.result as string;
+  //           const finalBlob = new Blob([htmlText], { type: 'text/html' });
+  //           const url = URL.createObjectURL(finalBlob);
+  //           const a = document.createElement('a');
+  //           a.href = url;
+  //           a.download = `${this.generatedFilename}.html`;
+  //           a.click();
+  //           URL.revokeObjectURL(url);
+  //         };
+  //         reader.readAsText(blob);
+  //       },
+  //       (error) => {
+  //         console.error('Download failed:', error);
+  //       }
+  //     );
+  // }
   downloadVisualization() {
     if (!this.generatedFilename) {
       console.warn('No file to download.');
       return;
     }
 
-    this.visualizeService
-      .downloadVisualization(this.generatedFilename)
-      .subscribe(
-        (blob) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const htmlText = reader.result as string;
-            const finalBlob = new Blob([htmlText], { type: 'text/html' });
-            const url = URL.createObjectURL(finalBlob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${this.generatedFilename}.html`;
-            a.click();
-            URL.revokeObjectURL(url);
-          };
-          reader.readAsText(blob);
-        },
-        (error) => {
-          console.error('Download failed:', error);
-        }
-      );
+    console.log('generatedFilename:', this.generatedFilename); // Debug log
+    console.log('visualSrc:', this.visualSrc);
+
+    // Your backend now expects the full filename with extension
+    // So we need to determine if this is HTML or PNG and add the appropriate extension
+    let fullFilename = this.generatedFilename;
+
+    // If the generatedFilename doesn't already include extension, determine it
+    if (!fullFilename.includes('.')) {
+      // Check if this is a PNG visualization (you'll need to determine this based on your logic)
+      // For now, let's assume we can detect it from visualSrc or another property
+      const isPng = this.visualSrc?.toString().endsWith('.png');
+      fullFilename = isPng
+        ? `${this.generatedFilename}.png`
+        : `${this.generatedFilename}.html`;
+    }
+
+    console.log('fullFilename being sent:', fullFilename); // Debug log
+
+    this.visualizeService.downloadVisualization(fullFilename).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fullFilename;
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Download failed:', error);
+      },
+    });
   }
 
   insertText(text: string, event: MouseEvent) {

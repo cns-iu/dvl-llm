@@ -59,26 +59,6 @@
                 />
               </svg>
             </button>
-            <!-- </button> -->
-            <!-- Revert button -->
-            <!-- <button
-              class="action-button revert-button"
-              title="Revert code"
-              (click)="revertCode()"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M1 4v6h6"></path>
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-              </svg>
-            </button> -->
             <!-- Copied message -->
             <div class="copied-message" *ngIf="copiedMessageShown">Copied!</div>
           </div>
@@ -179,15 +159,29 @@
 
               <svg
                 *ngIf="!isCodeVisible"
-                height="18"
-                width="18"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <path
-                  d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
-                  fill="#201E3D"
-                />
-                <circle cx="12" cy="12" r="3" fill="#fff" />
+                <mask
+                  id="mask0_4829_3545"
+                  style="mask-type: alpha"
+                  maskUnits="userSpaceOnUse"
+                  x="0"
+                  y="0"
+                  width="24"
+                  height="24"
+                >
+                  <rect width="24" height="24" fill="#D9D9D9" />
+                </mask>
+                <g mask="url(#mask0_4829_3545)">
+                  <path
+                    d="M11.9984 16C13.2484 16 14.3109 15.5625 15.1859 14.6875C16.0609 13.8125 16.4984 12.75 16.4984 11.5C16.4984 10.25 16.0609 9.1875 15.1859 8.3125C14.3109 7.4375 13.2484 7 11.9984 7C10.7484 7 9.68594 7.4375 8.81094 8.3125C7.93594 9.1875 7.49844 10.25 7.49844 11.5C7.49844 12.75 7.93594 13.8125 8.81094 14.6875C9.68594 15.5625 10.7484 16 11.9984 16ZM11.9984 14.2C11.2484 14.2 10.6109 13.9375 10.0859 13.4125C9.56094 12.8875 9.29844 12.25 9.29844 11.5C9.29844 10.75 9.56094 10.1125 10.0859 9.5875C10.6109 9.0625 11.2484 8.8 11.9984 8.8C12.7484 8.8 13.3859 9.0625 13.9109 9.5875C14.4359 10.1125 14.6984 10.75 14.6984 11.5C14.6984 12.25 14.4359 12.8875 13.9109 13.4125C13.3859 13.9375 12.7484 14.2 11.9984 14.2ZM11.9984 19C9.7651 19 7.7276 18.4 5.88594 17.2C4.04427 16 2.5901 14.4167 1.52344 12.45C1.4401 12.3 1.3776 12.1458 1.33594 11.9875C1.29427 11.8292 1.27344 11.6667 1.27344 11.5C1.27344 11.3333 1.29427 11.1708 1.33594 11.0125C1.3776 10.8542 1.4401 10.7 1.52344 10.55C2.5901 8.58333 4.04427 7 5.88594 5.8C7.7276 4.6 9.7651 4 11.9984 4C14.2318 4 16.2693 4.6 18.1109 5.8C19.9526 7 21.4068 8.58333 22.4734 10.55C22.5568 10.7 22.6193 10.8542 22.6609 11.0125C22.7026 11.1708 22.7234 11.3333 22.7234 11.5C22.7234 11.6667 22.7026 11.8292 22.6609 11.9875C22.6193 12.1458 22.5568 12.3 22.4734 12.45C21.4068 14.4167 19.9526 16 18.1109 17.2C16.2693 18.4 14.2318 19 11.9984 19Z"
+                    fill="#201E3D"
+                  />
+                </g>
               </svg>
             </button>
             <!-- // -->
@@ -232,19 +226,40 @@
         <!-- content area -->
         <div class="pane-content">
           <div class="iframe-wrapper" *ngIf="visualSrc">
-            <iframe
+            <!-- <iframe
               *ngIf="!visualSrc.toString().endsWith('.png')"
               [src]="visualSrc"
               class="visual-frame"
               frameborder="0"
               allowfullscreen
-            ></iframe>
-            <img
+            ></iframe> -->
+            <!-- <img
               *ngIf="visualSrc.toString().endsWith('.png')"
               [src]="visualSrc"
               class="image-frame"
               alt="Visualization PNG"
-            />
+            /> -->
+            <div class="iframe-wrapper" *ngIf="visualSrc">
+              <!-- For HTML visualizations - only show if NOT a PNG -->
+              <iframe
+                *ngIf="
+                  !(generatedFilename && generatedFilename.endsWith('.png'))
+                "
+                [src]="visualSrc"
+                class="visual-frame"
+                frameborder="0"
+                allowfullscreen
+              >
+              </iframe>
+
+              <!-- For PNG images - only show if it IS a PNG -->
+              <img
+                *ngIf="generatedFilename && generatedFilename.endsWith('.png')"
+                [src]="visualSrc"
+                class="image-frame"
+                alt="Visualization PNG"
+              />
+            </div>
           </div>
         </div>
       </div>
