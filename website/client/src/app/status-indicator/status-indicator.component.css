@@ -7,18 +7,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  /* Force exact height and remove any extra spacing */
   height: 20px;
-  padding: 0 6px; /* Remove top/bottom padding */
+  padding: 0 6px;
   box-sizing: border-box;
-
-  background-color: #b20a2f14; /* Use the exact red color from Figma */
+  background-color: #b20a2f14;
   border-radius: 12px;
-
-  /* Remove any margin that might be causing spacing */
   margin: 0;
-  vertical-align: top; /* Align to top instead of baseline */
+  vertical-align: top;
 }
 
 .status-text {
@@ -33,7 +28,6 @@
   padding: 0;
 }
 
-/* Responsive adjustments if needed */
 @media (max-width: 600px) {
   .status-indicator {
     font-size: 9px;

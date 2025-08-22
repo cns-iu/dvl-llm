@@ -26,6 +26,10 @@ import {
   RefineResponse,
   HistoryItem,
 } from '../app.service';
+import 'ace-builds/src-noconflict/mode-javascript';
+import 'ace-builds/src-noconflict/mode-python';
+import 'ace-builds/src-noconflict/mode-r';
+import 'ace-builds/src-noconflict/theme-monokai';
 
 @Component({
   selector: 'app-visualize',
@@ -123,19 +127,18 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
     private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute,
-    private appService: AppService // ← user story
+    private appService: AppService
   ) {
     this.codeText = '';
   }
 
   ngOnInit() {
-    // 1) Debug: print any router navigation object (usually null on reload)
-    console.log(
-      'Inside ngOnInit  router.getCurrentNavigation():',
-      this.router.getCurrentNavigation()
-    );
+    // console.log(
+    //   'Inside ngOnInit  router.getCurrentNavigation():',
+    //   this.router.getCurrentNavigation()
+    // );
 
-    // 2) Grab whatever you passed via router.navigate(..., { state })
+    // 2) Grab all passed via router.navigate(..., { state })
     const state = history.state as {
       id: number;
       model: string;
@@ -143,9 +146,9 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
       library: string;
       isDVL: boolean;
     };
-    console.log('📦 history.state in VisualizeComponent:', state);
+    // console.log('history.state in VisualizeComponent:', state);
 
-    // 3) If valid, initialize and fire off the generation
+    // 3) check if vaild
     if (state && state.id != null) {
       this.storyId = state.id;
       this.selectedModel = state.model || 'DeepSeek-R1';
@@ -160,8 +163,8 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
       this.appService.getRefinePrompts(this.storyId).subscribe((prompts) => {
         this.suggestions = prompts;
       });
-      // 5) Log and generate
-      console.log('generateVisualization() calling');
+      // 5) generate
+      // console.log('generateVisualization() calling');
       this.generateVisualization();
     } else {
       console.warn('No valid state—skipping auto-generate.');
@@ -249,32 +252,6 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
       this.updateLayoutBasedOnVisibility();
     }, 10);
   }
-
-  // toggleCode() {
-  //   if (!this.isCodeVisible) {
-  //     this.isCodeVisible = true;
-  //     this.isVisualizationVisible = false;
-  //     const splitPane = this.el.nativeElement.querySelector('.split-pane');
-  //     if (splitPane) {
-  //       this.renderer.addClass(splitPane, 'transitioning');
-  //       setTimeout(() => {
-  //         this.renderer.removeClass(splitPane, 'transitioning');
-  //       }, 500);
-  //     }
-  //   } else {
-  //     this.isCodeVisible = false;
-  //     const splitPane = this.el.nativeElement.querySelector('.split-pane');
-  //     if (splitPane) {
-  //       this.renderer.addClass(splitPane, 'transitioning');
-  //       setTimeout(() => {
-  //         this.renderer.removeClass(splitPane, 'transitioning');
-  //       }, 500);
-  //     }
-  //   }
-  //   setTimeout(() => {
-  //     this.updateLayoutBasedOnVisibility();
-  //   }, 10);
-  // }
   toggleCode() {
     this.isCodeVisible = !this.isCodeVisible;
 
@@ -348,19 +325,6 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
       this.renderer.removeClass(leftPane, 'fullscreen');
       this.renderer.removeClass(rightPane, 'fullscreen');
     } else if (this.isVisualizationVisible && !this.isCodeVisible) {
-      // this.renderer.removeClass(splitPane, 'both-visible');
-      // this.renderer.addClass(splitPane, 'single-pane');
-      // this.renderer.removeClass(leftPane, 'hidden');
-      // this.renderer.addClass(leftPane, 'hidden');
-      // this.renderer.addClass(leftPane, 'fullscreen');
-      // this.renderer.removeClass(rightPane, 'fullscreen');
-
-      // this.renderer.setStyle(leftPane, 'flex', '1 1 auto');
-      // this.renderer.setStyle(leftPane, 'width', '100%');
-      // this.renderer.setStyle(leftPane, 'height', '100%');
-      // this.renderer.setStyle(leftPane, 'max-width', '100%');
-      // this.renderer.setStyle(leftPane, 'max-height', '100%');
-      //
       this.renderer.removeClass(splitPane, 'both-visible');
       this.renderer.addClass(splitPane, 'single-pane');
       this.renderer.addClass(leftPane, 'hidden');
@@ -372,27 +336,12 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
       this.renderer.setStyle(rightPane, 'height', '100%');
       this.renderer.setStyle(rightPane, 'max-width', '100%');
       this.renderer.setStyle(rightPane, 'max-height', '100%');
-      //
       const iframe = leftPane.querySelector('iframe');
       if (iframe) {
         this.renderer.setStyle(iframe, 'width', '100%');
         this.renderer.setStyle(iframe, 'height', '100%');
       }
     }
-    // else if (!this.isVisualizationVisible && this.isCodeVisible) {
-    //   this.renderer.removeClass(splitPane, 'both-visible');
-    //   this.renderer.addClass(splitPane, 'single-pane');
-    //   this.renderer.addClass(leftPane, 'hidden');
-    //   this.renderer.removeClass(rightPane, 'hidden');
-    //   this.renderer.removeClass(leftPane, 'fullscreen');
-    //   this.renderer.addClass(rightPane, 'fullscreen');
-
-    //   this.renderer.setStyle(rightPane, 'flex', '1 1 auto');
-    //   this.renderer.setStyle(rightPane, 'width', '100%');
-    //   this.renderer.setStyle(rightPane, 'height', '100%');
-    //   this.renderer.setStyle(rightPane, 'max-width', '100%');
-    //   this.renderer.setStyle(rightPane, 'max-height', '100%');
-    // }
   }
 
   private setInitialPaneSizes() {
@@ -483,7 +432,7 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
   }
 
   generateVisualization() {
-    // 1) Ensure we have everything we need
+    // 1) all parameters for generate endpoint
     if (
       this.storyId != null &&
       this.selectedModel &&
@@ -493,7 +442,7 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
       this.isGenerating = true;
       this.shouldDisplayVisualization = true;
 
-      // 2) Build payload including storyId
+      // 2) payload including storyId
       const payload = {
         id: this.storyId,
         model: this.selectedModel,
@@ -502,40 +451,44 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
         isDVL: this.isDVL,
       };
       console.log('generateVisualization() payload:', payload);
-
+      console.log('Selected Language:', this.selectedLanguage);
+      console.log('ACE Mode:', this.selectedLanguage.toLowerCase());
       // 3) Call backend
-      this.visualizeService
-        .generateVisulization(payload) // ensure your service method is named generateVisualization
-        .subscribe(
-          (response) => {
-            // 4) On success: render chart & code
-            const fullPath = response.output_path;
-            this.generatedFilename =
-              fullPath.split('/').pop()?.replace('.html', '') || 'test';
+      this.visualizeService.generateVisulization(payload).subscribe(
+        (response) => {
+          // 4) On success: render chart & code
+          const fullPath = response.output_path;
+          this.generatedFilename =
+            fullPath.split('/').pop()?.replace('.html', '') || 'test';
 
-            this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
-              `http://localhost:8000${fullPath}`
-            );
-            this.codeText = response.code;
+          this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+            `http://localhost:8000${fullPath}`
+          );
+          // this.codeText = response.code;
+          this.codeText = this.formatCodeIfNeeded(
+            response.code,
+            this.selectedLanguage
+          );
 
-            // 5) Save original code if first time
-            if (!localStorage.getItem('originalCode')) {
-              localStorage.setItem('originalCode', this.codeText);
-            }
-
-            // 6) Tweak DOM after a short delay (same as your existing logic)
-            setTimeout(() => {
-              // ... your existing resizing/scrolling logic ...
-              this.isGenerating = false;
-            }, 300);
-          },
-          (error) => {
-            console.error('❌ Error generating visualization:', error);
-            this.isGenerating = false;
+          if (!localStorage.getItem('originalCode')) {
+            localStorage.setItem('originalCode', this.codeText);
           }
-        );
+
+          setTimeout(() => {
+            this.isGenerating = false;
+          }, 300);
+        },
+        (error) => {
+          // console.error('Error generating visualization:', error);
+          //if error, display error and a error image
+          this.isGenerating = false;
+          this.codeText = 'Error while generating the visualization';
+          this.visualSrc =
+            this.sanitizer.bypassSecurityTrustResourceUrl('/assets/bg.png');
+          this.generatedFilename = 'bg.png';
+        }
+      );
     } else {
-      // Missing required info: hide everything
       this.shouldDisplayVisualization = false;
       this.visualSrc = '';
       this.isGenerating = false;
@@ -543,6 +496,42 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
         'generateVisualization() skipped: missing storyId or selection'
       );
     }
+  }
+
+  formatCodeIfNeeded(code: string, language: string): string {
+    if (!code) return '';
+
+    switch (language.toLowerCase()) {
+      case 'javascript':
+        return this.formatJavaScript(code);
+
+      case 'r':
+        return this.formatRCode(code);
+
+      case 'python':
+      default:
+        return code;
+    }
+  }
+
+  formatJavaScript(code: string): string {
+    return code
+      .replace(/;/g, ';\n')
+      .replace(/{/g, '{\n    ')
+      .replace(/}/g, '\n}')
+      .replace(/,(?![^{]*})/g, ',\n    ')
+      .replace(/\n\s*\n/g, '\n')
+      .trim();
+  }
+
+  formatRCode(code: string): string {
+    return code
+      .replace(/<-/g, ' <- ')
+      .replace(/\+(?![^()]*\))/g, ' + ')
+      .replace(/=/g, ' = ')
+      .split('\n')
+      .map((line) => line.trim())
+      .join('\n');
   }
 
   startDragging(event: MouseEvent) {
@@ -896,18 +885,6 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
     this.appService.refineVisualization(text).subscribe(
       (res: RefineResponse) => {
         this.codeText = res.updated_code;
-        // currentItem.code = res.updated_code;
-        //         currentItem.code = `We are going to change the y-axis to a log scale as requested.
-        // The previous code already uses a linear scale, so we will adjust the layout to set the y-axis to log.
-        // We'll update the update_layout method to set yaxis_type='log'.
-        // Also, note that using a log scale might require handling zero counts. However, our cumulative counts start at 1 and grow, so it should be safe.
-        // If there are zeros in cumulative counts, we might need to adjust (but in the provided data, the counts are positive). We'll proceed with the log scale.
-        // However, let's note: the cumulative counts are computed from the 'count' values. Since the initial counts are positive (minimum 1), the cumulative counts will be at least 1. So no problem.
-        // We'll change the update_layout for yaxis_type from 'linear' to 'log'.
-        // Also, we can adjust the title and axis labels accordingly.
-        // But note: the requirement is to change to log scale on y-axis.
-        // Let's update the code accordingly.
-        // `;
         currentItem.code = res.thinking_text;
         currentItem.isDone = true;
         this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -924,12 +901,11 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
 
   // UNDO
   undoVisualization(): void {
+    // Prevent multiple simultaneous undo requests
     if (this.isUndoing) {
-      return; // Prevent multiple simultaneous undo requests
+      return;
     }
-
     this.isUndoing = true;
-
     this.visualizeService
       .undoVisualization()
       .subscribe(
@@ -948,10 +924,7 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
             this.generatedFilename =
               fullPath.split('/').pop()?.replace('.html', '') || 'test';
 
-            // Show success message (optional)
-            console.log('Undo successful:', response.message);
-
-            // You could also show a toast/snackbar message here
+            // console.log('Undo successful:', response.message);
             // this.showMessage('Changes undone successfully');
           } else {
             // Handle error response
@@ -962,15 +935,12 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
         (error) => {
           // Handle HTTP error
           console.error('Undo request failed:', error);
-          // this.handleUndoError(error);
         }
       )
       .add(() => {
-        // This runs whether success or error
         this.isUndoing = false;
       });
   }
-  // UNDO
   copiedMessageShown = false;
 
   copyCode() {
@@ -999,35 +969,6 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
       console.warn('Original code not found.');
     }
   }
-
-  // downloadVisualization() {
-  //   if (!this.generatedFilename) {
-  //     console.warn('No file to download.');
-  //     return;
-  //   }
-
-  //   this.visualizeService
-  //     .downloadVisualization(this.generatedFilename)
-  //     .subscribe(
-  //       (blob) => {
-  //         const reader = new FileReader();
-  //         reader.onload = () => {
-  //           const htmlText = reader.result as string;
-  //           const finalBlob = new Blob([htmlText], { type: 'text/html' });
-  //           const url = URL.createObjectURL(finalBlob);
-  //           const a = document.createElement('a');
-  //           a.href = url;
-  //           a.download = `${this.generatedFilename}.html`;
-  //           a.click();
-  //           URL.revokeObjectURL(url);
-  //         };
-  //         reader.readAsText(blob);
-  //       },
-  //       (error) => {
-  //         console.error('Download failed:', error);
-  //       }
-  //     );
-  // }
   downloadVisualization() {
     if (!this.generatedFilename) {
       console.warn('No file to download.');
@@ -1036,23 +977,16 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
 
     console.log('generatedFilename:', this.generatedFilename); // Debug log
     console.log('visualSrc:', this.visualSrc);
-
-    // Your backend now expects the full filename with extension
-    // So we need to determine if this is HTML or PNG and add the appropriate extension
     let fullFilename = this.generatedFilename;
 
     // If the generatedFilename doesn't already include extension, determine it
     if (!fullFilename.includes('.')) {
-      // Check if this is a PNG visualization (you'll need to determine this based on your logic)
-      // For now, let's assume we can detect it from visualSrc or another property
       const isPng = this.visualSrc?.toString().endsWith('.png');
       fullFilename = isPng
         ? `${this.generatedFilename}.png`
         : `${this.generatedFilename}.html`;
     }
-
-    console.log('fullFilename being sent:', fullFilename); // Debug log
-
+    // console.log('fullFilename being sent:', fullFilename);
     this.visualizeService.downloadVisualization(fullFilename).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);

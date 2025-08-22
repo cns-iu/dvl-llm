@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { FooterComponent } from './footer/footer.component';
-import { HomeComponent } from './home/home.component';
+// import { HomeComponent } from './home/home.component';
 import { StatusIndicatorComponent } from './status-indicator/status-indicator.component';
 
 @Component({
@@ -24,7 +24,7 @@ import { StatusIndicatorComponent } from './status-indicator/status-indicator.co
     HttpClientModule,
     BreadcrumbComponent,
     FooterComponent,
-    HomeComponent,
+    // HomeComponent,
     StatusIndicatorComponent,
   ],
   templateUrl: './app.component.html',

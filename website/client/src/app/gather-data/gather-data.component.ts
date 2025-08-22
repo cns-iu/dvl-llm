@@ -1,11 +1,4 @@
-// gather-data.component.ts
-
-import {
-  Component,
-  DestroyRef,
-  HostListener, // ← import HostListener
-  inject,
-} from '@angular/core';
+import { Component, DestroyRef, HostListener, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AppService, UserStory } from '../app.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -20,8 +13,8 @@ import { CommonModule } from '@angular/common';
 })
 export class GatherDataComponent {
   userStories: UserStory[] = [];
-  sectionIds: string[] = []; // ← holds unique categories
-  currentSection = ''; // ← tracks which section is active
+  sectionIds: string[] = []; //  holds unique categories
+  currentSection = ''; // tracks which section is active
   destroyRef = inject(DestroyRef);
 
   constructor(private router: Router, private appService: AppService) {}
@@ -37,8 +30,6 @@ export class GatherDataComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((stories) => {
         this.userStories = stories;
-
-        // derive unique categories in original order
         this.sectionIds = Array.from(new Set(stories.map((s) => s.category)));
       });
   }
@@ -75,41 +66,3 @@ export class GatherDataComponent {
     this.router.navigate(['/gather/analyze', storyId]);
   }
 }
-
-// import { Component, DestroyRef, inject } from '@angular/core';
-// import { Router, RouterModule } from '@angular/router';
-// import { AppService, UserStory } from '../app.service';
-// import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-// import { CommonModule } from '@angular/common';
-
-// @Component({
-//   selector: 'app-gather-data',
-//   standalone: true,
-//   templateUrl: './gather-data.component.html',
-//   styleUrls: ['./gather-data.component.scss'],
-//   imports: [CommonModule, RouterModule],
-// })
-// export class GatherDataComponent {
-//   title = 'Acquire Data App';
-//   userStories: UserStory[] = [];
-//   destroyRef = inject(DestroyRef);
-
-//   constructor(private router: Router, private appService: AppService) {}
-
-//   get isChildRoute(): boolean {
-//     return this.router.url?.includes('/analyze');
-//   }
-
-//   ngOnInit() {
-//     this.appService
-//       .getUserStories()
-//       .pipe(takeUntilDestroyed(this.destroyRef))
-//       .subscribe((stories) => {
-//         this.userStories = stories;
-//       });
-//   }
-
-//   onExplore(storyId: number) {
-//     this.router.navigate(['/gather/analyze', storyId]);
-//   }
-// }

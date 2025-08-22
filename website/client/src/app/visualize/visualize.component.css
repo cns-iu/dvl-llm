@@ -1,7 +1,5 @@
-/* overall white page background */
 .visualize-wrapper {
   background: #fcfcfc;
-  /* margin: 40px 40px 40px 40px; */
   padding: 40px;
 }
 
@@ -32,17 +30,16 @@
   font-family: var(--font-ui);
   font-size: 38px;
   font-weight: 500 !important;
-  margin: 0; /* reset margin */
-  /* color: #4c4c58 !important; */
+  margin: 0;
 }
 
 .header-text::after {
   content: "";
   display: block;
-  height: 1px; /* line thickness */
-  background-color: #acb5c3; /* line color */
-  margin-top: 8px; /* 8px gap after heading */
-  margin-bottom: 16px; /* 16px gap before text */
+  height: 1px;
+  background-color: #acb5c3;
+  margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 .header-description {
@@ -64,16 +61,14 @@
   align-items: start;
   margin-bottom: 1rem;
 }
-/* .story-info h3 {
-  margin: 0 0.5rem 0 0;
-} */
+
 .info-table {
   border: 1px solid #ccc;
   border-radius: 4px;
   border-collapse: collapse;
   overflow: hidden;
-  border-collapse: separate; /* allow rounded corners */
-  border-spacing: 0; /* no gaps between cells */
+  border-collapse: separate;
+  border-spacing: 0;
 }
 .info-table th,
 .info-table td {
@@ -91,28 +86,21 @@ tr:nth-child(2) {
 /* split-pane fixed height so both panes are always visible */
 .split-pane {
   display: flex;
-  height: 66.35vh; /* value to always see the viz */
-  min-height: 300px; /* never collapse below this */
+  height: 66.35vh;
+  min-height: 300px;
   border: 1px solid #abc5c3;
   border-radius: 8px;
   overflow: hidden;
 }
 
-/* left & right scroll internally */
-/* .left-pane,
-.right-pane {
-  flex: 1;
-  overflow: auto;
-  position: relative;
-} */
 .left-pane {
   flex: 1;
-  overflow: auto; /* keep code editor scroll */
+  overflow: auto; /* code editor scroll */
   position: relative;
 }
 .right-pane {
   flex: 1;
-  overflow: hidden; /* <-- no scrollbars around the PNG */
+  overflow: hidden;
   position: relative;
 }
 
@@ -134,11 +122,6 @@ tr:nth-child(2) {
   right: 0;
 }
 
-/* viz download & container */
-/* .download-container {
-  text-align: right;
-  padding: 0.5rem;
-} */
 .download-container {
   position: absolute;
   top: 10px;
@@ -185,12 +168,6 @@ tr:nth-child(2) {
   width: 100px;
 }
 
-/* .iframe-wrapper {
-  width: 100%;
-  height: calc(100% - 2rem);
-  
-} */
-/*  */
 .iframe-wrapper {
   width: 100%;
   height: 100%;
@@ -200,47 +177,23 @@ tr:nth-child(2) {
   overflow: hidden !important; /* prevent inner scrollbars */
 }
 
-/*  */
-/* .visual-frame,
-.image-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-} */
-/*  */
 .visual-frame {
   width: 100%;
   height: 100%;
   border: none !important;
 }
-/* .image-frame {
-  width: auto; 
-  height: auto; 
-  max-width: 100%; 
-  max-height: 100%; 
-  object-fit: fill; 
-  border: none !important;
-  display: block;
-  margin: 0 auto; 
-} */
 
 .image-frame {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* show entire image, no cropping */
+  object-fit: contain;
   display: block;
   border: none !important;
-  margin: 0; /* no extra centering margin needed with flex */
+  margin: 0;
 }
 
-/*  */
-
-/* Give the left‐pane itself a black background */
 .left-pane {
-  background: #000; /* black */
+  background: #000;
 }
 
 /* Override ACE’s internal scroller/editor backgrounds */
@@ -249,13 +202,11 @@ tr:nth-child(2) {
   background-color: #000 !important;
 }
 
-/* Make sure the text stays light on black */
 .left-pane ::ng-deep .ace_content,
 .left-pane ::ng-deep .ace_scroller {
   color: #f8f8f8 !important;
 }
 
-/* If you want the gutter (line numbers) dark too: */
 .left-pane ::ng-deep .ace_gutter {
   background: #111 !important;
   color: #888 !important;
@@ -315,19 +266,13 @@ tr:nth-child(2) {
   }
 }
 
-/* // viz, code, icons on top */
-
-/* Card wrapper around each pane */
-/* WRAPPER: each pane stays flexed for your split-pane logic */
 .pane-card {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: 1px solid #e2e8f0; /* light gray border */
-  /* border-radius: 6px;  */
-  /* gentle rounding */
-  background-color: #ffffff; /* white background */
-  overflow: hidden; /* clip inner scrolls */
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  overflow: hidden;
 }
 
 /* HEADER */
@@ -335,8 +280,8 @@ tr:nth-child(2) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem; /* 8px top/bottom, 16px left/right */
-  background-color: #f9fafb; /* very light gray */
+  padding: 0.5rem 1rem;
+  background-color: #f9fafb;
   border-bottom: 1px solid #e2e8f0;
   flex: 0 0 auto;
 }
@@ -350,39 +295,30 @@ tr:nth-child(2) {
 
 .pane-icons {
   display: flex;
-  align-items: center; /* vertically center all icons */
-  gap: 16px; /* spacing between icons */
+  align-items: center;
+  gap: 16px;
 }
 .pane-icons button {
-  /* remove the chrome */
-
   background: none;
   border: none;
   padding: 0;
-
-  /* keep it clickable */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-
-  /* (optional) small gap between icons */
-  /* margin-left: 16px; */
-
-  width: 24px; /* square tap area – adjust to taste */
+  width: 24px;
   height: 24px;
 }
 
 .pane-icons button:hover,
 .pane-icons button:focus-visible {
-  /* no visual change on hover/focus unless you add one */
   background: none;
 }
 .pane-icons button svg {
   display: block; /* removes the default inline baseline */
 }
 
-/* CONTENT: editor or iframe fills remaining space */
+/*  iframe fills remaining space */
 .pane-content {
   flex: 1 1 auto;
   position: relative;
@@ -394,17 +330,13 @@ tr:nth-child(2) {
   height: 100%;
   border: none !important;
 }
-/* .pane-content .image-frame {
-  overflow: hidden !important;
-} */
 
-/* OPTIONAL: match the gutter style if you need to tweak it */
 .drag-bar {
-  background-color: #f3f4f6; /* or whatever your gutter was */
+  background-color: #f3f4f6;
   cursor: col-resize;
 }
 
-/* ——— outer rounded box ——— */
+/* outer rounded box  */
 .refine-box {
   border: 1px solid #d8dbe1;
   border-radius: 8px;
@@ -412,13 +344,12 @@ tr:nth-child(2) {
   background: #fff;
   display: flex;
   flex-direction: column;
-  /* gap: 8px; */
   width: 100%;
   margin-top: 16px;
   margin-bottom: 40px;
 }
 
-/* ——— textarea (row 1) ——— */
+/*  textarea (row 1)  */
 .refine-input {
   width: 100%;
   min-height: 40px;
@@ -431,12 +362,12 @@ tr:nth-child(2) {
 
 .chip-row {
   display: grid;
-  grid-template-columns: 1fr auto; /* chips | arrow  */
+  grid-template-columns: 1fr auto; /* buttons, arrow  */
   align-items: end; /* arrow hugs bottom */
   gap: 8px;
 }
 
-/* chips block */
+/* refine chips block */
 .suggestions {
   display: flex;
   flex-wrap: wrap;
@@ -465,7 +396,7 @@ tr:nth-child(2) {
   background: none;
   border: none;
   border-radius: 50%;
-  width: 36px; /* circle size */
+  width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
@@ -487,15 +418,15 @@ tr:nth-child(2) {
 }
 
 .refine-box {
-  gap: 0 !important; /* makes sure the flex column adds no gap */
+  gap: 0 !important;
 }
 
 .refine-input,
 .chip-row {
-  margin: 0 !important; /* kills any stray top/bottom margins */
+  margin: 0 !important;
 }
 
-/* ─── history list start ── */
+/*  history list */
 /* chat */
 .history-list {
   margin-top: 16px;
@@ -509,32 +440,26 @@ tr:nth-child(2) {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px; /* space between user pill and assistant message */
+  gap: 8px;
 }
-
-/* User message pill - positioned at top right */
 
 .user-pill {
   align-self: flex-end;
-  /* typography */
   font-family: var(--font-ui);
   font-size: 16px;
-  line-height: 24px; /* ← exactly as requested */
+  line-height: 24px;
 
   /* bubble look */
   background: var(--schemes-surface-n-98-blue-5, #eff2f5);
   border-radius: 12px;
 
   /* size & wrapping */
-  padding: 12px 16px; /* top-bottom 12px ─ left-right 16px */
-  min-height: 48px; /* pill is always at least 48 px tall */
-  width: fit-content; /* hug the text until the cap */
-  max-width: 560px; /* wrap after 560 px */
+  padding: 12px 16px;
+  min-height: 48px;
+  width: fit-content;
+  max-width: 560px;
   white-space: normal;
   word-break: break-word;
-
-  /* optional: keep the single line perfectly centered
-     while still working for multiline wraps */
   display: inline-flex;
   align-items: center;
 }
@@ -543,7 +468,7 @@ tr:nth-child(2) {
 .assistant-message {
   display: flex;
   flex-direction: column;
-  padding-left: 48px; /* avatar gutter */
+  padding-left: 48px;
   position: relative;
 }
 
@@ -551,7 +476,7 @@ tr:nth-child(2) {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #9fa6b2; /* grey circle */
+  background: #9fa6b2;
   position: absolute;
   left: 0;
   top: 0;
@@ -610,7 +535,7 @@ tr:nth-child(2) {
 .toggle-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px; /* icon ←→ label */
+  gap: 8px;
   border: none;
   background: none;
   color: #b20a2f;
@@ -621,7 +546,7 @@ tr:nth-child(2) {
   align-self: flex-start;
 }
 
-/* thinking animations */
+/* thinking animation */
 @keyframes pulse-fade {
   0% {
     opacity: 1;
@@ -646,13 +571,12 @@ tr:nth-child(2) {
 }
 
 .assistant-body.waiting {
-  /* default is column – switch to row for thinking */
   flex-direction: row;
-  align-items: center; /* vertical-align the SVG and text */
-  gap: 4px; /* space between icon and label */
+  align-items: center;
+  gap: 4px;
 }
 
-/* ─── history list end ── */
+/*  history list end */
 
 .left-pane.hidden,
 .right-pane.hidden {
@@ -663,17 +587,6 @@ button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
 }
-/*  */
-/* FINAL: keep PNGs self-contained */
-/* .split-pane .right-pane .pane-content .image-frame {
-  width: auto !important;
-  height: auto !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-} */
 
 /* Center the content visually inside the pane */
 .split-pane .right-pane .pane-content .iframe-wrapper {
@@ -682,5 +595,5 @@ button[disabled] {
   justify-content: center;
 }
 .pane-content {
-  overflow: hidden !important; /* prevent scrollbars when using object-fit */
+  overflow: hidden !important;
 }

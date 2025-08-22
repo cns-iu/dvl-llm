@@ -3,13 +3,28 @@ import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    HttpClientModule,
+    MatSelectModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
 })
 export class HomeComponent {
   cards = [
@@ -33,6 +48,11 @@ export class HomeComponent {
   apiKey = '';
   selectedProvider = '';
   showKey = false;
+  providers = [
+    { value: 'google', label: 'Google' },
+    { value: 'openai', label: 'OpenAI' },
+    { value: 'jetstream', label: 'Jetstream2' },
+  ];
 
   constructor(private router: Router, private http: HttpClient) {}
 

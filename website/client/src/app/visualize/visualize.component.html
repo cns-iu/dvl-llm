@@ -6,35 +6,10 @@
       Improve the visualization code by prompting with AI.
     </div>
   </div>
-
-  <!-- 2) Story + Properties -->
-  <!-- <div class="story-header">
-    <div class="story-info">
-      <h3>Selected Dataset : {{ storyTitle }}</h3>
-      <p>{{ storyDescription }}</p>
-    </div>
-    <div class="info-panel">
-      <h3>Properties</h3>
-      <table class="info-table">
-        <tr>
-          <td>Model</td>
-          <td>{{ selectedModel }}</td>
-        </tr>
-        <tr>
-          <td>Language</td>
-          <td>{{ selectedLanguage }}</td>
-        </tr>
-        <tr>
-          <td>Library</td>
-          <td>{{ selectedLibrary }}</td>
-        </tr>
-      </table>
-    </div>
-  </div> -->
   <div *ngIf="isGenerating" class="loading-spinner">
     Generating visualization… Please wait...
   </div>
-  <!-- 5) Split-pane: Code editor on the left, visualization on the right -->
+  <!-- Split-pane: Code editor on the left, visualization on the right -->
   <div class="split-pane" #splitPane>
     <!-- LEFT: ACE editor pane -->
     <div class="left-pane" #leftPane>
@@ -44,7 +19,6 @@
           <span class="pane-title">Code</span>
           <div class="pane-icons">
             <!-- Copy button -->
-            <!-- <button title="Copy code" (click)="copyCode()"> -->
             <button title="Copy code" (click)="copyCode()">
               <svg
                 width="17"
@@ -124,7 +98,6 @@
               </svg>
             </button>
             <!-- Undo -->
-            <!-- // -->
             <button
               title="{{ isCodeVisible ? 'Hide code' : 'Show code' }}"
               (click)="toggleCode()"
@@ -226,21 +199,8 @@
         <!-- content area -->
         <div class="pane-content">
           <div class="iframe-wrapper" *ngIf="visualSrc">
-            <!-- <iframe
-              *ngIf="!visualSrc.toString().endsWith('.png')"
-              [src]="visualSrc"
-              class="visual-frame"
-              frameborder="0"
-              allowfullscreen
-            ></iframe> -->
-            <!-- <img
-              *ngIf="visualSrc.toString().endsWith('.png')"
-              [src]="visualSrc"
-              class="image-frame"
-              alt="Visualization PNG"
-            /> -->
             <div class="iframe-wrapper" *ngIf="visualSrc">
-              <!-- For HTML visualizations - only show if NOT a PNG -->
+              <!-- For HTML visualizations -->
               <iframe
                 *ngIf="
                   !(generatedFilename && generatedFilename.endsWith('.png'))
@@ -251,8 +211,7 @@
                 allowfullscreen
               >
               </iframe>
-
-              <!-- For PNG images - only show if it IS a PNG -->
+              <!-- For PNG images -->
               <img
                 *ngIf="generatedFilename && generatedFilename.endsWith('.png')"
                 [src]="visualSrc"
@@ -265,30 +224,7 @@
       </div>
     </div>
   </div>
-  <!-- 4) Refine -->
-  <!-- <div *ngIf="!isGenerating" class="refine-section">
-    <h2 class="refine-header">How Can I help optimize this visualization?</h2>
-    <div class="refine-controls">
-      <textarea
-        class="refine-input"
-        [(ngModel)]="refineText"
-        placeholder="Suggest an Improvement or Edit"
-      ></textarea>
-      <button class="refine-button" (click)="applyRefinement()">Submit</button>
-    </div>
-    <div class="suggestions">
-      <button
-        *ngFor="let s of suggestions"
-        type="button"
-        class="suggestion-button"
-        (click)="setRefinePrompt(s.description)"
-      >
-        {{ s.keyword }}
-      </button>
-    </div>
-  </div> -->
 
-  <!-- // -->
   <!--  CHAT HISTORY -->
   <section class="history-list" *ngIf="history.length">
     <article *ngFor="let h of history; let last = last" class="history-item">
@@ -308,7 +244,6 @@
         <!-- assistant body -->
         <div class="assistant-body" [ngClass]="{ waiting: !h.isDone }">
           <ng-container *ngIf="!h.isDone">
-            <!-- <span class="thinking-icon">⚡</span> Thinking… -->
             <span class="thinking-icon"
               ><svg
                 width="19"
@@ -329,10 +264,6 @@
             <pre class="code-preview" [class.collapsed]="h.collapsed"
               >{{ h.code }} </pre
             >
-
-            <!-- <button class="toggle-btn" (click)="h.collapsed = !h.collapsed">
-            {{ h.collapsed ? "Show more" : "Show less" }}
-          </button> -->
             <button class="toggle-btn" (click)="h.collapsed = !h.collapsed">
               <ng-container *ngIf="h.collapsed; else expanded">
                 <!-- ▼ Show more -->
@@ -364,7 +295,7 @@
               </ng-container>
 
               <ng-template #expanded>
-                <!-- ▲ Show less -->
+                <!-- Show less -->
                 <svg
                   width="24"
                   height="25"
@@ -398,10 +329,7 @@
     </article>
   </section>
   <!-- CHAT HISTORY END -->
-
-  <!-- // -->
   <div class="refine-box">
-    <!-- ❶  multi-line input -->
     <textarea
       class="refine-input"
       [(ngModel)]="refineText"
@@ -409,7 +337,7 @@
     >
     </textarea>
 
-    <!-- ❷  chips + arrow share one grid row -->
+    <!-- refine chips + arrow,  one grid row -->
     <div class="chip-row">
       <div class="suggestions">
         <button
@@ -444,124 +372,3 @@
     </div>
   </div>
 </div>
-
-<!-- <div class="split-pane" #splitPane>
-    LEFT: ACE editor - c
-    <div class="left-pane" #leftPane>
-      <span class="button-container">
-        Copy button - c
-        <button
-          class="action-button copy-button"
-          title="Copy code"
-          (click)="copyCode()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-            <path
-              d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-            ></path>
-          </svg>
-        </button>
-        <div class="copied-message" *ngIf="copiedMessageShown">Copied!</div>
-
-        Revert button -c
-        <button
-          class="action-button revert-button"
-          title="Revert code"
-          (click)="revertCode()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M1 4v6h6"></path>
-            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-          </svg>
-        </button>
-      </span>
-
-      <ace-editor
-        [(text)]="codeText"
-        [mode]="selectedLanguage.toLowerCase()"
-        [theme]="'monokai'"
-        style="width: 100%; height: 100%"
-        [readOnly]="false"
-      ></ace-editor>
-      <ace-editor
-        [(text)]="codeText"
-        [mode]="selectedLanguage.toLowerCase()"
-        [theme]="'twilight'"
-        [readOnly]="false"
-        [autoUpdateContent]="true"
-        [durationBeforeCallback]="1000"
-        style="width: 100%; height: 100%"
-      ></ace-editor>
-      <div class="code-buttons">
-        <button (click)="copyCode()" title="Copy code">Copy</button>
-        <button (click)="revertCode()" title="Undo">Undo</button>
-      </div>
-    </div>
-
-    DRAG HANDLE-c
-    <div
-      class="drag-bar"
-      #dragBar
-      (mousedown)="startDragging($event)"
-      (touchstart)="startTouchDragging($event)"
-    ></div>
-
-    RIGHT: Visualization-c
-    <div class="right-pane" #rightPane>
-      <div class="download-container">
-        <button
-          class="download-button"
-          title="Download visualization"
-          (click)="downloadVisualization()"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-        </button>
-      </div>
-      <div class="iframe-wrapper">
-        <ng-container *ngIf="visualSrc">
-          <iframe
-            *ngIf="!visualSrc.toString().endsWith('.png')"
-            [src]="visualSrc"
-            class="visual-frame"
-            frameborder="0"
-            allowfullscreen
-          ></iframe>
-          <img
-            *ngIf="visualSrc.toString().endsWith('.png')"
-            [src]="visualSrc"
-            class="image-frame"
-            alt="Visualization PNG"
-          />
-        </ng-container>
-      </div>
-    </div>
-  </div> -->

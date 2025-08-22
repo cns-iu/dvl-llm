@@ -1,15 +1,12 @@
 .home-container {
   position: relative;
   width: 100%;
-  min-height: 653px; /* Figma spec  */
-  /* height: 100vh; */
+  min-height: 653px;
   background: url("../../assets/bg.png") no-repeat center bottom;
   background-size: cover;
 }
 
-/* The “splash” section that holds everything */
 .splash {
-  //   max-width: 1200px;
   display: flex;
   flex-direction: column;
 }
@@ -17,26 +14,26 @@
 .splash-content {
   margin: 160px 40px 280px 40px;
 }
-/* ─── Title ─── */
+/* Title */
 .splash-title {
   font-family: var(--font-ui);
   font-size: 42px;
   font-weight: 500;
   color: #201e3d;
   margin: 0 0 38px 0;
-  line-height: var(--Display-Line-height, 63px); /* 150% */
+  line-height: var(--Display-Line-height, 63px);
   letter-spacing: var(--Display-Line-spacing, -1.25px);
 }
 
-/* ─── Card row ─── */
+/* Card row */
 .card-group {
   display: flex;
-  gap: 40px; /* equal space between cards */
+  gap: 40px; /* space between cards */
   flex-wrap: wrap;
   margin: 0 0 80px 0;
 }
 
-/* ─── Individual card ─── */
+/* Individual card */
 .splash-card {
   width: 320px;
   min-height: 102px;
@@ -48,7 +45,7 @@
   padding: 16px;
 }
 
-/* ─── Card header ─── */
+/* Card header */
 .card-header {
   display: flex;
   align-items: center;
@@ -76,7 +73,7 @@
   color: #201e3d;
 }
 
-/* ─── Card text ─── */
+/* Card text */
 .card-text {
   font-family: var(--font-ui);
   font-size: 14px;
@@ -86,23 +83,6 @@
   color: #444444;
   line-height: 1.4;
 }
-
-/* ─── Get Started button ─── */
-// .get-started {
-//   align-self: flex-start;
-//   background: #e11a3c;
-//   color: #fff;
-//   border: none;
-//   border-radius: 4px;
-//   padding: 8px 16px;
-//   font-size: 1rem;
-//   font-weight: 600;
-//   cursor: pointer;
-//   transition: background 0.2s;
-// }
-// .get-started:hover {
-//   background: #c71331;
-// }
 
 .use-btn {
   padding: 0.5rem 1rem;
@@ -122,183 +102,377 @@
 .use-btn:hover {
   background: #e00d3a;
 }
-
-// key+provider
 .provider-key-text {
   font-family: var(--font-ui);
   font-size: 32px;
-  font-weight: 500px;
+  font-weight: 500;
   line-height: 48px;
   color: #4c4c58;
 }
+
 .cta-row {
   display: flex;
   gap: 20px;
   justify-content: left;
+  align-items: flex-end;
   margin-top: 32px;
+  height: 48px;
+}
+
+.provider-dropdown {
+  min-width: 200px;
 }
 
 .api-key-box {
   min-width: 280px;
   max-width: 420px;
-}
-.api-input-wrap {
-  position: relative;
-  width: 100%;
+  color: #eff2f5;
 }
 
-.api-input {
-  width: 100%;
-  height: 40px;
-  font-family: var(--font-ui);
-  padding: 0 50px 0 16px;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  outline: none;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-}
-
-.api-input:focus {
-  border-color: #acb5c3;
-}
-
-.toggle-visibility {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
+.use-btn {
+  padding: 0.5rem 1rem;
+  background: #e00d3a;
+  color: #fff;
   border: none;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.toggle-visibility:hover {
-  background-color: #f3f4f6;
-}
-
-.provider-dropdown {
-  flex: 0 0 auto;
-}
-
-.provider-select {
-  height: 40px;
-  font-family: var(--font-ui);
-  padding: 0 16px;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  outline: none;
-  background-color: white;
   cursor: pointer;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
+  transition: background 0.2s;
+  width: 121.3125px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: 500;
+
+  &:hover {
+    background: #e00d3a;
+  }
+
+  &:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
 }
 
-.provider-select:focus {
-  border-color: #acb5c3;
+// Select Provider
+.provider-select {
+  width: 100%;
+
+  // Override Material's fill background
+  .mat-mdc-text-field-wrapper {
+    background-color: white !important;
+    border: 1px solid #e1e5e9 !important;
+    border-radius: 8px !important;
+    height: 48px !important;
+    box-shadow: none !important;
+
+    // Remove Material's default bottom border/underline
+    &::before {
+      display: none !important;
+    }
+
+    &::after {
+      display: none !important;
+    }
+  }
+
+  // form field container
+  .mat-mdc-form-field-flex {
+    height: 48px !important;
+    align-items: center !important;
+    padding: 0 !important;
+  }
+
+  .mat-mdc-form-field-infix {
+    padding: 16px !important;
+    border: none !important;
+    min-height: auto !important;
+    padding-top: 20px !important;
+    padding-bottom: 4px !important;
+  }
+
+  // select value text
+  .mat-mdc-select-value {
+    font-family: var(--font-ui) !important;
+    font-size: 16px !important;
+    color: #201e3d !important;
+    line-height: 24px !important;
+  }
+
+  //  label
+  .mat-mdc-floating-label {
+    font-family: var(--font-ui) !important;
+    font-size: 16px !important;
+    color: #999 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+
+    &.mdc-floating-label--float-above {
+      font-size: 12px !important;
+      color: #666 !important;
+      top: 8px !important;
+      transform: none !important;
+    }
+  }
+
+  // Remove focus
+  .mat-mdc-form-field-focus-overlay {
+    background-color: transparent !important;
+    opacity: 0 !important;
+  }
+
+  // Focus state
+  &.mat-focused {
+    .mat-mdc-text-field-wrapper {
+      border-color: #acb5c3 !important;
+    }
+
+    .mat-mdc-floating-label {
+      color: #acb5c3 !important;
+    }
+  }
+
+  // Remove subscript wrapper
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
 }
 
-// .use-btn {
-//   height: 48px;
-//   padding: 0 24px;
-//   background-color: #dc2626;
-//   color: white;
-//   border: none;
-//   border-radius: 4px;
-//   cursor: pointer;
-//   transition: background-color 0.2s;
-//   white-space: nowrap;
-//   flex: 0 0 auto;
-//   font-size: 16px;
-//   font-weight: 500;
-// }
+// API Key Input Styling
+.api-input-wrap {
+  width: 100%;
 
-// .use-btn:hover {
-//   background-color: #b91c1c;
-// }
+  // Override Material's fill background
+  .mat-mdc-text-field-wrapper {
+    background-color: white !important;
+    border: 1px solid #e1e5e9 !important;
+    border-radius: 8px !important;
+    height: 48px !important;
+    box-shadow: none !important;
 
-.use-btn:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
+    // Remove Material's default bottom border/underline
+    &::before {
+      display: none !important;
+    }
+
+    &::after {
+      display: none !important;
+    }
+  }
+
+  // Style the form field container
+  .mat-mdc-form-field-flex {
+    height: 48px !important;
+    align-items: center !important;
+    padding: 0 !important;
+  }
+
+  .mat-mdc-form-field-infix {
+    padding: 16px !important;
+    border: none !important;
+    min-height: auto !important;
+    padding-top: 20px !important;
+    padding-bottom: 4px !important;
+  }
+
+  // Style the input
+  .mat-mdc-input-element {
+    font-family: var(--font-ui) !important;
+    font-size: 16px !important;
+    color: #201e3d !important;
+    height: auto !important;
+    line-height: 24px !important;
+    padding: 0 !important;
+  }
+
+  // Style the label
+  .mat-mdc-floating-label {
+    font-family: var(--font-ui) !important;
+    font-size: 16px !important;
+    color: #999 !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+
+    &.mdc-floating-label--float-above {
+      font-size: 12px !important;
+      color: #666 !important;
+      top: 8px !important;
+      transform: none !important;
+    }
+  }
+
+  // Remove focus overlay
+  .mat-mdc-form-field-focus-overlay {
+    background-color: transparent !important;
+    opacity: 0 !important;
+  }
+
+  // Focus state
+  &.mat-focused {
+    .mat-mdc-text-field-wrapper {
+      border-color: #acb5c3 !important;
+    }
+
+    .mat-mdc-floating-label {
+      color: #acb5c3 !important;
+    }
+  }
+
+  // Remove subscript wrapper (helper text area)
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
 }
-/* ─── API key + CTA row ─── */
-// .cta-row {
-//   display: flex;
-//   align-items: center;
-//   gap: 20px;
-//   flex-wrap: wrap;
-// }
 
-// .api-key-box {
-//   min-width: 280px;
-//   max-width: 420px;
-// }
+// Toggle visibility icon
+.toggle-visibility {
+  cursor: pointer;
+  color: #666;
+  margin-right: 8px;
 
-// .api-input-wrap {
-//   position: relative;
-// }
+  &:hover {
+    color: #333;
+  }
+}
 
-// .api-input {
-//   width: 100%;
-//   height: 40px; /* matches .use-btn height */
-//   padding: 0 40px 0 12px; /* room for eye button */
-//   border: 1px solid #d6d6e7;
-//   border-radius: 4px;
-//   font-family: var(--font-ui);
-//   font-size: 14px;
-//   color: #201e3d;
-//   background: #fcfcfc;
-//   outline: none;
-//   transition: box-shadow 0.15s ease, border-color 0.15s ease;
-// }
+// Button styling
+.use-btn.mat-mdc-raised-button {
+  height: 48px !important;
+  background: #e00d3a !important;
+  color: white !important;
+  font-family: var(--font-ui) !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  min-width: 121px !important;
 
-// .api-input:focus {
-//   border-color: #6d5dfc;
-//   box-shadow: 0 0 0 3px rgba(109, 93, 252, 0.15);
-// }
+  &:hover {
+    background: #e00d3a !important;
+    box-shadow: 0 2px 8px rgba(224, 13, 58, 0.3) !important;
+  }
 
-// .toggle-visibility {
-//   position: absolute;
-//   right: 8px;
-//   top: 50%;
-//   transform: translateY(-50%);
-//   border: none;
-//   background: transparent;
-//   padding: 6px;
-//   cursor: pointer;
-//   border-radius: 4px;
-// }
+  &:disabled {
+    background-color: #9ca3af !important;
+    cursor: not-allowed;
+  }
+}
 
-// .provider-dropdown {
-//   flex: 1;
-//   max-width: 100px;
-//   min-width: 100px;
-// }
+// Additional Material overrides to prevent conflicts
+::ng-deep {
+  .provider-select,
+  .api-input-wrap {
+    // Ensure no outline appears
+    .mat-mdc-form-field-outline,
+    .mat-mdc-notched-outline {
+      display: none !important;
+    }
 
-// .provider-select {
-//   width: 100%;
-//   padding: 12px 16px;
-//   border: 2px solid #e1e5e9;
-//   border-radius: 8px;
-//   font-size: 14px;
-//   outline: none;
-//   background-color: white;
-//   cursor: pointer;
-//   transition: border-color 0.2s;
-//   box-sizing: border-box;
-//   font-family: var(--font-ui);
-// }
+    // Remove any ripple effects
+    .mat-ripple {
+      display: none !important;
+    }
 
-// .provider-select:focus {
-//   border-color: #2563eb;
-// }
+    // Override the default Material fill colors
+    .mdc-text-field--filled {
+      background-color: white !important;
 
-// .provider-select option {
-//   padding: 8px;
-// }
+      &:not(.mdc-text-field--disabled):hover {
+        background-color: white !important;
+      }
+    }
+
+    // Remove Material's state layer
+    .mat-mdc-form-field-focus-overlay,
+    .mat-mdc-form-field-hover-overlay {
+      display: none !important;
+    }
+
+    // Ensure clean white background
+    .mdc-text-field__input {
+      background-color: transparent !important;
+    }
+  }
+
+  .provider-select {
+    .mat-mdc-select-arrow {
+      color: #666 !important;
+    }
+  }
+}
+
+.provider-select .mat-mdc-text-field-wrapper,
+.api-input-wrap .mat-mdc-text-field-wrapper {
+  height: 40px !important; // Change from 56px to 40px
+}
+
+.provider-select,
+.api-input-wrap {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+    height: 0 !important;
+  }
+
+  // remove the bottom margin that reserves space for subscript
+  .mat-mdc-form-field {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500px;
+  color: #4c4c58;
+  line-height: 21px;
+}
+
+//
+::ng-deep {
+  .provider-select,
+  .api-input-wrap {
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none !important;
+      height: 0 !important;
+      min-height: 0 !important;
+    }
+
+    .mat-mdc-form-field-bottom-align {
+      display: none !important;
+    }
+  }
+}
+::ng-deep .mat-mdc-select-panel {
+  background-color: #fcfcfc !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+::ng-deep .mat-mdc-select-value {
+  font-family: var(--font-ui) !important;
+}
+
+// Override Material's default line ripple colors
+::ng-deep .mdc-line-ripple {
+  &::before {
+    border-bottom-color: var(--schemes-primary-p-40-gray-2, #4c4c58) !important;
+  }
+
+  &::after {
+    border-bottom-color: var(
+      --schemes-on-secondary-fixed-s-10-blue-2,
+      #4b4b5e
+    ) !important;
+  }
+
+  // override Material's default background colors
+  background-color: transparent !important;
+}
+
+//  focused state
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-line-ripple::after {
+  border-bottom-color: var(
+    --schemes-on-secondary-fixed-s-10-blue-2,
+    #4b4b5e
+  ) !important;
+}

@@ -43,14 +43,10 @@ export class BreadcrumbComponent implements OnInit {
 `,
   ];
 
-  // 2) the sanitized HTML array you’ll bind to
   icons: SafeHtml[];
 
-  /** What we actually render: label + routerLink */
   steps: (MenuItem & { label: string })[] = [];
 
-  /** which step index is active (0,1,2) */
-  // currentStep = 0;
   currentStep = -1;
 
   /** supporting text under each step, if any */
@@ -76,12 +72,9 @@ export class BreadcrumbComponent implements OnInit {
 
         // 2) Always show 3 steps; for each index:
         //    - If crumbs[i] exists, use its routerLink
-        //    - Else fallback to a default route (first step: /gather)
         this.steps = this.defaultSteps.map((def, i) => ({
           label: def.label,
-          routerLink: crumbs[i]?.routerLink || [
-            '/gather' /* or whatever default path you want */,
-          ],
+          routerLink: crumbs[i]?.routerLink || ['/gather'],
           routerLinkActiveOptions: { exact: true },
         }));
 
@@ -115,7 +108,6 @@ export class BreadcrumbComponent implements OnInit {
       });
   }
 
-  /** unchanged: returns crumbs only for routes you’ve hit so far */
   private buildBreadcrumbs(
     route: ActivatedRoute,
     url: string = '',
@@ -145,266 +137,3 @@ export class BreadcrumbComponent implements OnInit {
     return breadcrumbs;
   }
 }
-
-// import { Component, OnInit } from '@angular/core';
-// import {
-//   Router,
-//   NavigationEnd,
-//   ActivatedRoute,
-//   RouterModule,
-// } from '@angular/router';
-// import { CommonModule } from '@angular/common';
-// import { filter } from 'rxjs/operators';
-// import { MenuItem } from 'primeng/api';
-
-// interface Step {
-//   label: string;
-//   routerLink: any[];
-// }
-
-// @Component({
-//   selector: 'app-breadcrumb',
-//   standalone: true,
-//   imports: [CommonModule, RouterModule],
-//   templateUrl: './breadcrumb.component.html',
-//   styleUrls: ['./breadcrumb.component.scss'],
-// })
-// export class BreadcrumbComponent implements OnInit {
-//   /** Our “defaults” so we always show 3 steps */
-//   private defaultSteps: Step[] = [
-//     { label: 'Select dataset', routerLink: ['/gather'] },
-//     { label: 'Select visualization', routerLink: ['/analyze'] },
-//     { label: 'Optimize with AI', routerLink: ['/deploy'] },
-//   ];
-
-//   /** What we actually render each time */
-//   steps: Step[] = [];
-
-//   /** Index of the active step (0,1,2) */
-//   currentStep = 0;
-
-//   constructor(private router: Router, private route: ActivatedRoute) {}
-
-//   ngOnInit() {
-//     this.router.events
-//       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-//       .subscribe(() => {
-//         // Rebuild the breadcrumbs (with exact params) on every navigation
-//         const crumbs: MenuItem[] = this.buildBreadcrumbs(this.route.root);
-//         // The last crumb is your “active” one
-//         this.currentStep = crumbs.length - 1;
-
-//         // Merge: for each of the three positions, if buildBreadcrumbs
-//         // gave us a routerLink use it; otherwise fall back to defaults.
-//         this.steps = this.defaultSteps.map((def, idx) => {
-//           const dynamic = crumbs[idx]?.routerLink as any[] | undefined;
-//           return {
-//             label: def.label,
-//             routerLink: dynamic ?? def.routerLink,
-//           };
-//         });
-//       });
-//   }
-
-//   /** Exactly your original buildBreadcrumbs logic */
-//   private buildBreadcrumbs(
-//     route: ActivatedRoute,
-//     url: string = '',
-//     breadcrumbs: MenuItem[] = []
-//   ): MenuItem[] {
-//     const children = route.children;
-//     if (!children.length) return breadcrumbs;
-
-//     for (const child of children) {
-//       const routeURL = child.snapshot.url.map((s) => s.path).join('/');
-//       if (routeURL) {
-//         let fullPath = `/${routeURL}`;
-//         // replace params like :id
-//         Object.entries(child.snapshot.params).forEach(([k, v]) => {
-//           fullPath = fullPath.replace(`:${k}`, v as string);
-//         });
-//         url += fullPath;
-
-//         let label = '';
-//         if (routeURL === 'gather') label = 'Acquire Data';
-//         else if (routeURL.includes('analyze')) label = 'Choose Visualization';
-//         else if (routeURL.includes('deploy')) label = 'Visualize and Iterate';
-
-//         if (label) {
-//           const segments = url.split('/').filter(Boolean);
-//           breadcrumbs.push({
-//             label,
-//             routerLink: ['/', ...segments],
-//             routerLinkActiveOptions: { exact: true },
-//           });
-//         }
-//       }
-//       // only recurse into the first active child
-//       return this.buildBreadcrumbs(child, url, breadcrumbs);
-//     }
-//     return breadcrumbs;
-//   }
-// }
-
-// import { Component, OnInit } from '@angular/core';
-// import {
-//   Router,
-//   NavigationEnd,
-//   ActivatedRoute,
-//   RouterModule,
-// } from '@angular/router';
-// import { filter } from 'rxjs/operators';
-// import { MenuItem } from 'primeng/api';
-// import { CommonModule } from '@angular/common';
-
-// @Component({
-//   selector: 'app-breadcrumb',
-//   standalone: true,
-//   imports: [CommonModule, RouterModule],
-//   templateUrl: './breadcrumb.component.html',
-//   styleUrls: ['./breadcrumb.component.scss'],
-// })
-// export class BreadcrumbComponent implements OnInit {
-//   /** holds label & routerLink arrays from buildBreadcrumbs */
-//   items: MenuItem[] = [];
-//   /** index of the current (active) step */
-//   currentStep = 0;
-
-//   constructor(private router: Router, private route: ActivatedRoute) {}
-
-//   ngOnInit(): void {
-//     this.router.events
-//       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-//       .subscribe(() => {
-//         // rebuild your breadcrumb structure on every navigation
-//         this.items = this.buildBreadcrumbs(this.route.root);
-//         // last crumb → active step
-//         this.currentStep = this.items.length - 1;
-//       });
-//   }
-
-//   /** exactly your original logic—returns [{ label, routerLink }, …] */
-//   private buildBreadcrumbs(
-//     route: ActivatedRoute,
-//     url: string = '',
-//     breadcrumbs: MenuItem[] = []
-//   ): MenuItem[] {
-//     const children = route.children;
-//     if (children.length === 0) return breadcrumbs;
-
-//     for (const child of children) {
-//       const routeURL = child.snapshot.url.map((s) => s.path).join('/');
-//       if (routeURL) {
-//         let fullPath = `/${routeURL}`;
-//         const params = child.snapshot.params;
-//         Object.entries(params).forEach(([key, val]) => {
-//           fullPath = fullPath.replace(`:${key}`, val as string);
-//         });
-//         url += fullPath;
-
-//         let label = '';
-//         if (routeURL === 'gather') label = 'Acquire Data';
-//         else if (routeURL.includes('analyze')) label = 'Choose Visualization';
-//         else if (routeURL.includes('deploy')) label = 'Visualize and Iterate';
-
-//         if (label) {
-//           const segments = url.split('/').filter(Boolean);
-//           breadcrumbs.push({
-//             label,
-//             routerLink: ['/', ...segments],
-//             routerLinkActiveOptions: { exact: true },
-//           });
-//         }
-//       }
-//       // recurse into the first matching child
-//       return this.buildBreadcrumbs(child, url, breadcrumbs);
-//     }
-//     return breadcrumbs;
-//   }
-// }
-
-// import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-// import {
-//   ActivatedRoute,
-//   NavigationEnd,
-//   Params,
-//   Router,
-//   RouterModule,
-// } from '@angular/router';
-// import { filter } from 'rxjs/operators';
-// import { MenuItem } from 'primeng/api';
-// import { BreadcrumbModule } from 'primeng/breadcrumb';
-// import { CommonModule } from '@angular/common';
-// import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-// @Component({
-//   selector: 'app-breadcrumb',
-//   templateUrl: './breadcrumb.component.html',
-//   styleUrls: ['./breadcrumb.component.scss'],
-//   standalone: true,
-//   imports: [BreadcrumbModule, RouterModule, CommonModule],
-// })
-// export class BreadcrumbComponent implements OnInit {
-//   items: MenuItem[] = [];
-//   destroyRef = inject(DestroyRef);
-
-//   constructor(private router: Router, private route: ActivatedRoute) {}
-
-//   ngOnInit(): void {
-//     this.router.events
-//       .pipe(
-//         filter((event) => event instanceof NavigationEnd),
-//         takeUntilDestroyed(this.destroyRef)
-//       )
-//       .subscribe(() => {
-//         this.items = this.buildBreadcrumbs(this.route.root);
-//       });
-//   }
-
-//   buildBreadcrumbs(
-//     route: ActivatedRoute,
-//     url: string = '',
-//     breadcrumbs: MenuItem[] = []
-//   ): MenuItem[] {
-//     const children = route.children;
-//     if (children.length === 0) return breadcrumbs;
-
-//     for (const child of children) {
-//       const routeURL = child.snapshot.url
-//         .map((segment) => segment.path)
-//         .join('/');
-//       if (routeURL !== '') {
-//         let fullPath = `/${routeURL}`;
-//         const params = child.snapshot.params;
-//         // Replace route params like :id with actual values
-//         Object.entries(params).forEach(([key, value]) => {
-//           fullPath = fullPath.replace(`:${key}`, value);
-//         });
-
-//         url += fullPath;
-//         let label = '';
-
-//         if (routeURL === 'gather') {
-//           label = 'Acquire Data';
-//         } else if (routeURL.includes('analyze')) {
-//           label = 'Choose Visualization';
-//         } else if (routeURL.includes('deploy')) {
-//           label = 'Visualize and Iterate';
-//         }
-
-//         if (label) {
-//           const fullURL = url.split('/').filter(Boolean); // removes empty strings
-//           breadcrumbs.push({
-//             label,
-//             routerLink: ['/', ...fullURL],
-//             routerLinkActiveOptions: { exact: true },
-//           });
-//         }
-//       }
-
-//       return this.buildBreadcrumbs(child, url, breadcrumbs);
-//     }
-
-//     return breadcrumbs;
-//   }
-// }

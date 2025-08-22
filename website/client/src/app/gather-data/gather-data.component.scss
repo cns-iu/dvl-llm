@@ -7,7 +7,6 @@
   margin: 40px 40px 40px 40px;
 }
 
-/* Container padding */
 .gather-container {
   background-color: #fcfcfc;
 }
@@ -20,10 +19,8 @@
 /* Two-column responsive grid */
 .card-list {
   display: grid;
-  /* exactly 2 equal columns */
   grid-template-columns: repeat(2, 1fr);
   gap: 32px;
-  // margin-top: 1rem;
 }
 
 .dataset-card {
@@ -33,7 +30,6 @@
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  // width: 484px;
   max-width: 700px;
   min-width: 316px;
   background: #fff;
@@ -95,8 +91,6 @@
   background: #e00d3a;
 }
 
-//
-
 .category-section {
   scroll-margin-top: 80px;
   margin-top: 56px;
@@ -127,7 +121,6 @@
     height: 40px;
     line-height: 24px;
     height: 168px;
-    // gap: 0.5rem;
   }
 
   li {
@@ -141,21 +134,20 @@
       cursor: pointer;
       font-size: 14px;
       font-weight: 400;
-      padding: 0.5rem 0.75rem; /* comfortable click area */
-      border-radius: 4px; /* small rounding (or 0 for a perfect square) */
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px;
       line-height: 21px;
       height: 32px;
 
       &:hover {
         background: var(--state-layers-secondary-s-40-hra-blue-8, #201e3d14);
-        /* light grey hover */
       }
     }
 
     &.active button {
       color: #4c4c58;
-      background: #e00d3a33; /* your pink highlight */
-      font-weight: bold; /* make it stand out */
+      background: #e00d3a33;
+      font-weight: bold;
     }
   }
 }

@@ -11,7 +11,6 @@
   align-items: center;
   gap: 16px; /* space between steps + lines */
   padding: 20px 32px;
-  // background: #f4f6fa;
   font-family: var(--font-ui);
 }
 
@@ -19,9 +18,9 @@
 .step-line {
   flex: 1 1 auto;
   height: 1px;
-  background-color: #acb5c3; /* grey */
-  opacity: 0.38; /* 38 % by default (up-coming) */
-  align-self: center; /* always centred on circle */
+  background-color: #acb5c3;
+  opacity: 0.38;
+  align-self: center;
 }
 
 /* navy line after completed / active step */
@@ -37,10 +36,8 @@
   grid-template-columns: 24px auto 24px;
   grid-auto-rows: auto;
   column-gap: 12px;
-  align-items: center; /* circle / line centred */
-  text-decoration: none; /* kill anchor underline */
-  // grid-template-rows: auto 21px;
-  // grid-template-rows: auto;
+  align-items: center;
+  text-decoration: none;
 }
 
 /* number-circle (col-1, spans rows) */
@@ -84,16 +81,16 @@
   margin-top: 2px;
 }
 
-/* ────────────  STATE COLOURS  ──────────── */
+/*STATE COLOURS */
 .step.completed .step-number,
 .step.active .step-number {
-  background: #1d2033; /* navy */
+  background: #1d2033;
 }
 
 .step.completed .step-label,
 .step.active .step-label,
 .step.completed .step-subtext {
-  color: #201e3d; /* navy text */
+  color: #201e3d;
 }
 
 .step.disabled .step-number,
@@ -105,24 +102,20 @@
   display: none;
 }
 
-/* current step returns to one-row grid so label and
-   circle share the same centre line */
 .step.active {
   grid-template-rows: auto;
   align-items: center !important;
 }
 
-/* upcoming (disabled) step = only one row */
+/* upcoming (disabled) step */
 .step.disabled {
   grid-template-rows: auto;
 }
 
-/* circle stays on row-1, no span */
 .step.disabled .step-number {
   grid-row: 1;
 }
 
-/* step-icon (col-1, spans rows) */
 .step-icon {
   grid-row: 1 / span 2;
   grid-column: 1;
@@ -132,27 +125,25 @@
   justify-content: center;
 }
 
-/* ────────────  STATE COLOURS  ──────────── */
+/*STATE COLOURS*/
 .step.completed .step-icon,
 .step.active .step-icon {
-  color: #4b4b5e; /* navy - this changes the SVG fill */
+  color: #4b4b5e;
 }
 
 .step.disabled .step-icon {
-  color: rgba(29, 32, 51, 0.38); /* grey for disabled */
-}
+  color: rgba(29, 32, 51, 0.38);
 
-.step.disabled .step-icon {
-  grid-row: 1;
-}
+  .step.disabled .step-icon {
+    grid-row: 1;
+  }
 
-/* active step alignment - sits at same baseline as other steps */
-.step.active {
-  grid-template-rows: auto;
-  align-items: center;
-}
+  .step.active {
+    grid-template-rows: auto;
+    align-items: center;
+  }
 
-/* active step icon aligns properly with completed/disabled steps */
-.step.active .step-icon {
-  align-self: center;
+  .step.active .step-icon {
+    align-self: center;
+  }
 }

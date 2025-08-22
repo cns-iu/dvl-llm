@@ -13,7 +13,7 @@ export class ErrorComponent {
   message = 'This page isn’t available';
 
   constructor(private router: Router) {
-    // Read message passed via router state (fallback to default)
+    // Read message passed via router state
     const st = this.router.getCurrentNavigation()?.extras?.state as
       | { message?: string }
       | undefined;

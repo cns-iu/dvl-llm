@@ -6,7 +6,7 @@ import { AnalyzeDataComponent } from './analyze-data/analyze-data.component';
 import { ErrorComponent } from './error/error.component';
 
 export const routes: Routes = [
-  // 1) Root path shows your new splash/home
+  // 1) Root path shows new splash/home
   {
     path: '',
     component: HomeComponent,

@@ -4,11 +4,8 @@
 .info-banner {
   display: flex;
   align-items: center;
-  // background-color: #e8f4fd; /* pale blue */ background: #1791FF1F;
   background-color: #1791ff1f;
-  // border-left: 4px solid #3b82f6; /* vivid blue bar */
   padding: 0.75rem 1rem;
-  // margin-bottom: 2rem;
   border-radius: 4px;
   font-family: var(--font-ui);
   font-size: 16px;
@@ -35,7 +32,6 @@
 
   p {
     margin-top: 10px;
-    // margin: 0 0 1.5rem;
     color: #4b5563;
     font-size: 1rem;
   }
@@ -48,7 +44,6 @@
   margin-bottom: 1rem;
 }
 
-/* wrap the info & chart side-by-side */
 .visualization-card {
   .card-body {
     display: grid;
@@ -69,10 +64,10 @@
 .info-table {
   width: 100%;
   border: 1px solid #ccc; /* outer box */
-  border-collapse: separate; /* allow rounded corners */
-  border-spacing: 0; /* no gaps between cells */
-  border-radius: 6px; /* smooth corners */
-  overflow: hidden; /* clip the corners */
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 6px;
+  overflow: hidden;
   font-family: var(--font-ui) !important;
   font-size: 14px !important;
   tr {
@@ -83,9 +78,9 @@
   }
 
   td {
-    padding: 0.75rem 1rem; /* a bit more breathing room */
-    border-right: 1px solid #ccc; /* vertical separators */
-    border-bottom: 1px solid #ccc; /* horizontal separators */
+    padding: 0.75rem 1rem;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
   }
   tr:last-child td {
     border-bottom: none;
@@ -108,8 +103,6 @@
   cursor: pointer;
   align-self: flex-start;
   transition: background 0.2s;
-  // width: 121.3125px;
-  // height: 40px;
   width: 170px;
   height: 40px;
   font-size: 16px;
@@ -125,7 +118,6 @@
     height: auto;
     display: block;
     border-radius: 4px;
-    //box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
     box-shadow: 0 5px 16px 0 rgba(32, 30, 61, 0.24);
   }
 }
@@ -167,7 +159,6 @@
     .category-section {
       // scroll-margin-top: 120px;
       scroll-margin-top: 80px;
-      // margin-bottom: 3rem;
       margin-top: 48px;
 
       .category-title {
@@ -182,7 +173,6 @@
       .visualization-grid {
         display: flex;
         flex-direction: column;
-        // gap: 56px;
         gap: 24px;
       }
 
@@ -265,7 +255,6 @@
   }
 }
 
-// Responsive design
 @media (max-width: 768px) {
   .visualizations-page {
     .header {
@@ -331,11 +320,9 @@
   background: #a8a8a8;
 }
 
-/* 1)  container into two columns: main content + sidebar */
 .content-container {
   display: grid;
-  grid-template-columns: 1fr 250px; /* left is fluid, right (sidebar) is 250px */
-  // gap: 2rem;
+  grid-template-columns: 1fr 250px;
 }
 
 .sidebar {
