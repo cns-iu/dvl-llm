@@ -479,13 +479,19 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
           }, 300);
         },
         (error) => {
-          // console.error('Error generating visualization:', error);
-          //if error, display error and a error image
           this.isGenerating = false;
-          this.codeText = 'Error while generating the visualization';
-          this.visualSrc =
-            this.sanitizer.bypassSecurityTrustResourceUrl('/assets/bg.png');
-          this.generatedFilename = 'bg.png';
+          // this.codeText = 'Error while generating the visualization';
+          // this.codeText = JSON.stringify(error.error.detail, null, 2);
+          const detail = error.error.detail;
+          this.codeText = `Something went wrong while generating your visualization\nWhat happened: ${
+            detail.error_message
+          }\nTechnical details:${
+            detail.details?.stderr || 'No additional details available'
+          }  `;
+          this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+            '/assets/error-genviz.png'
+          );
+          this.generatedFilename = 'error-genviz.png';
         }
       );
     } else {
@@ -893,7 +899,20 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
         this.isGenerating = false;
       },
       (err) => {
-        console.error(err);
+        const errorDetails =
+          err?.error?.detail || err?.message || 'Unknown error';
+        const errorCode = err?.error?.error_code || 'HTTP_ERROR';
+
+        currentItem.code = `Refinement Failed\nError: ${errorDetails}, Error Code: ${errorCode}`;
+        currentItem.isDone = true;
+
+        this.codeText = `Refinement Request Failed\nDetails: ${errorDetails}`;
+        this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+          '/assets/error-genviz.png'
+        );
+        this.generatedFilename = 'error-genviz.png';
+        // console.error('Refinement request failed:', err);
+        this.isGenerating = false;
         this.isGenerating = false;
       }
     );
@@ -927,13 +946,26 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
             // console.log('Undo successful:', response.message);
             // this.showMessage('Changes undone successfully');
           } else {
-            // Handle error response
+            // display error message in code pane
+            this.codeText = ` Undo Failed\nError: ${response.error_message}, Error Code: ${response.error_code}`;
+            //  error image in visualization pane
+            this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+              '/assets/error-genviz.png'
+            );
+            this.generatedFilename = 'error-genviz.png';
+
             console.error('Undo failed:', response.error_message);
-            // this.handleUndoError(response);
           }
         },
         (error) => {
           // Handle HTTP error
+          this.codeText = `Undo Request Failed\nUnexpected error occurred.\nDetails: ${
+            error?.message || 'Unknown error'
+          }`;
+          this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
+            '/assets/error-genviz.png'
+          );
+          this.generatedFilename = 'error-genviz.png';
           console.error('Undo request failed:', error);
         }
       )

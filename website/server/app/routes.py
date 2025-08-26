@@ -1,3 +1,4 @@
+import traceback
 import httpx
 from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Body
 from app.models import GenerateRequest, GenerateResponse, UserStoryResponse
@@ -21,54 +22,90 @@ with open(json_path,"r") as f:
 
 orchestrator = None
 
-@router.post("/generate", response_model=GenerateResponse)
-def generate(req: GenerateRequest):
-    """
-    Generates visualization code based on the provided prompt using the selected LLM, language, and charting library.
+# @router.post("/generate", response_model=GenerateResponse)
+# def generate(req: GenerateRequest):
+#     """
+#     Generates visualization code based on the provided prompt using the selected LLM, language, and charting library.
 
-    - **model**: Name of the LLM to use (e.g., DeepSeek-R1)
-    - **language**: Programming language in which the code should be generated
-    - **library**: Charting library to use (e.g., Plotly, Matplotlib, Altair)
-    - **isDVL**: Set to true if using DVL framework constraints
+#     - **model**: Name of the LLM to use (e.g., DeepSeek-R1)
+#     - **language**: Programming language in which the code should be generated
+#     - **library**: Charting library to use (e.g., Plotly, Matplotlib, Altair)
+#     - **isDVL**: Set to true if using DVL framework constraints
 
-    This endpoint returns the generated code and a path to the rendered visualization output.
+#     This endpoint returns the generated code and a path to the rendered visualization output.
     
-    Example Input:
-    `{
-    "id":1,
-    "model_name": "DeepSeek-R1",
-    "language": "python",
-    "library": "plotly",
-    "isDVL": true
-    }`
-    """
-    global orchestrator
-    try:
-        orchestrator = LLMOrchestrator(
-            # provider="jetstream",
-            provider = stored_provider,
-            model_name=req.model,
-            llm_factory_api_key=stored_api_key,
-            prompt_file_path="/app/sdata/input/prompts/prompts_updated.json"
-        )
+#     Example Input:
+#     `{
+#     "id":1,
+#     "model_name": "DeepSeek-R1",
+#     "language": "python",
+#     "library": "plotly",
+#     "isDVL": true
+#     }`
+#     """
+#     global orchestrator
+#     try:
+#         orchestrator = LLMOrchestrator(
+#             # provider="jetstream",
+#             provider = stored_provider,
+#             model_name=req.model,
+#             llm_factory_api_key=stored_api_key,
+#             prompt_file_path="/app/sdata/input/prompts/prompts_updated.json"
+#         )
 
-        # 1. Initial Run
-        result = orchestrator.run(
-            execution_env=req.language, library=req.library,
-            filename_prefix=f"{req.model}{req.id}_{req.language}_{req.library}",
-            story_id=req.id
-        )
-        code = result["code"]  
-        output_file = result["output_html_path"]
-        filename = output_file.split("/")[-1]  # test.html
-        # if req.id in (3,10): #directly serve static html files
-        #     output_path = output_file
-        # else:
-        output_path = f"/static-output/{filename}"
-        # image_b64 = run_python(code)
-        return GenerateResponse(code=code, output_path=output_path)
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+#         # 1. Initial Run
+#         result = orchestrator.run(
+#             execution_env=req.language, library=req.library,
+#             filename_prefix=f"{req.model}{req.id}_{req.language}_{req.library}",
+#             story_id=req.id
+#         )
+#         code = result["code"]  
+#         output_file = result["output_html_path"]
+#         filename = output_file.split("/")[-1]  # test.html
+#         # if req.id in (3,10): #directly serve static html files
+#         #     output_path = output_file
+#         # else:
+#         output_path = f"/static-output/{filename}"
+#         # image_b64 = run_python(code)
+
+#         code = result["code"]
+#         output_path = f"/static-output/{filename}"
+#         return GenerateResponse(code=code, output_path=output_path)
+#     except Exception as exc:
+#         full_error = traceback.format_exc()
+#         raise HTTPException(status_code=500, detail=result)
+       
+# @router.post("/generate", response_model=GenerateResponse)
+# def generate(req: GenerateRequest):
+#         code = """library(ggplot2)
+# library(dplyr)
+# library(scales)
+
+# data <- read.csv('/app/data/input/dvl-llm-1-hra-growth-over-time.csv')
+# data$date <- as.Date(data$date)
+
+# cumulative_data <- data %>%
+#   group_by(group) %>%
+#   arrange(date) %>%
+#   mutate(cumulative_count = cumsum(count))
+
+# ggplot(cumulative_data, aes(x = date, y = cumulative_count, color = group)) +
+#   geom_line(linewidth = 1) +
+#   labs(title = "Cumulative Counts Over Time by Biological Group",
+#        x = "Date",
+#        y = "Cumulative Count",
+#        color = "Biological Group") +
+#   scale_x_date(date_breaks = "6 months", date_labels = "%b %Y") +
+#   scale_y_continuous(labels = comma) +
+#   theme_minimal() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
+#         legend.position = "bottom",
+#         plot.title = element_text(hjust = 0.5))
+
+# ggsave('/app/data/output/DeepSeek-R11_r_ggplot2_1.png', width = 10, height = 6, dpi = 300)
+# """
+#         output_path = f"/static-output/DeepSeek-R11_r_ggplot2_1.png"
+#         return GenerateResponse(code=code, output_path=output_path)
 
 @router.get("/download/{filename}")
 def download_visualization(filename: str):
@@ -85,10 +122,17 @@ def download_visualization(filename: str):
     where the file path is returned for both rendering the visualization.
     """
     # file_path = f"/code/data/output/{filename}.html" 
-    file_path = f"/app/data/output/{filename}.html"
+    file_path = f"/app/data/output/{filename}"
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(file_path, filename=filename, media_type='text/html')
+    if filename.lower().endswith('.png'):
+        media_type = 'image/png'
+    elif filename.lower().endswith('.html'):
+        media_type = 'text/html'
+    else:
+        # Default to octet-stream for unknown file types
+        media_type = 'application/octet-stream'
+    return FileResponse(file_path, filename=filename, media_type=media_type)
 
 @router.get("/userstories", response_model=List[UserStoryResponse])
 def get_userstories():
@@ -284,7 +328,7 @@ def get_all_visualizations(us_id: str):
         provider_llm_mapping = {
             "jetstream": ["DeepSeek-R1", "llama-4-scout"],
             "google": ["gemini-2.5-flash"],
-            "openai": ["GPT-4o"]
+            "openai": ["gpt-4o"]
         }
         
         # Get allowed LLMs based on provider
@@ -347,26 +391,50 @@ async def upload_excel(file: UploadFile = File(...)):
 @router.post("/refine", response_model=RefineResponse)
 def refine(req: RefineRequest):
     global orchestrator
-
+    
     if orchestrator is None:
-        raise HTTPException(status_code=400, detail="No active orchestrator session. Call /generate first.")
+        error_detail = {
+            "error_code": "NO_ACTIVE_SESSION",
+            "error_message": "No active orchestrator session. Call /generate first.",
+            "details": {"required_action": "Call /generate endpoint before using /refine"}
+        }
+        raise HTTPException(status_code=400, detail=error_detail)
 
     try:
         result = orchestrator.refine(req.prompt)
-        code = result["code"]
-        output_file = result["output_html_path"]
-        filename = output_file.split("/")[-1]
-        output_path = f"/static-output/{filename}"
-        thinking_text = result["thinking_text"]
+        # Check if the result indicates an error
+        if result.get("status") == "error":
+            error_code = result.get("error_code")
+            error_message = result.get("error_message", "An unknown error occurred during refinement.")
+            details = result.get("details", {})
+            
+            # Create error response with detailed information
+            error_detail = {
+                "error_code": error_code,
+                "error_message": error_message,
+                "details": details
+            }
+            raise HTTPException(status_code=500, detail=error_detail)
+        if result.get("status") == "success":
+            code = result["code"]
+            output_file = result["output_html_path"]
+            filename = output_file.split("/")[-1]
+            output_path = f"/static-output/{filename}"
+            thinking_text = result.get("thinking_text", "")
 
-        return {
-            "updated_code": code,
-            "output_path": output_path,
-            "thinking_text": thinking_text
-        }
-
+            return RefineResponse(
+                updated_code=code,
+                output_path=output_path,
+                thinking_text=thinking_text
+            )
+            # return {
+            #     "updated_code": code,
+            #     "output_path": output_path,
+            #     "thinking_text": thinking_text
+            # }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+    
 @router.post("/undo", response_model=UndoResponse, summary="Undo last action and revert to previous visualization")
 def undo_last_action():
     global orchestrator
@@ -436,3 +504,93 @@ def save_api_key(api_key: str = Body(..., embed=True), provider: str = Body(...,
     stored_api_key = api_key
     stored_provider = provider
     return {"message": "API key saved successfully"}
+
+
+# 
+@router.post("/generate", response_model=GenerateResponse)
+def generate(req: GenerateRequest):
+    """
+    Generates visualization code based on the provided prompt using the selected LLM, language, and charting library.
+
+    - **model**: Name of the LLM to use (e.g., DeepSeek-R1)
+    - **language**: Programming language in which the code should be generated
+    - **library**: Charting library to use (e.g., Plotly, Matplotlib, Altair)
+    - **isDVL**: Set to true if using DVL framework constraints
+
+    This endpoint returns the generated code and a path to the rendered visualization output.
+    
+    Example Input:
+    `{
+    "id":1,
+    "model_name": "DeepSeek-R1",
+    "language": "python",
+    "library": "plotly",
+    "isDVL": true
+    }`
+    """
+    global orchestrator
+    try:
+        orchestrator = LLMOrchestrator(
+            # provider="jetstream",
+            provider = stored_provider,
+            model_name=req.model,
+            llm_factory_api_key=stored_api_key,
+            prompt_file_path="/app/sdata/input/prompts/prompts_updated.json"
+        )
+
+        # 1. Initial Run
+        result = orchestrator.run(
+            execution_env=req.language, library=req.library,
+            filename_prefix=f"{req.model}{req.id}_{req.language}_{req.library}",
+            story_id=req.id
+        )
+        
+        # Check if the result indicates an error
+        if result.get("status") == "error":
+            # Extract error information
+            error_code = result.get("error_code")
+            error_message = result.get("error_message", "An unknown error occurred.")
+            details = result.get("details", {})
+            
+            # error response with detailed information
+            error_detail = {
+                "error_code": error_code,
+                "error_message": error_message,
+                "details": details
+            }
+            raise HTTPException(status_code=500, detail=error_detail)
+        
+        # Handle success case
+        if result.get("status") == "success":
+            code = result["code"]  
+            output_file = result["output_html_path"]
+            filename = output_file.split("/")[-1]  # test.html
+            output_path = f"/static-output/{filename}"
+            
+            return GenerateResponse(code=code, output_path=output_path)
+        
+        # Handle unexpected result format
+        raise HTTPException(
+            status_code=500, 
+            detail={
+                "error_code": "UNEXPECTED_RESULT_FORMAT",
+                "error_message": "Unexpected result format from orchestrator",
+                "details": {"result": result}
+            }
+        )
+        
+    except HTTPException:
+        # Re-raise HTTPExceptions (our custom error responses)
+        raise
+    except Exception as exc:
+        # Handle any other unexpected exceptions
+        full_error = traceback.format_exc()
+        error_detail = {
+            "error_code": "INTERNAL_SERVER_ERROR",
+            "error_message": f"An unexpected error occurred: {str(exc)}",
+            "details": {
+                "traceback": full_error
+            }
+        }
+        raise HTTPException(status_code=500, detail=error_detail)
+# 
