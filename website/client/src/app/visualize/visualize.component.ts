@@ -458,8 +458,9 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
         (response) => {
           // 4) On success: render chart & code
           const fullPath = response.output_path;
-          this.generatedFilename =
-            fullPath.split('/').pop()?.replace('.html', '') || 'test';
+          // this.generatedFilename =
+          //   fullPath.split('/').pop()?.replace('.html', '') || 'test';
+          this.generatedFilename = fullPath.split('/').pop() || 'test.html';
 
           this.visualSrc = this.sanitizer.bypassSecurityTrustResourceUrl(
             `http://localhost:8000${fullPath}`
@@ -942,6 +943,7 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
             const fullPath = response.output_path;
             this.generatedFilename =
               fullPath.split('/').pop()?.replace('.html', '') || 'test';
+            // this.generatedFilename = fullPath.split('/').pop() || 'test.html';
 
             // console.log('Undo successful:', response.message);
             // this.showMessage('Changes undone successfully');
@@ -1012,13 +1014,17 @@ export class VisualizeComponent implements AfterViewInit, OnInit {
     let fullFilename = this.generatedFilename;
 
     // If the generatedFilename doesn't already include extension, determine it
-    if (!fullFilename.includes('.')) {
-      const isPng = this.visualSrc?.toString().endsWith('.png');
-      fullFilename = isPng
-        ? `${this.generatedFilename}.png`
-        : `${this.generatedFilename}.html`;
-    }
+    // if (!fullFilename.includes('.')) {
+    //   const isPng = this.visualSrc?.toString().endsWith('.png');
+    //   fullFilename = isPng
+    //     ? `${this.generatedFilename}.png`
+    //     : `${this.generatedFilename}.html`;
+    // }
     // console.log('fullFilename being sent:', fullFilename);
+    if (!/\.(html|png)$/i.test(fullFilename)) {
+      const src = this.visualSrc?.toString().toLowerCase() || '';
+      fullFilename += src.endsWith('.png') ? '.png' : '.html';
+    }
     this.visualizeService.downloadVisualization(fullFilename).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
