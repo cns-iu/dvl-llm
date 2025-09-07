@@ -1,4 +1,3 @@
-import traceback
 import httpx
 from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Body
 from app.models import GenerateRequest, GenerateResponse, UserStoryResponse
@@ -10,6 +9,9 @@ from typing import List
 import os, json, shutil
 import pandas as pd
 from pathlib import Path
+from typing import List, Optional
+from jinja2.sandbox import SandboxedEnvironment
+from jinja2 import StrictUndefined
 
 router = APIRouter(prefix="/api", tags=["generate"])
 
@@ -21,19 +23,24 @@ with open(json_path,"r") as f:
 # JSON_PATH = Path(os.getenv("VISUALS_JSON", DEFAULT_JSON))
 
 orchestrator = None
-
+_last_generation_ctx = {
+    "execution_env": None,
+    "library": None,
+    "filename_prefix": None,
+}
+#
 # @router.post("/generate", response_model=GenerateResponse)
 # def generate(req: GenerateRequest):
 #     """
 #     Generates visualization code based on the provided prompt using the selected LLM, language, and charting library.
-
+#
 #     - **model**: Name of the LLM to use (e.g., DeepSeek-R1)
 #     - **language**: Programming language in which the code should be generated
 #     - **library**: Charting library to use (e.g., Plotly, Matplotlib, Altair)
 #     - **isDVL**: Set to true if using DVL framework constraints
-
+#
 #     This endpoint returns the generated code and a path to the rendered visualization output.
-    
+#
 #     Example Input:
 #     `{
 #     "id":1,
@@ -52,14 +59,14 @@ orchestrator = None
 #             llm_factory_api_key=stored_api_key,
 #             prompt_file_path="/app/sdata/input/prompts/prompts_updated.json"
 #         )
-
+#
 #         # 1. Initial Run
 #         result = orchestrator.run(
 #             execution_env=req.language, library=req.library,
 #             filename_prefix=f"{req.model}{req.id}_{req.language}_{req.library}",
 #             story_id=req.id
 #         )
-#         code = result["code"]  
+#         code = result["code"]
 #         output_file = result["output_html_path"]
 #         filename = output_file.split("/")[-1]  # test.html
 #         # if req.id in (3,10): #directly serve static html files
@@ -67,45 +74,9 @@ orchestrator = None
 #         # else:
 #         output_path = f"/static-output/{filename}"
 #         # image_b64 = run_python(code)
-
-#         code = result["code"]
-#         output_path = f"/static-output/{filename}"
 #         return GenerateResponse(code=code, output_path=output_path)
 #     except Exception as exc:
-#         full_error = traceback.format_exc()
-#         raise HTTPException(status_code=500, detail=result)
-       
-# @router.post("/generate", response_model=GenerateResponse)
-# def generate(req: GenerateRequest):
-#         code = """library(ggplot2)
-# library(dplyr)
-# library(scales)
-
-# data <- read.csv('/app/data/input/dvl-llm-1-hra-growth-over-time.csv')
-# data$date <- as.Date(data$date)
-
-# cumulative_data <- data %>%
-#   group_by(group) %>%
-#   arrange(date) %>%
-#   mutate(cumulative_count = cumsum(count))
-
-# ggplot(cumulative_data, aes(x = date, y = cumulative_count, color = group)) +
-#   geom_line(linewidth = 1) +
-#   labs(title = "Cumulative Counts Over Time by Biological Group",
-#        x = "Date",
-#        y = "Cumulative Count",
-#        color = "Biological Group") +
-#   scale_x_date(date_breaks = "6 months", date_labels = "%b %Y") +
-#   scale_y_continuous(labels = comma) +
-#   theme_minimal() +
-#   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-#         legend.position = "bottom",
-#         plot.title = element_text(hjust = 0.5))
-
-# ggsave('/app/data/output/DeepSeek-R11_r_ggplot2_1.png', width = 10, height = 6, dpi = 300)
-# """
-#         output_path = f"/static-output/DeepSeek-R11_r_ggplot2_1.png"
-#         return GenerateResponse(code=code, output_path=output_path)
+#         raise HTTPException(status_code=500, detail=str(exc))
 
 @router.get("/download/{filename}")
 def download_visualization(filename: str):
@@ -207,7 +178,28 @@ def get_top_rows(us_id: str, n: int = Query(5, gt=0, le=20)):
         return top_rows.to_dict(orient="records")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
+_jinja_env = SandboxedEnvironment(
+    undefined=StrictUndefined,
+    autoescape=False,
+    trim_blocks=True,
+    lstrip_blocks=True,
+)
+
+def _render_value(val: object, context: dict) -> object:
+    if not isinstance(val, str):
+        return val
+    tmpl = _jinja_env.from_string(val)
+    return tmpl.render(**context)
+
+def _render_obj(obj: object, context: dict) -> object:
+    if isinstance(obj, dict):
+        return {k: _render_obj(v, context) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_render_obj(v, context) for v in obj]
+    return _render_value(obj, context)
+
 REFINEMENT_FILE = os.path.join("sdata", "input", "prompts", "prompts_updated.json")
 
 @router.get("/refinements/{user_story_id}")
@@ -230,8 +222,19 @@ def get_refinements(user_story_id: str):
     if not isinstance(refinements, list) or not refinements:
         raise HTTPException(status_code=404, detail="No refinements found for this user story")
 
-    # 4) return the list directly
-    return refinements
+    context = {
+        "execution_env": _last_generation_ctx["execution_env"],
+        "library": _last_generation_ctx["library"],
+        "filename_prefix": _last_generation_ctx["filename_prefix"],
+        "previous_filename_prefix": _last_generation_ctx["filename_prefix"],
+    }
+
+    try:
+        rendered = _render_obj(refinements, context)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Template rendering error: {e}")
+
+    return rendered
 
 # @router.post("/refine", response_model=RefineResponse, summary="Refine an existing visualization")
 # async def refine_visualization(req: RefineRequest):
@@ -391,7 +394,7 @@ async def upload_excel(file: UploadFile = File(...)):
 @router.post("/refine", response_model=RefineResponse)
 def refine(req: RefineRequest):
     global orchestrator
-    
+
     if orchestrator is None:
         error_detail = {
             "error_code": "NO_ACTIVE_SESSION",
@@ -407,7 +410,7 @@ def refine(req: RefineRequest):
             error_code = result.get("error_code")
             error_message = result.get("error_message", "An unknown error occurred during refinement.")
             details = result.get("details", {})
-            
+
             # Create error response with detailed information
             error_detail = {
                 "error_code": error_code,
@@ -434,7 +437,7 @@ def refine(req: RefineRequest):
             # }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
-    
+
 @router.post("/undo", response_model=UndoResponse, summary="Undo last action and revert to previous visualization")
 def undo_last_action():
     global orchestrator
@@ -506,7 +509,7 @@ def save_api_key(api_key: str = Body(..., embed=True), provider: str = Body(...,
     return {"message": "API key saved successfully"}
 
 
-# 
+#
 @router.post("/generate", response_model=GenerateResponse)
 def generate(req: GenerateRequest):
     """
@@ -518,7 +521,7 @@ def generate(req: GenerateRequest):
     - **isDVL**: Set to true if using DVL framework constraints
 
     This endpoint returns the generated code and a path to the rendered visualization output.
-    
+
     Example Input:
     `{
     "id":1,
@@ -544,14 +547,20 @@ def generate(req: GenerateRequest):
             filename_prefix=f"{req.model}{req.id}_{req.language}_{req.library}",
             story_id=req.id
         )
-        
+
+        _last_generation_ctx.update({
+            "execution_env": req.language,
+            "library": req.library,
+            "filename_prefix": f"{req.model}{req.id}_{req.language}_{req.library}",
+        })
+
         # Check if the result indicates an error
         if result.get("status") == "error":
             # Extract error information
             error_code = result.get("error_code")
             error_message = result.get("error_message", "An unknown error occurred.")
             details = result.get("details", {})
-            
+
             # error response with detailed information
             error_detail = {
                 "error_code": error_code,
@@ -559,26 +568,26 @@ def generate(req: GenerateRequest):
                 "details": details
             }
             raise HTTPException(status_code=500, detail=error_detail)
-        
+
         # Handle success case
         if result.get("status") == "success":
-            code = result["code"]  
+            code = result["code"]
             output_file = result["output_html_path"]
             filename = output_file.split("/")[-1]  # test.html
             output_path = f"/static-output/{filename}"
-            
+
             return GenerateResponse(code=code, output_path=output_path)
-        
+
         # Handle unexpected result format
         raise HTTPException(
-            status_code=500, 
+            status_code=500,
             detail={
                 "error_code": "UNEXPECTED_RESULT_FORMAT",
                 "error_message": "Unexpected result format from orchestrator",
                 "details": {"result": result}
             }
         )
-        
+
     except HTTPException:
         # Re-raise HTTPExceptions (our custom error responses)
         raise
@@ -593,4 +602,4 @@ def generate(req: GenerateRequest):
             }
         }
         raise HTTPException(status_code=500, detail=error_detail)
-# 
+#

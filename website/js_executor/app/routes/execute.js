@@ -9,8 +9,14 @@ const FORBIDDEN_KEYWORDS = [
   "require('child_process')",
   "eval",
   "process.env",
+  "process.kill",
   "process.exit",
-  "process.kill"
+   "fs.rm",
+  "fs.rmdir",
+  "fs.unlink",
+  "fs.symlink",
+  "fs.chmod",
+  "fs.chown",
 ];
 
 const TEMP_SCRIPT_DIR = "/tmp/js-executor";
@@ -31,7 +37,7 @@ router.post("/", async (req, res) => {
     if (code.includes(keyword)) {
       return res.status(400).json({
         status: "error",
-        error_code: 2000,
+        error_code: 1200,
         error_message: `Security Violation: Forbidden keyword '${keyword}' detected.`,
         details: { stdout: "", stderr: "" }
       });
@@ -52,7 +58,7 @@ router.post("/", async (req, res) => {
 
     // --- Execute the JS File with NODE_PATH for module resolution ---
     const execCommand = `NODE_PATH=/app/node_modules node ${tempScriptPath}`;
-    exec(execCommand, { cwd: '/app', timeout: 10000 }, async (error, stdout, stderr) => {
+    exec(execCommand, { cwd: '/app', timeout: 300000 }, async (error, stdout, stderr) => {
       if (error) {
         return res.status(400).json({
           status: "error",

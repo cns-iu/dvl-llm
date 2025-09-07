@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Use a non-root user for security
-USER node
+#USER node
 
 # Set working directory
 WORKDIR /app

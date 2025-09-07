@@ -6,6 +6,7 @@ matplotlib
 requests
 langchain
 langchain-openai
+langchain-google-genai==2.1.5
 pandas
 python-multipart
 jinja2

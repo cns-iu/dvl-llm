@@ -21,6 +21,13 @@ RUN apt-get update && apt-get install -y \
 
 RUN Rscript -e "install.packages('svglite', repos='https://cloud.r-project.org')"
 
+
+# Library dependency installations
+RUN Rscript -e 'install.packages("echarts4r", repos="https://cloud.r-project.org")'
+RUN Rscript -e 'install.packages("ggiraph", repos="https://cloud.r-project.org")'
+RUN Rscript -e 'install.packages("forcats", repos="https://cloud.r-project.org")'
+RUN Rscript -e 'install.packages("ggdist", repos="https://cloud.r-project.org")'
+
 # --- Headless Chromium for webshot2 ---
 # --- Google Chrome repo (Ubuntu 24.04-friendly) ---
 RUN apt-get update && apt-get install -y --no-install-recommends wget gpg ca-certificates && \
@@ -36,6 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget gpg ca-cer
 # Point chromote/webshot2 at Chrome with safe flags for containers
 ENV CHROMOTE_CHROME=/usr/bin/google-chrome
 ENV CHROMOTE_CHROME_ARGS="--headless=new,--no-sandbox,--disable-dev-shm-usage,--hide-scrollbars,--disable-gpu"
+
 
 COPY app.R .
 COPY run_plumber.R .

@@ -1,5 +1,7 @@
+/* overall white page background */
 .visualize-wrapper {
   background: #fcfcfc;
+  /* margin: 40px 40px 40px 40px; */
   padding: 40px;
 }
 
@@ -21,6 +23,19 @@
   color: #b20a2f;
 }
 
+/* intro header */
+/* .intro-header {
+  margin-bottom: 8px;
+}
+.intro-header h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+.intro-header p {
+  margin: 0;
+  color: #555;
+} */
+
 .intro-header {
   display: flex;
   flex-direction: column;
@@ -30,16 +45,17 @@
   font-family: var(--font-ui);
   font-size: 38px;
   font-weight: 500 !important;
-  margin: 0;
+  margin: 0; /* reset margin */
+  /* color: #4c4c58 !important; */
 }
 
 .header-text::after {
   content: "";
   display: block;
-  height: 1px;
-  background-color: #acb5c3;
-  margin-top: 8px;
-  margin-bottom: 16px;
+  height: 1px; /* line thickness */
+  background-color: #acb5c3; /* line color */
+  margin-top: 8px; /* 8px gap after heading */
+  margin-bottom: 16px; /* 16px gap before text */
 }
 
 .header-description {
@@ -61,14 +77,16 @@
   align-items: start;
   margin-bottom: 1rem;
 }
-
+/* .story-info h3 {
+  margin: 0 0.5rem 0 0;
+} */
 .info-table {
   border: 1px solid #ccc;
   border-radius: 4px;
   border-collapse: collapse;
   overflow: hidden;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: separate; /* allow rounded corners */
+  border-spacing: 0; /* no gaps between cells */
 }
 .info-table th,
 .info-table td {
@@ -83,24 +101,56 @@ tr:nth-child(2) {
   background: #f2f2f2;
 }
 
+/* .info-table {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 6px;
+  overflow: hidden;
+
+  tr {
+    background: #fff;
+  }
+  tr:nth-child(2) {
+    background: #f2f2f2; /
+  }
+
+  td {
+    padding: 0.75rem 1rem;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+
+    &:first-child {
+      font-weight: 600;
+      color: #495057;
+      width: 35%;
+    }
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  td:last-child {
+    border-right: none;
+  }
+} */
+
 /* split-pane fixed height so both panes are always visible */
 .split-pane {
   display: flex;
-  height: 66.35vh;
-  min-height: 300px;
+  height: 66.35vh; /* value to always see the viz */
+  min-height: 300px; /* never collapse below this */
   border: 1px solid #abc5c3;
   border-radius: 8px;
   overflow: hidden;
 }
 
-.left-pane {
-  flex: 1;
-  overflow: auto; /* code editor scroll */
-  position: relative;
-}
+/* left & right scroll internally */
+.left-pane,
 .right-pane {
   flex: 1;
-  overflow: hidden;
+  overflow: auto;
   position: relative;
 }
 
@@ -122,6 +172,11 @@ tr:nth-child(2) {
   right: 0;
 }
 
+/* viz download & container */
+/* .download-container {
+  text-align: right;
+  padding: 0.5rem;
+} */
 .download-container {
   position: absolute;
   top: 10px;
@@ -167,33 +222,36 @@ tr:nth-child(2) {
   flex-direction: column;
   width: 100px;
 }
+/* .download-option {
+  padding: 8px 12px;
+  border: none;
+  background-color: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1f2937;
+  transition: background-color 0.2s ease;
+}
+
+.download-option:hover {
+  background-color: #f3f4f6;
+} */
 
 .iframe-wrapper {
   width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center; /* vertical center */
-  justify-content: center; /* horizontal center */
-  overflow: hidden !important; /* prevent inner scrollbars */
+  height: calc(100% - 2rem);
 }
-
-.visual-frame {
-  width: 100%;
-  height: 100%;
-  border: none !important;
-}
-
+.visual-frame,
 .image-frame {
   width: 100%;
   height: 100%;
+  border: none;
   object-fit: contain;
-  display: block;
-  border: none !important;
-  margin: 0;
 }
 
+/* Give the left‐pane itself a black background */
 .left-pane {
-  background: #000;
+  background: #000; /* black */
 }
 
 /* Override ACE’s internal scroller/editor backgrounds */
@@ -202,15 +260,28 @@ tr:nth-child(2) {
   background-color: #000 !important;
 }
 
+/* Make sure the text stays light on black */
 .left-pane ::ng-deep .ace_content,
 .left-pane ::ng-deep .ace_scroller {
   color: #f8f8f8 !important;
 }
 
+/* If you want the gutter (line numbers) dark too: */
 .left-pane ::ng-deep .ace_gutter {
   background: #111 !important;
   color: #888 !important;
 }
+
+/* // */
+/* Button Container for Code Actions */
+/* .button-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+} */
 
 /* Action Button Styles */
 .action-button {
@@ -266,13 +337,19 @@ tr:nth-child(2) {
   }
 }
 
+/* // viz, code, icons on top */
+
+/* Card wrapper around each pane */
+/* WRAPPER: each pane stays flexed for your split-pane logic */
 .pane-card {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: 1px solid #e2e8f0;
-  background-color: #ffffff;
-  overflow: hidden;
+  border: 1px solid #e2e8f0; /* light gray border */
+  /* border-radius: 6px;  */
+  /* gentle rounding */
+  background-color: #ffffff; /* white background */
+  overflow: hidden; /* clip inner scrolls */
 }
 
 /* HEADER */
@@ -280,8 +357,8 @@ tr:nth-child(2) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background-color: #f9fafb;
+  padding: 0.5rem 1rem; /* 8px top/bottom, 16px left/right */
+  background-color: #f9fafb; /* very light gray */
   border-bottom: 1px solid #e2e8f0;
   flex: 0 0 auto;
 }
@@ -293,32 +370,58 @@ tr:nth-child(2) {
   font-weight: 500 !important;
 }
 
+/* ICON BUTTONS */
+/* .pane-icons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: 0.25rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.pane-icons button:hover {
+  background-color: #f3f4f6;
+} */
 .pane-icons {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: center; /* vertically center all icons */
+  gap: 16px; /* spacing between icons */
 }
 .pane-icons button {
+  /* remove the chrome */
+
   background: none;
   border: none;
   padding: 0;
+
+  /* keep it clickable */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  width: 24px;
+
+  /* (optional) small gap between icons */
+  /* margin-left: 16px; */
+
+  width: 24px; /* square tap area – adjust to taste */
   height: 24px;
 }
 
 .pane-icons button:hover,
 .pane-icons button:focus-visible {
+  /* no visual change on hover/focus unless you add one */
   background: none;
 }
 .pane-icons button svg {
   display: block; /* removes the default inline baseline */
 }
 
-/*  iframe fills remaining space */
+/* CONTENT: editor or iframe fills remaining space */
 .pane-content {
   flex: 1 1 auto;
   position: relative;
@@ -331,12 +434,63 @@ tr:nth-child(2) {
   border: none !important;
 }
 
+/* OPTIONAL: match the gutter style if you need to tweak it */
 .drag-bar {
-  background-color: #f3f4f6;
+  background-color: #f3f4f6; /* or whatever your gutter was */
   cursor: col-resize;
 }
 
-/* outer rounded box  */
+/* // */
+
+/* ─── suggestion buttons styling ─── */
+/* .suggestions {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.suggestion-button {
+  background: #e0e0e0;
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.suggestion-button:hover {
+  background: #d5d5d5;
+} */
+/* ─── end suggestion buttons styling ─── */
+
+/* refine controls */
+/* .refine-section {
+  margin-bottom: 1rem;
+}
+.refine-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+.refine-input {
+  max-width: 70%;
+  flex: 0 0 70%;
+  width: 70%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.refine-button {
+  padding: 0.5rem 1rem;
+  background: #c82333;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  flex: 0 0 auto;
+} */
+
+/* ——— outer rounded box ——— */
 .refine-box {
   border: 1px solid #d8dbe1;
   border-radius: 8px;
@@ -344,30 +498,32 @@ tr:nth-child(2) {
   background: #fff;
   display: flex;
   flex-direction: column;
+  /* gap: 8px; */
   width: 100%;
   margin-top: 16px;
   margin-bottom: 40px;
 }
 
-/*  textarea (row 1)  */
+/* ——— textarea (row 1) ——— */
 .refine-input {
   width: 100%;
   min-height: 40px;
-  resize: vertical;
-  border: none;
-  outline: none;
+  resize: vertical; /* grows downward */
+  border: none; /* no inner border */
+  outline: none; /* rely on outer box */
   font-family: var(--font-ui);
   font-size: 16px;
 }
 
+/* ——— chips + arrow (row 2) ——— */
 .chip-row {
   display: grid;
-  grid-template-columns: 1fr auto; /* buttons, arrow  */
+  grid-template-columns: 1fr auto; /* chips | arrow  */
   align-items: end; /* arrow hugs bottom */
   gap: 8px;
 }
 
-/* refine chips block */
+/* chips block */
 .suggestions {
   display: flex;
   flex-wrap: wrap;
@@ -396,7 +552,7 @@ tr:nth-child(2) {
   background: none;
   border: none;
   border-radius: 50%;
-  width: 36px;
+  width: 36px; /* circle size */
   height: 36px;
   display: flex;
   align-items: center;
@@ -418,15 +574,15 @@ tr:nth-child(2) {
 }
 
 .refine-box {
-  gap: 0 !important;
+  gap: 0 !important; /* makes sure the flex column adds no gap */
 }
 
 .refine-input,
 .chip-row {
-  margin: 0 !important;
+  margin: 0 !important; /* kills any stray top/bottom margins */
 }
 
-/*  history list */
+/* ─── history list start ── */
 /* chat */
 .history-list {
   margin-top: 16px;
@@ -440,26 +596,32 @@ tr:nth-child(2) {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 8px; /* space between user pill and assistant message */
 }
+
+/* User message pill - positioned at top right */
 
 .user-pill {
   align-self: flex-end;
+  /* typography */
   font-family: var(--font-ui);
   font-size: 16px;
-  line-height: 24px;
+  line-height: 24px; /* ← exactly as requested */
 
   /* bubble look */
   background: var(--schemes-surface-n-98-blue-5, #eff2f5);
   border-radius: 12px;
 
   /* size & wrapping */
-  padding: 12px 16px;
-  min-height: 48px;
-  width: fit-content;
-  max-width: 560px;
+  padding: 12px 16px; /* top-bottom 12px ─ left-right 16px */
+  min-height: 48px; /* pill is always at least 48 px tall */
+  width: fit-content; /* hug the text until the cap */
+  max-width: 560px; /* wrap after 560 px */
   white-space: normal;
   word-break: break-word;
+
+  /* optional: keep the single line perfectly centered
+     while still working for multiline wraps */
   display: inline-flex;
   align-items: center;
 }
@@ -468,7 +630,7 @@ tr:nth-child(2) {
 .assistant-message {
   display: flex;
   flex-direction: column;
-  padding-left: 48px;
+  padding-left: 48px; /* avatar gutter */
   position: relative;
 }
 
@@ -476,7 +638,7 @@ tr:nth-child(2) {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #9fa6b2;
+  background: #9fa6b2; /* grey circle */
   position: absolute;
   left: 0;
   top: 0;
@@ -535,7 +697,7 @@ tr:nth-child(2) {
 .toggle-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 8px; /* icon ←→ label */
   border: none;
   background: none;
   color: #b20a2f;
@@ -546,7 +708,7 @@ tr:nth-child(2) {
   align-self: flex-start;
 }
 
-/* thinking animation */
+/* thinking animations */
 @keyframes pulse-fade {
   0% {
     opacity: 1;
@@ -571,12 +733,13 @@ tr:nth-child(2) {
 }
 
 .assistant-body.waiting {
+  /* default is column – switch to row for thinking */
   flex-direction: row;
-  align-items: center;
-  gap: 4px;
+  align-items: center; /* vertical-align the SVG and text */
+  gap: 4px; /* space between icon and label */
 }
 
-/*  history list end */
+/* ─── history list end ── */
 
 .left-pane.hidden,
 .right-pane.hidden {
@@ -586,14 +749,4 @@ tr:nth-child(2) {
 button[disabled] {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-/* Center the content visually inside the pane */
-.split-pane .right-pane .pane-content .iframe-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.pane-content {
-  overflow: hidden !important;
 }

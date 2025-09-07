@@ -5,7 +5,7 @@ message("Installing required CRAN packages...")
 install.packages(c(
   "ggplot2", "plotly", "lattice", "ggvis", "highcharter", "dygraphs",
   "dplyr", "xts", "reshape2", "tidyr", "htmlwidgets",
-  "scales", "lubridate", "DT", "knitr", "processx", "remotes", "networkD3", "ggalluvial"
+  "scales", "lubridate", "DT", "knitr", "processx", "remotes", "networkD3", "ggalluvial", "echarts4r", "ggiraph", "forcats"
 ), repos = "https://cloud.r-project.org", dependencies = TRUE)
 
 message("Installing webshot2 from GitHub (requires remotes)...")
@@ -17,7 +17,7 @@ remotes::install_github("rstudio/webshot2")
 required_pkgs <- c(
   "ggplot2", "plotly", "lattice", "ggvis", "highcharter", "dygraphs",
   "dplyr", "xts", "reshape2", "tidyr", "htmlwidgets",
-  "scales", "lubridate", "DT", "knitr", "processx", "webshot2", "networkD3", "ggalluvial"
+  "scales", "lubridate", "DT", "knitr", "processx", "webshot2", "networkD3", "ggalluvial", "echarts4r", "ggiraph", "forcats"
 )
 
 missing <- required_pkgs[!sapply(required_pkgs, requireNamespace, quietly = TRUE)]

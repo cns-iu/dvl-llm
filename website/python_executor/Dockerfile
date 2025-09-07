@@ -29,7 +29,7 @@ RUN GECKO_VERSION="v0.34.0" && \
     rm "geckodriver-${GECKO_VERSION}-linux-aarch64.tar.gz"
 
 # Create non-root user
-RUN useradd -m safeuser
+#RUN useradd -m safeuser
 
 # Set work directory and copy app code
 WORKDIR /app
@@ -38,7 +38,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 
 # Use non-root user for safety
-USER safeuser
+#USER safeuser
 
 # Start FastAPI app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5001"]

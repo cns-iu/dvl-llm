@@ -165,8 +165,8 @@ class LLMFactory:
 
 if __name__ == "__main__":
     llm = LLMFactory(
-        provider="jetstream",
-        model_name="DeepSeek-R1",
+        provider="google",
+        model_name="",
         default_jetstream_api_key="sk-ffb6c536e10d40dc902f28e93159a039",
         temperature=0,
         strip_think_tags=False  # show raw content including <think> for demo

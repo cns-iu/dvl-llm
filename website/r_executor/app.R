@@ -7,6 +7,7 @@ library(jsonlite)
 error_definitions <- list(
   `1000` = "Code Execution Error: The provided script failed during execution due to a runtime or syntax error.",
   `1100` = "Logical Error: The script ran without crashing but did not create the expected output file.",
+  `1200` = "Security Violation: The submitted code contained forbidden keywords.",
   `2000` = "Service Level Error: The executor service encountered a problem."
 )
 
@@ -47,7 +48,7 @@ function(req, res) {
       res$status <- 400
       return(list(
         status = unbox("error"),
-        error_code = unbox(2000),
+        error_code = unbox(1200),
         error_message = unbox(paste0("Security Violation: Forbidden pattern '", pattern, "' detected.")),
         details = list(stdout = unbox(""), stderr = unbox(""))
       ))
@@ -77,7 +78,7 @@ function(req, res) {
     args = c("--vanilla", temp_script_file),
     stderr = "|",
     stdout = "|",
-    timeout = 60,
+    timeout = 300,
     error_on_status = FALSE
   )
 
@@ -130,4 +131,30 @@ function(req, res) {
     code = unbox(code),
     output_html_path = unbox(output_file)
   ))
+}
+
+#* @get /health
+function(req, res){
+  data_dir <- "/app/data"
+  out_dir  <- file.path(data_dir, "output")
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+
+  testfile <- file.path(out_dir, paste0(".health_", as.integer(Sys.time())))
+  ok  <- FALSE
+  err <- NULL
+
+  tryCatch({
+    writeLines("ok", testfile)
+    file.remove(testfile)
+    ok <- TRUE
+  }, error = function(e) {
+    err <<- as.character(e)
+  })
+
+  if (dir.exists(data_dir) && dir.exists(out_dir) && ok) {
+    return(list(status = "ok"))
+  } else {
+    res$status <- 503
+    return(list(status = "unhealthy", error = err))
+  }
 }

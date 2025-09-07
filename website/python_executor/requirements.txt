@@ -22,3 +22,8 @@ selenium
 cairosvg
 networkx
 pyvis
+scikit-learn
+graphviz
+scanpy
+igraph
+leidenalg
