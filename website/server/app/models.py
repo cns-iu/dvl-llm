@@ -16,8 +16,8 @@ class GenerateRequest(BaseModel):
     )
     language: str = Field(
         default="python",
-        pattern="^(python|r|javascript|other)$",
-        description="Target programming language ('python', 'r', 'javascript', 'other')"
+        pattern="^(python|r|javascript|other|Other)$",
+        description="Target programming language ('python', 'r', 'javascript', 'other', 'Other')"
     )
     library: str = Field(
         ..., 

@@ -155,7 +155,7 @@ class LLMOrchestrator:
         print(py_json.dumps(payload, indent=2))
 
         try:
-            response = requests.post(url, json=payload, timeout=40)
+            response = requests.post(url, json=payload, timeout=300)
 
             try:
                 result = response.json()
@@ -266,10 +266,10 @@ class LLMOrchestrator:
         Returns exactly what it returned before (no shape change).
         """
         if story_id == 3:
-            return {"status": "success", "code": "NA", "output_html_path": "http://localhost:8000/sdata-output/USP2/3/us3.html"}
+            return {"status": "success", "code": "NA", "output_html_path": "/sdata-output/USP2/3/us3.html"}
         elif story_id == 10:
             return {"status": "success", "code": "NA",
-                    "output_html_path": "http://localhost:8000/sdata-output/USP2/10/us10.html"}
+                    "output_html_path": "/sdata-output/USP2/10/us10.html"}
 
         print("--- Starting Initial Orchestration ---")
         self.execution_env = execution_env

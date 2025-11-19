@@ -1,5 +1,5 @@
 # Dockerfile
-FROM dvl-llm-r-exec-base:latest
+FROM dparaman/dvl-llm-r-exec-base:1.0
 
 ENV RETICULATE_PYTHON=/usr/bin/python3
 
